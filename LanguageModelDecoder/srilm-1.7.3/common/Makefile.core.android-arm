@@ -1,0 +1,24 @@
+#
+#    File:   Makefile.core.android-arm
+#    Author: Mike Frandsen
+#    Date:   2010/08/03
+#
+#    Description:
+#	Machine dependent compilation options and variable definitions
+#	for Android on ARM, core file
+#
+#    Copyright (c) 1999-2010 SRI International.  All Rights Reserved.
+#
+#    $Header: /home/srilm/CVS/srilm/common/Makefile.core.android-arm,v 1.2 2012/08/10 08:27:50 frandsen Exp $
+#
+
+   # Child Makefile should include this core after first setting:
+   #   ANDROID_CUST_CFLAGS and ANDROID_CUST_DIR
+   # And, if necessary:
+   #   ANDROID_TOOLCHAIN_NAME_ALT and ANDROID_CUST_DIR_ALT
+
+   ANDROID_ARCH := arch-arm
+   ANDROID_TOOLCHAIN_NAME := arm-linux-androideabi
+   ARCH_FLAGS = -nostdlib -fno-exceptions -fno-rtti -mtune=xscale $(ANDROID_CUST_CFLAGS) -mthumb-interwork -mthumb -D__ARM_ARCH_5__ -D__ARM_ARCH_5T__ -D__ARM_ARCH_5E__ -D__ARM_ARCH_5TE__ -DANDROID  -DNO_EXCEPTIONS
+
+   include $(SRILM)/common/Makefile.core.android

@@ -1,0 +1,38 @@
+#!/bin/sh
+
+# fix sorting order to avoid test failure
+LC_COLLATE=C
+export LC_COLLATE
+
+# enable sort +N syntax for newer GNU systems
+_POSIX2_VERSION=199209
+export _POSIX2_VERSION
+
+text=../disambig/newdevtest.ascii
+C=50
+
+ngram-count -order 1 -text $text -write - | \
+${GAWK-gawk} 'NF == 2 && $2 >= 5 { print $1 }' > min5.vocab
+
+ngram-class -debug 1 \
+	-vocab min5.vocab -noclass-vocab noclass.vocab \
+	-text ../disambig/newdevtest.ascii \
+        -incremental -numclasses $C \
+	-save 100 \
+        -classes CLASSES
+
+sort +2 -3 CLASSES
+
+# test restarting merging from an intermediate state
+
+ngram-class -debug 1 \
+	-vocab min5.vocab -noclass-vocab noclass.vocab \
+	-read CLASSES.000400 \
+	-text ../disambig/newdevtest.ascii \
+        -incremental -numclasses $C \
+        -classes CLASSES-AFTER-RESTART
+
+cmp CLASSES CLASSES-AFTER-RESTART
+
+rm min5.vocab CLASSES*
+

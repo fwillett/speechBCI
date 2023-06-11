@@ -1,0 +1,226 @@
+#
+#    File:   Makefile.common.variables
+#    Author: The SRI DECIPHER (TM) System
+#    Date:   Tue Nov  3 23:54:18 1992
+#
+#    Description:
+#       This file provides the common "make" variables shared by the
+#       DECIPHER (TM) subsystems.  Include this file in the variables
+#       a makefile to use the shared definitions.  (Typically, the
+#	"include" should be the first command in the makefile.)
+#
+#    Copyright (c) 1992-2001 SRI International.  All Rights Reserved.
+#
+#    $Header: /home/srilm/CVS/srilm/common/Makefile.common.variables,v 1.38 2013-12-11 15:30:07 frandsen Exp $
+#
+
+
+# Define variables
+
+# Store some outputs in variables to write to
+# lib/OUTDIR/SRILM_OPTIONS.mk
+
+# Store these as "EXPORT_SRILM_BUILD*" and write as "SRILM_BUILD* = ".
+# They get added to as special settings are made below.
+EXPORT_SRILM_BUILD_LIB_DEPENDENCIES =
+
+# Determine the current host machine type.
+ifeq ($(MACHINE_TYPE),  )
+  MACHINE_TYPE := $(shell $(SRILM)/sbin/machine-type)
+endif
+ifeq ($(OS_TYPE),  )
+  OS_TYPE := $(shell uname -s)
+endif
+ifeq ($(OS_VERSION),  )
+  OS_VERSION := $(shell uname -r)
+endif
+
+# Define options.
+OPTIMIZE_OPTION =
+COMPACT_OPTION = _c
+SHORT_OPTION = _s
+LLONG_OPTION = _l
+DEBUG_OPTION = _g
+PROFILE_OPTION = _p
+EXPORT_OPTION = _x
+
+# Flags for generating "compact" data structures (nothing by default)
+COMPACT_FLAGS = $(OPTIMIZE_FLAGS)
+
+# Flags for generating "short" data structures (nothing by default)
+SHORT_FLAGS = $(COMPACT_FLAGS)
+
+# Flags for generating "long long" data structures (nothing by default)
+LLONG_FLAGS = $(COMPACT_FLAGS)
+
+# Purify support (can be changed in Makefile.machine.$(MACHINE_TYPE))
+PURIFY = purify
+PURIFY_FLAGS = -best-effort
+
+# Flag for generating "exported" code:
+# omit third-party functionality and strip binaries
+EXPORT_FLAGS = -DEXCLUDE_CONTRIB
+EXPORT_LDFLAGS = -s
+
+# How to remove directories
+RMDIR = rmdir
+
+# How to create an archive library
+ARCHIVE = $(AR) ruv
+AR_OUTPUT_OPTION = $@
+
+# This is appended to certain commands to demangle C++ symbols
+DEMANGLE_FILTER = 2>&1 | c++filt
+
+# Path to GNU awk; used in editing scripts 
+GAWK = /usr/local/bin/gawk
+
+# Path to Perl; used in editing scripts 
+PERL = /usr/local/bin/perl
+
+# Keep the source and object files in separate directories.
+OUTPUT_OPTION = -o $@
+LD_OUTPUT_OPTION = -o $@
+
+# by default, linking uses same optimization switches as compiler
+LD_OPTION_FLAGS = $(OPTION_FLAGS)
+
+# File suffixes
+EXE_SUFFIX =
+OBJ_SUFFIX = .o
+LIB_SUFFIX = .a
+LIB_PREFIX = lib
+
+MATH_LIBRARY = -lm
+
+# How to force linking with the math error handler
+MATHERR_LINK = -u $(SYMBOL_PREFIX)matherr
+SYMBOL_PREFIX =
+
+# Default PIC flag is for gcc 
+# (for others override in Makefile.machine.*)
+PIC_FLAG = -fPIC
+
+# Include machine-type dependent variables
+include $(SRILM)/common/Makefile.machine.$(MACHINE_TYPE)
+
+# Optionally include site dependent variables
+-include $(SRILM)/common/Makefile.site.$(MACHINE_TYPE)
+
+# Don't link to TCL Library if NO_TCL is set to anything non-empty
+ifneq ($(NO_TCL), )
+	TCL_INCLUDE =
+	TCL_LIBRARY =
+else
+	# Removed 12/11/2013. Programs depend on this, not generated libs.
+	# EXPORT_SRILM_BUILD_LIB_DEPENDENCIES += $(TCL_LIBRARY)
+endif 
+
+# Needed for MaxEnt models
+ifneq ($(HAVE_LIBLBFGS), )
+    ifeq ($(LBFGS_LIBRARY), )
+	LBFGS_LIBRARY = -llbfgs
+	EXPORT_SRILM_BUILD_LIB_DEPENDENCIES += $(LBFGS_LIBRARY)
+    endif
+else
+    LBFGS_LIBRARY =
+endif
+
+# Search in the SRILM library directories for things of the form "-l<LibName>".
+ifeq ($(EXTRA_LIBDIR), )
+	VPATH = $(SRILM_LIBDIR)
+else
+	VPATH = $(SRILM_LIBDIR):$(EXTRA_LIBDIR)
+endif
+
+# Install script for all machines (based on GNU ginstall utility)
+INSTALL = $(SRILM)/sbin/decipher-install
+
+# Note:  The current directory must be searched before the main SRILM include
+#         directory to ensure that local versions of included files will be used.
+INCLUDES = $(ADDITIONAL_INCLUDES) -I. -I$(SRILM_INCDIR)
+DEPENDENCIES = Dependencies.$(MACHINE_TYPE)
+
+
+# Which of the above options is to be used by default?
+OPTION = $(OPTIMIZE_OPTION)
+
+# The make option determines the object and binary directory suffixes.
+OBJ_OPTION = $(OPTION)
+BIN_OPTION = $(OPTION)
+
+# Choose the appropriate compilation options.
+ifeq ($(OPTION), $(OPTIMIZE_OPTION))
+  OPTION_FLAGS = $(OPTIMIZE_FLAGS)
+else
+  ifeq ($(OPTION), $(COMPACT_OPTION))
+    OPTION_FLAGS = $(COMPACT_FLAGS)
+  else
+    ifeq ($(OPTION), $(SHORT_OPTION))
+      OPTION_FLAGS = $(SHORT_FLAGS)
+    else
+      ifeq ($(OPTION), $(LLONG_OPTION))
+	OPTION_FLAGS = $(LLONG_FLAGS)
+      else
+	ifeq ($(OPTION), $(DEBUG_OPTION))
+	  OPTION_FLAGS = $(DEBUG_FLAGS)
+	  ADDITIONAL_LDFLAGS := $(ADDITIONAL_LDFLAGS) $(DEBUG_LDFLAGS)
+	else
+	  ifeq ($(OPTION), $(PROFILE_OPTION))
+	    OPTION_FLAGS = $(PROFILE_FLAGS)
+	    # We also need to link with the profiling flags.
+	    ifeq ($(PROFILE_LDFLAGS),)
+		PROFILE_LDFLAGS = $(PROFILE_FLAGS)
+	    endif
+	    ADDITIONAL_LDFLAGS := $(ADDITIONAL_LDFLAGS) $(PROFILE_LDFLAGS)
+	  else
+	    ifeq ($(OPTION), $(EXPORT_OPTION))
+	      # Export programs are compiled with optimization
+	      #  and linked with special export flags.
+	      OPTION_FLAGS = $(OPTIMIZE_FLAGS) $(EXPORT_FLAGS)
+	      ADDITIONAL_LDFLAGS := $(ADDITIONAL_LDFLAGS) $(EXPORT_LDFLAGS)
+	    endif
+	  endif
+	endif
+      endif
+    endif
+  endif
+endif
+
+# PIC compilation
+ifneq ($(MAKE_PIC),)
+  CFLAGS += $(PIC_FLAG)
+  CXXFLAGS += $(PIC_FLAG)
+endif
+
+# Define directories.
+
+# SRILM directories.
+# Note: attempt to construct relative paths when building inside $SRILM,
+# for the benefit of MSVC tools which don't understand absolute cygwin paths
+
+ifeq ($(patsubst $(SRILM)/%/src,,$(PWD)),)
+SRILM_INCDIR = ../../include
+SRILM_LIB = ../../lib
+SRILM_BIN = ../../bin
+else
+SRILM_INCDIR = $(SRILM)/include
+SRILM_LIB = $(SRILM)/lib
+SRILM_BIN = $(SRILM)/bin
+endif
+
+SRILM_LIBDIR = $(SRILM_LIB)/$(MACHINE_TYPE)$(OBJ_OPTION)
+SRILM_BINDIR = $(SRILM_BIN)/$(MACHINE_TYPE)$(BIN_OPTION)
+
+# Default directories.
+
+SRCDIR = .
+
+BASE_OBJDIR = ../obj/$(MACHINE_TYPE)
+OBJDIR = $(BASE_OBJDIR)$(OBJ_OPTION)
+
+BASE_BINDIR = ../bin/$(MACHINE_TYPE)
+BINDIR = $(BASE_BINDIR)$(BIN_OPTION)
+
+# Lint output files:
+ALL_LINT = $(ALL_SOURCES:$(SRCDIR)/%.c=$(SRCDIR)/%.lint)

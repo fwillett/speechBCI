@@ -1,0 +1,131 @@
+#!/bin/sh
+#
+# compare-sclite --
+#	compare sclite word error sentence-by-sentence
+#
+# $Header: /home/srilm/CVS/srilm/utils/src/compare-sclite,v 1.26 2017/08/12 05:48:34 stolcke Exp $
+#
+
+# enforce proper sorting order
+LC_COLLATE=C
+export LC_COLLATE
+
+if [ $# -lt 3 ]; then
+	echo "usage: $0 [-v] -h1 hyps1 -h2 hyps2 -r refs [-S id-subset] [-M|-multiwords] [sclite-options ...]" >&2
+	echo "   or  $0 hyps1 hyps2 refs" >&2
+	exit 2
+elif [ $# -eq 3 ]; then
+	# old syntax
+	hypsA=${1}
+	hypsB=${2}
+	refs=${3}
+else
+	# parse arguments
+	while [ $# -gt 0 ]; do
+		case "$1" in
+		-r)	refs=$2; shift ;;
+		-h1)	hypsA=$2; shift ;;
+		-h2)	hypsB=$2; shift ;;
+		-S)	options="$options -S $2"; shift ;;
+		*)	options="$options $1" ;;
+		esac
+		shift
+	done
+fi
+
+tmpdir=${TMPDIR-/tmp}
+pralignA=pralignA$$
+pralignB=pralignB$$
+subset="$tmpdir/subset$$"
+
+trap '/bin/rm -f $tmpdir/$pralignA.pra $tmpdir/$pralignB.pra $subset.*' 0 1 2 13 15
+
+set -e
+
+#
+# use the intersection of the too hyp sets and (if specified) the -S set
+#
+case "$hypsA" in
+*.ctm)	case "$hypsB" in
+	*.ctm)	${GAWK-gawk} '{ print $1 "_" $2 }' < "$hypsA" | sort -u > $subset.A
+		${GAWK-gawk} '{ print $1 "_" $2 }' < "$hypsB" | sort -u > $subset.B
+		;;
+	*)	echo "both hyps must be in same format" >&2
+		exit 2
+		;;
+	esac
+	;;
+*)	case "$hypsB" in
+	*.ctm)	echo "both hyps must be in same format" >&2
+		exit 2
+		;;
+	*)	${GAWK-gawk} '{ print $1 }' < "$hypsA" | sort -u > $subset.A 
+		${GAWK-gawk} '{ print $1 }' < "$hypsB" | sort -u > $subset.B
+		;;
+	esac
+	;;
+esac
+
+comm -12 $subset.A $subset.B  > $subset.AB
+options="$options -S $subset.AB"
+
+#
+# generate alignments for the two hyp sets
+#
+compute-sclite -h "$hypsA" -r "$refs" $options -O $tmpdir -n $pralignA -o pralign
+compute-sclite -h "$hypsB" -r "$refs" $options -O $tmpdir -n $pralignB -o pralign
+
+#
+# compute error totals by utterance and compare
+#
+${GAWK-gawk} '
+BEGIN {
+	less = greater = equal = 0;
+}
+$1 == "id:" {
+	sentid = $2;
+	sub("^\\(", "", sentid);
+	sub("\\)$", "", sentid);
+	next;
+}
+$1 == "Scores:" {
+	corr = $6;
+	subs = $7;
+	dels = $8;
+	inss = $9;
+
+	words = corr + subs + dels;
+	errs = subs + dels + inss;
+
+	if (errors[sentid] == "") {
+		errors[sentid] = errs;
+		total_wordsA += words;
+		total_errsA += errs
+		total_sentsA ++;
+	} else {
+		if (errs > errors[sentid]) greater++;
+		else if (errs < errors[sentid]) less++;
+		else equal++;
+		total_wordsB += words;
+		total_errsB += errs;
+		total_sentsB ++;
+	}
+        next;
+}
+END {
+	werA = (total_wordsA > 0 ? total_errsA/total_wordsA * 100 : 0);
+	werB = (total_wordsB > 0 ? total_errsB/total_wordsB * 100 : 0);
+
+	printf "result 1: %d errors (%.2f%%), %d words, %d sentences\n", \
+		    total_errsA, werA, total_wordsA, total_sentsA;
+	printf "result 2: %d errors (%.2f%%), %d words, %d sentences\n", \
+		    total_errsB, werB, total_wordsB, total_sentsB;
+        printf "less %d, greater %d, equal %d, different %d (%+.2f%%)\n", \
+                 less, greater, equal, less + greater, werB - werA;
+	if (less + greater > 0) {
+	    printf "significance:\n"
+	    system("cumbin " (less+greater) " " (less>greater ? less : greater));
+	}
+}
+' $tmpdir/$pralignA.pra $tmpdir/$pralignB.pra
+

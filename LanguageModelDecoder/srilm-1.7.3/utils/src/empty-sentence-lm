@@ -1,0 +1,79 @@
+#!/bin/sh
+#
+# empty-sentence-lm --
+#	modify language model to allow the empty sentence.
+#	This adds a "<s> </s>" bigram to the model and scales the 
+#	probabilities of other bigrams starting with <s>.
+#	probabilities.  Backoff weights are recomputed.
+#
+# usage: empty-sentence-lm -prob P -lm oldlm -write-lm newlm
+#
+# $Header: /home/srilm/CVS/srilm/utils/src/empty-sentence-lm,v 1.5 2013/03/09 07:13:01 stolcke Exp $
+#
+
+oldlm=-
+newlm=-
+prob=0.1
+vocab=/dev/null
+norm_option=-renorm
+
+while [ $# -gt 0 ]; do
+	case "$1" in
+	-prob)	prob="$2" ; shift ;;
+	-lm)	oldlm="$2" ; shift ;;
+	-write-lm)	newlm="$2" ; shift ;;
+	-nonorm) norm_option= ; shift ;;
+	*)	options="$options $1" ;;
+	esac
+	shift
+done
+
+gzip -dcf $oldlm | ${GAWK-gawk} '
+function log10(x) {
+        return log(x)/2.30258509299404568402;
+}
+
+/^ngram 2=/ {
+	num = substr($2, 3);
+	print "ngram 2=" num + 1;
+	next;
+}
+
+#
+# add empty-sentence bigram
+#
+/^\\2-grams:/ {
+	print;
+	print log10(prob), "<s> </s>";
+	in_ngrams = 2;
+	next;
+}
+
+#
+# ensure that <s> has backoff weight and 
+# approximately adjust it (correct adjustment done by ngram -renorm)
+#
+in_ngrams == 1 && $2 == "<s>" {
+	$3 += log10(1-prob);
+}
+
+#
+# scale bigram probs starting with <s>
+#
+in_ngrams == 2 && $2 == "<s>" {
+	$1 += log10(1-prob);
+}
+
+/^\\1-grams:/ {
+	in_ngrams = 1;
+}
+
+/^\\3-grams:/ {
+	in_ngrams = 3;
+}
+
+{
+	print;
+}' prob=$prob | \
+ngram -lm - $norm_option -write-lm "$newlm" $options
+

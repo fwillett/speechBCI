@@ -1,0 +1,22 @@
+
+Standard, speed-optimized libraries (using hash tables)
+
+bin/i386-solaris/ngram -debug 1 -memuse -lm $EVAL2000/data/lms/devel2000/swbd+ch_en+h4eval2000-m-pruned.3bo.gz -write-vocab /dev/null
+reading 34610 1-grams
+reading 4826134 2-grams
+reading 9733194 3-grams
+total memory 276788424 (263.966M), used 170254952 (162.368M), wasted 106533472 (
+101.598M)
+Time elapsed 67.06 user 70.26 system 5.90 utilization 113.57%
+
+
+"compact", space-optimized libraries (using sorted arrays)
+
+bin/i386-solaris_c/ngram -debug 1 -memuse -lm $EVAL2000/data/lms/devel2000/swbd+ch_en+h4eval2000-m-pruned.3bo.gz -write-vocab /dev/null
+reading 34610 1-grams
+reading 4826134 2-grams
+reading 9733194 3-grams
+total memory 175131744 (167.019M), used 170254952 (162.368M), wasted 4876792 (4.
+65087M)
+Time elapsed 75.17 user 81.84 system 4.47 utilization 114.83%
+

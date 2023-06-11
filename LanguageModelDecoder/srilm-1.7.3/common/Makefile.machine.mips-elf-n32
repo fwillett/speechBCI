@@ -1,0 +1,33 @@
+#
+#    File:   Makefile.mips-elf-n32
+#    Author: The SRI DECIPHER (TM) System
+#    Date:   Fri Mar  3 15:29:29 PST 1995
+#
+#    Description:
+#	Machine dependent compilation options and variable definitions
+#	for SGI workstations running IRIX 5.x
+#
+#    Copyright (c) 1995-2001 SRI International.  All Rights Reserved.
+#
+#    $Header: /home/srilm/CVS/srilm/common/Makefile.machine.mips-elf-n32,v 1.2 2009/06/28 08:56:21 stolcke Exp $
+#
+
+include $(SRILM)/common/Makefile.machine.mips-elf
+
+ifeq ($(USE_CC), )
+   # all our machines are R4000 (or higher) based, so there is no use
+   # sticking to the mips1 instruction set
+   GCC_FLAGS = -Wreturn-type -Wimplicit
+   CC = $(GCC_PATH)gcc $(GCC_FLAGS) -Wimplicit-int 
+   CXX = $(GCC_PATH)g++ $(GCC_FLAGS) -DINSTANTIATE_TEMPLATES
+else
+   # Use the SGI C++ compiler
+   CC = cc -mips2
+   CXX = CC -ptused -mips2 -Olimit 2000
+
+   # keep binaries separate from the default
+   OPTIMIZE_OPTION = _CC
+endif
+
+   CFLAGS = $(ADDITIONAL_CFLAGS) $(INCLUDES)
+

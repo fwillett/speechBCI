@@ -1,0 +1,6 @@
+# Makefile to augment Makefile.machine.msvc for Visual Studio 2008 for x86 platform
+
+include $(SRILM)/common/Makefile.common.msvc-vs2008
+include $(SRILM)/common/Makefile.machine.msvc
+
+MS_CODE_OPTION=/MT

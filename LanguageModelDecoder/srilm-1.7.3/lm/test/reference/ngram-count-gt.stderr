@@ -1,0 +1,408 @@
+using GoodTuring for 1-grams
+Good-Turing discounting 1-grams
+GT-count [0] = 0
+GT-count [1] = 8810
+GT-count [2] = 3821
+warning: discount coeff 1 is out of range: -3.62691e-16
+using GoodTuring for 2-grams
+Good-Turing discounting 2-grams
+GT-count [0] = 0
+GT-count [1] = 271981
+GT-count [2] = 57170
+GT-count [3] = 24789
+GT-count [4] = 14210
+GT-count [5] = 9255
+GT-count [6] = 6346
+GT-count [7] = 4882
+GT-count [8] = 3701
+using GoodTuring for 3-grams
+Good-Turing discounting 3-grams
+GT-count [0] = 0
+GT-count [1] = 1065684
+GT-count [2] = 128239
+GT-count [3] = 46598
+GT-count [4] = 23979
+GT-count [5] = 14378
+GT-count [6] = 9732
+GT-count [7] = 6974
+GT-count [8] = 5202
+warning: -1.7164e-13 backoff probability mass left for "" -- incrementing denominator
+warning: 3.13243e-07 backoff probability mass left for "" -- incrementing denominator
+warning: 6.26485e-07 backoff probability mass left for "" -- incrementing denominator
+warning: 9.39727e-07 backoff probability mass left for "" -- incrementing denominator
+warning: 1.25297e-06 backoff probability mass left for "" -- incrementing denominator
+warning: 1.56621e-06 backoff probability mass left for "" -- incrementing denominator
+warning: 1.87945e-06 backoff probability mass left for "" -- incrementing denominator
+warning: 2.19269e-06 backoff probability mass left for "" -- incrementing denominator
+warning: 2.50594e-06 backoff probability mass left for "" -- incrementing denominator
+warning: 2.81918e-06 backoff probability mass left for "" -- incrementing denominator
+discarded 11 1-gram probs predicting pseudo-events
+warning: distributing 3.11852e-06 left-over probability mass over 6550 zeroton words
+warning: 0 backoff probability mass left for "lucked" -- incrementing denominator
+warning: 0 backoff probability mass left for "quantum" -- incrementing denominator
+warning: 0 backoff probability mass left for "oddly" -- incrementing denominator
+warning: 0 backoff probability mass left for "influx" -- incrementing denominator
+warning: 0 backoff probability mass left for "reader's" -- incrementing denominator
+warning: 0 backoff probability mass left for "et" -- incrementing denominator
+warning: 0 backoff probability mass left for "entitled" -- incrementing denominator
+warning: 0 backoff probability mass left for "macneil" -- incrementing denominator
+warning: 0 backoff probability mass left for "referring" -- incrementing denominator
+warning: 0 backoff probability mass left for "gung" -- incrementing denominator
+warning: 0 backoff probability mass left for "reminds" -- incrementing denominator
+warning: 0 backoff probability mass left for "amazes" -- incrementing denominator
+warning: 0 backoff probability mass left for "heaven's" -- incrementing denominator
+warning: 0 backoff probability mass left for "unheard" -- incrementing denominator
+warning: 0 backoff probability mass left for "according" -- incrementing denominator
+warning: 0 backoff probability mass left for "jagged" -- incrementing denominator
+warning: 0 backoff probability mass left for "notre" -- incrementing denominator
+warning: 0 backoff probability mass left for "relates" -- incrementing denominator
+discarded 2 2-gram contexts containing pseudo-events
+discarded 11 2-gram probs predicting pseudo-events
+warning: 0 backoff probability mass left for "long talked" -- incrementing denominator
+warning: 0 backoff probability mass left for "do exercise" -- incrementing denominator
+warning: 0 backoff probability mass left for "uhoh <s>" -- incrementing denominator
+warning: 0 backoff probability mass left for "depending <s>" -- incrementing denominator
+warning: 0 backoff probability mass left for "you involved" -- incrementing denominator
+warning: 0 backoff probability mass left for "thousands and" -- incrementing denominator
+warning: 0 backoff probability mass left for "et and" -- incrementing denominator
+warning: 0 backoff probability mass left for "kind and" -- incrementing denominator
+warning: 0 backoff probability mass left for "instead and" -- incrementing denominator
+warning: 0 backoff probability mass left for "u and" -- incrementing denominator
+warning: 0 backoff probability mass left for "you sad" -- incrementing denominator
+warning: 0 backoff probability mass left for "number fair" -- incrementing denominator
+warning: 0 backoff probability mass left for "part that's" -- incrementing denominator
+warning: 0 backoff probability mass left for "sort that's" -- incrementing denominator
+warning: 0 backoff probability mass left for "supposed that's" -- incrementing denominator
+warning: 0 backoff probability mass left for "kind right" -- incrementing denominator
+warning: 0 backoff probability mass left for "thank right" -- incrementing denominator
+warning: 0 backoff probability mass left for "care took" -- incrementing denominator
+warning: 0 backoff probability mass left for "willing is" -- incrementing denominator
+warning: 0 backoff probability mass left for "supposed is" -- incrementing denominator
+warning: 0 backoff probability mass left for "sort is" -- incrementing denominator
+warning: 0 backoff probability mass left for "to cover" -- incrementing denominator
+warning: 0 backoff probability mass left for "a thousand" -- incrementing denominator
+warning: 0 backoff probability mass left for "as might" -- incrementing denominator
+warning: 0 backoff probability mass left for "my quit" -- incrementing denominator
+warning: 0 backoff probability mass left for "sort same" -- incrementing denominator
+warning: 0 backoff probability mass left for "tends it" -- incrementing denominator
+warning: 0 backoff probability mass left for "huh it" -- incrementing denominator
+warning: 0 backoff probability mass left for "uhhuh it" -- incrementing denominator
+warning: 0 backoff probability mass left for "other it" -- incrementing denominator
+warning: 0 backoff probability mass left for "sort it" -- incrementing denominator
+warning: 0 backoff probability mass left for "worries it" -- incrementing denominator
+warning: 0 backoff probability mass left for "instead it" -- incrementing denominator
+warning: 0 backoff probability mass left for "ought it" -- incrementing denominator
+warning: 0 backoff probability mass left for "kind @reject@" -- incrementing denominator
+warning: 0 backoff probability mass left for "part @reject@" -- incrementing denominator
+warning: 0 backoff probability mass left for "sort @reject@" -- incrementing denominator
+warning: 0 backoff probability mass left for "you myself" -- incrementing denominator
+warning: 0 backoff probability mass left for "kind would" -- incrementing denominator
+warning: 0 backoff probability mass left for "you team" -- incrementing denominator
+warning: 0 backoff probability mass left for "you very" -- incrementing denominator
+warning: 0 backoff probability mass left for "uhhuh huh" -- incrementing denominator
+warning: 0 backoff probability mass left for "seems uh" -- incrementing denominator
+warning: 0 backoff probability mass left for "silence uh" -- incrementing denominator
+warning: 0 backoff probability mass left for "dances uh" -- incrementing denominator
+warning: 0 backoff probability mass left for "p w" -- incrementing denominator
+warning: 0 backoff probability mass left for "pretty works" -- incrementing denominator
+warning: 0 backoff probability mass left for "once paid" -- incrementing denominator
+warning: 0 backoff probability mass left for "bye-bye uhhuh" -- incrementing denominator
+warning: 0 backoff probability mass left for "you type" -- incrementing denominator
+warning: 0 backoff probability mass left for "used so" -- incrementing denominator
+warning: 0 backoff probability mass left for "am so" -- incrementing denominator
+warning: 0 backoff probability mass left for "him pick" -- incrementing denominator
+warning: 0 backoff probability mass left for "excuse [mouth]" -- incrementing denominator
+warning: 0 backoff probability mass left for "kind [mouth]" -- incrementing denominator
+warning: 0 backoff probability mass left for "sales percent" -- incrementing denominator
+warning: 0 backoff probability mass left for "time from" -- incrementing denominator
+warning: 0 backoff probability mass left for "high from" -- incrementing denominator
+warning: 0 backoff probability mass left for "tried always" -- incrementing denominator
+warning: 0 backoff probability mass left for "count always" -- incrementing denominator
+warning: 0 backoff probability mass left for "end always" -- incrementing denominator
+warning: 0 backoff probability mass left for "trying always" -- incrementing denominator
+warning: 0 backoff probability mass left for "kind always" -- incrementing denominator
+warning: 0 backoff probability mass left for "north raleigh" -- incrementing denominator
+warning: 0 backoff probability mass left for "oh four" -- incrementing denominator
+warning: 0 backoff probability mass left for "supposed it's" -- incrementing denominator
+warning: 0 backoff probability mass left for "hell a" -- incrementing denominator
+warning: 0 backoff probability mass left for "handle a" -- incrementing denominator
+warning: 0 backoff probability mass left for "pick a" -- incrementing denominator
+warning: 0 backoff probability mass left for "driver's a" -- incrementing denominator
+warning: 0 backoff probability mass left for "hung a" -- incrementing denominator
+warning: 0 backoff probability mass left for "swimming a" -- incrementing denominator
+warning: 0 backoff probability mass left for "capital against" -- incrementing denominator
+warning: 0 backoff probability mass left for "high through" -- incrementing denominator
+warning: 0 backoff probability mass left for "in pain" -- incrementing denominator
+warning: 0 backoff probability mass left for "y b" -- incrementing denominator
+warning: 0 backoff probability mass left for "new upstate" -- incrementing denominator
+warning: 0 backoff probability mass left for "wound i" -- incrementing denominator
+warning: 0 backoff probability mass left for "end i" -- incrementing denominator
+warning: 0 backoff probability mass left for "happen i" -- incrementing denominator
+warning: 0 backoff probability mass left for "ended i" -- incrementing denominator
+warning: 0 backoff probability mass left for "ought i" -- incrementing denominator
+warning: 0 backoff probability mass left for "you read" -- incrementing denominator
+warning: 0 backoff probability mass left for "trying am" -- incrementing denominator
+warning: 0 backoff probability mass left for "kind am" -- incrementing denominator
+warning: 0 backoff probability mass left for "most get" -- incrementing denominator
+warning: 0 backoff probability mass left for "ahold get" -- incrementing denominator
+warning: 0 backoff probability mass left for "you allows" -- incrementing denominator
+warning: 0 backoff probability mass left for "wonder the" -- incrementing denominator
+warning: 0 backoff probability mass left for "near the" -- incrementing denominator
+warning: 0 backoff probability mass left for "bulk the" -- incrementing denominator
+warning: 0 backoff probability mass left for "sake the" -- incrementing denominator
+warning: 0 backoff probability mass left for "supreme the" -- incrementing denominator
+warning: 0 backoff probability mass left for "lack the" -- incrementing denominator
+warning: 0 backoff probability mass left for "by side" -- incrementing denominator
+warning: 0 backoff probability mass left for "kind i'd" -- incrementing denominator
+warning: 0 backoff probability mass left for "right college" -- incrementing denominator
+warning: 0 backoff probability mass left for "b f" -- incrementing denominator
+warning: 0 backoff probability mass left for "to needless" -- incrementing denominator
+warning: 0 backoff probability mass left for "forward look" -- incrementing denominator
+warning: 0 backoff probability mass left for "type certain" -- incrementing denominator
+warning: 0 backoff probability mass left for "of spur" -- incrementing denominator
+warning: 0 backoff probability mass left for "you his" -- incrementing denominator
+warning: 0 backoff probability mass left for "do shows" -- incrementing denominator
+warning: 0 backoff probability mass left for "kind seems" -- incrementing denominator
+warning: 0 backoff probability mass left for "bothers really" -- incrementing denominator
+warning: 0 backoff probability mass left for "c watching" -- incrementing denominator
+warning: 0 backoff probability mass left for "t watching" -- incrementing denominator
+warning: 0 backoff probability mass left for "all start" -- incrementing denominator
+warning: 0 backoff probability mass left for "used there" -- incrementing denominator
+warning: 0 backoff probability mass left for "needs there" -- incrementing denominator
+warning: 0 backoff probability mass left for "trying there" -- incrementing denominator
+warning: 0 backoff probability mass left for "ought there" -- incrementing denominator
+warning: 0 backoff probability mass left for "and beauty" -- incrementing denominator
+warning: 0 backoff probability mass left for "other anything" -- incrementing denominator
+warning: 0 backoff probability mass left for "you her" -- incrementing denominator
+warning: 0 backoff probability mass left for "willing was" -- incrementing denominator
+warning: 0 backoff probability mass left for "suppose was" -- incrementing denominator
+warning: 0 backoff probability mass left for "supposed was" -- incrementing denominator
+warning: 0 backoff probability mass left for "sort was" -- incrementing denominator
+warning: 0 backoff probability mass left for "growing was" -- incrementing denominator
+warning: 0 backoff probability mass left for "kind of" -- incrementing denominator
+warning: 0 backoff probability mass left for "instead of" -- incrementing denominator
+warning: 0 backoff probability mass left for "listening enjoy" -- incrementing denominator
+warning: 0 backoff probability mass left for "not try" -- incrementing denominator
+warning: 0 backoff probability mass left for "listen i'll" -- incrementing denominator
+warning: 0 backoff probability mass left for "apt more" -- incrementing denominator
+warning: 0 backoff probability mass left for "[laugh] yep" -- incrementing denominator
+warning: 0 backoff probability mass left for "not trying" -- incrementing denominator
+warning: 0 backoff probability mass left for "familiar i'm" -- incrementing denominator
+warning: 0 backoff probability mass left for "supposed i'm" -- incrementing denominator
+warning: 0 backoff probability mass left for "sort i'm" -- incrementing denominator
+warning: 0 backoff probability mass left for "too spend" -- incrementing denominator
+warning: 0 backoff probability mass left for "you spend" -- incrementing denominator
+warning: 0 backoff probability mass left for "kind had" -- incrementing denominator
+warning: 0 backoff probability mass left for "sort had" -- incrementing denominator
+warning: 0 backoff probability mass left for "you started" -- incrementing denominator
+warning: 0 backoff probability mass left for "kind gets" -- incrementing denominator
+warning: 0 backoff probability mass left for "sort been" -- incrementing denominator
+warning: 0 backoff probability mass left for "[laugh] cat" -- incrementing denominator
+warning: 0 backoff probability mass left for "ends make" -- incrementing denominator
+warning: 0 backoff probability mass left for "year eleven" -- incrementing denominator
+warning: 0 backoff probability mass left for "quite there's" -- incrementing denominator
+warning: 0 backoff probability mass left for "kind there's" -- incrementing denominator
+warning: 0 backoff probability mass left for "got there's" -- incrementing denominator
+warning: 0 backoff probability mass left for "going there's" -- incrementing denominator
+warning: 0 backoff probability mass left for "kind i've" -- incrementing denominator
+warning: 0 backoff probability mass left for "still i've" -- incrementing denominator
+warning: 0 backoff probability mass left for "you i've" -- incrementing denominator
+warning: 0 backoff probability mass left for "income federal" -- incrementing denominator
+warning: 0 backoff probability mass left for "trying or" -- incrementing denominator
+warning: 0 backoff probability mass left for "sixty on" -- incrementing denominator
+warning: 0 backoff probability mass left for "p on" -- incrementing denominator
+warning: 0 backoff probability mass left for "t m" -- incrementing denominator
+warning: 0 backoff probability mass left for "grew he" -- incrementing denominator
+warning: 0 backoff probability mass left for "ended he" -- incrementing denominator
+warning: 0 backoff probability mass left for "sort he" -- incrementing denominator
+warning: 0 backoff probability mass left for "if he" -- incrementing denominator
+warning: 0 backoff probability mass left for "you happen" -- incrementing denominator
+warning: 0 backoff probability mass left for "t cable" -- incrementing denominator
+warning: 0 backoff probability mass left for "piece little" -- incrementing denominator
+warning: 0 backoff probability mass left for "t favorite" -- incrementing denominator
+warning: 0 backoff probability mass left for "north just" -- incrementing denominator
+warning: 0 backoff probability mass left for "rhode in" -- incrementing denominator
+warning: 0 backoff probability mass left for "graduate in" -- incrementing denominator
+warning: 0 backoff probability mass left for "l in" -- incrementing denominator
+warning: 0 backoff probability mass left for "boy in" -- incrementing denominator
+warning: 0 backoff probability mass left for "trying in" -- incrementing denominator
+warning: 0 backoff probability mass left for "salt in" -- incrementing denominator
+warning: 0 backoff probability mass left for "latin in" -- incrementing denominator
+warning: 0 backoff probability mass left for "regards in" -- incrementing denominator
+warning: 0 backoff probability mass left for "sort in" -- incrementing denominator
+warning: 0 backoff probability mass left for "plan don't" -- incrementing denominator
+warning: 0 backoff probability mass left for "tend don't" -- incrementing denominator
+warning: 0 backoff probability mass left for "up left" -- incrementing denominator
+warning: 0 backoff probability mass left for "nine whole" -- incrementing denominator
+warning: 0 backoff probability mass left for "you finally" -- incrementing denominator
+warning: 0 backoff probability mass left for "rid got" -- incrementing denominator
+warning: 0 backoff probability mass left for "kind got" -- incrementing denominator
+warning: 0 backoff probability mass left for "want me" -- incrementing denominator
+warning: 0 backoff probability mass left for "let me" -- incrementing denominator
+warning: 0 backoff probability mass left for "[laugh] sorry" -- incrementing denominator
+warning: 0 backoff probability mass left for "excuse oh" -- incrementing denominator
+warning: 0 backoff probability mass left for "rid getting" -- incrementing denominator
+warning: 0 backoff probability mass left for "kind getting" -- incrementing denominator
+warning: 0 backoff probability mass left for "you getting" -- incrementing denominator
+warning: 0 backoff probability mass left for "t regular" -- incrementing denominator
+warning: 0 backoff probability mass left for "ability their" -- incrementing denominator
+warning: 0 backoff probability mass left for "seem do" -- incrementing denominator
+warning: 0 backoff probability mass left for "kind do" -- incrementing denominator
+warning: 0 backoff probability mass left for "away do" -- incrementing denominator
+warning: 0 backoff probability mass left for "not decided" -- incrementing denominator
+warning: 0 backoff probability mass left for "types other" -- incrementing denominator
+warning: 0 backoff probability mass left for "during work" -- incrementing denominator
+warning: 0 backoff probability mass left for "kind like" -- incrementing denominator
+warning: 0 backoff probability mass left for "us wanted" -- incrementing denominator
+warning: 0 backoff probability mass left for "kind he's" -- incrementing denominator
+warning: 0 backoff probability mass left for "talk let's" -- incrementing denominator
+warning: 0 backoff probability mass left for "you spent" -- incrementing denominator
+warning: 0 backoff probability mass left for "going think's" -- incrementing denominator
+warning: 0 backoff probability mass left for "kind all" -- incrementing denominator
+warning: 0 backoff probability mass left for "et cetera" -- incrementing denominator
+warning: 0 backoff probability mass left for "a happens" -- incrementing denominator
+warning: 0 backoff probability mass left for "[laugh] bucks" -- incrementing denominator
+warning: 0 backoff probability mass left for "you amazing" -- incrementing denominator
+warning: 0 backoff probability mass left for "sort have" -- incrementing denominator
+warning: 0 backoff probability mass left for "kind um" -- incrementing denominator
+warning: 0 backoff probability mass left for "sort um" -- incrementing denominator
+warning: 0 backoff probability mass left for "kind you" -- incrementing denominator
+warning: 0 backoff probability mass left for "happen you" -- incrementing denominator
+warning: 0 backoff probability mass left for "subscribe you" -- incrementing denominator
+warning: 0 backoff probability mass left for "bye-bye you" -- incrementing denominator
+warning: 0 backoff probability mass left for "right here" -- incrementing denominator
+warning: 0 backoff probability mass left for "little as" -- incrementing denominator
+warning: 0 backoff probability mass left for "sort as" -- incrementing denominator
+warning: 0 backoff probability mass left for "compared as" -- incrementing denominator
+warning: 0 backoff probability mass left for "nice one" -- incrementing denominator
+warning: 0 backoff probability mass left for "d washington" -- incrementing denominator
+warning: 0 backoff probability mass left for "kind people" -- incrementing denominator
+warning: 0 backoff probability mass left for "sort people" -- incrementing denominator
+warning: 0 backoff probability mass left for "tend people" -- incrementing denominator
+warning: 0 backoff probability mass left for "ought people" -- incrementing denominator
+warning: 0 backoff probability mass left for "shall how" -- incrementing denominator
+warning: 0 backoff probability mass left for "regard with" -- incrementing denominator
+warning: 0 backoff probability mass left for "current with" -- incrementing denominator
+warning: 0 backoff probability mass left for "kind know" -- incrementing denominator
+warning: 0 backoff probability mass left for "instead know" -- incrementing denominator
+warning: 0 backoff probability mass left for "willing are" -- incrementing denominator
+warning: 0 backoff probability mass left for "beginning are" -- incrementing denominator
+warning: 0 backoff probability mass left for "kind are" -- incrementing denominator
+warning: 0 backoff probability mass left for "trying than" -- incrementing denominator
+warning: 0 backoff probability mass left for "l r" -- incrementing denominator
+warning: 0 backoff probability mass left for "to consider" -- incrementing denominator
+warning: 0 backoff probability mass left for "going nobody's" -- incrementing denominator
+warning: 0 backoff probability mass left for "you war" -- incrementing denominator
+warning: 0 backoff probability mass left for "you almost" -- incrementing denominator
+warning: 0 backoff probability mass left for "told somebody" -- incrementing denominator
+warning: 0 backoff probability mass left for "in o'clock" -- incrementing denominator
+warning: 0 backoff probability mass left for "for eye" -- incrementing denominator
+warning: 0 backoff probability mass left for "used you're" -- incrementing denominator
+warning: 0 backoff probability mass left for "able you're" -- incrementing denominator
+warning: 0 backoff probability mass left for "trying you're" -- incrementing denominator
+warning: 0 backoff probability mass left for "right but" -- incrementing denominator
+warning: 0 backoff probability mass left for "used gotten" -- incrementing denominator
+warning: 0 backoff probability mass left for "b at" -- incrementing denominator
+warning: 0 backoff probability mass left for "n at" -- incrementing denominator
+warning: 0 backoff probability mass left for "t much" -- incrementing denominator
+warning: 0 backoff probability mass left for "an miles" -- incrementing denominator
+warning: 0 backoff probability mass left for "kind can" -- incrementing denominator
+warning: 0 backoff probability mass left for "relate can" -- incrementing denominator
+warning: 0 backoff probability mass left for "of yeah" -- incrementing denominator
+warning: 0 backoff probability mass left for "capital about" -- incrementing denominator
+warning: 0 backoff probability mass left for "gun about" -- incrementing denominator
+warning: 0 backoff probability mass left for "waiting day" -- incrementing denominator
+warning: 0 backoff probability mass left for "wound we" -- incrementing denominator
+warning: 0 backoff probability mass left for "kind we" -- incrementing denominator
+warning: 0 backoff probability mass left for "listen we" -- incrementing denominator
+warning: 0 backoff probability mass left for "supposed we" -- incrementing denominator
+warning: 0 backoff probability mass left for "ought we" -- incrementing denominator
+warning: 0 backoff probability mass left for "you wasn't" -- incrementing denominator
+warning: 0 backoff probability mass left for "of peace" -- incrementing denominator
+warning: 0 backoff probability mass left for "[noise] bye" -- incrementing denominator
+warning: 0 backoff probability mass left for "now bye" -- incrementing denominator
+warning: 0 backoff probability mass left for "bye bye" -- incrementing denominator
+warning: 0 backoff probability mass left for "let better" -- incrementing denominator
+warning: 0 backoff probability mass left for "homes better" -- incrementing denominator
+warning: 0 backoff probability mass left for "period long" -- incrementing denominator
+warning: 0 backoff probability mass left for "out kick" -- incrementing denominator
+warning: 0 backoff probability mass left for "out deal" -- incrementing denominator
+warning: 0 backoff probability mass left for "[laugh] ahead" -- incrementing denominator
+warning: 0 backoff probability mass left for "b h" -- incrementing denominator
+warning: 0 backoff probability mass left for "m h" -- incrementing denominator
+warning: 0 backoff probability mass left for "you eventually" -- incrementing denominator
+warning: 0 backoff probability mass left for "morning dallas" -- incrementing denominator
+warning: 0 backoff probability mass left for "fort dallas" -- incrementing denominator
+warning: 0 backoff probability mass left for "kind could" -- incrementing denominator
+warning: 0 backoff probability mass left for "kinds these" -- incrementing denominator
+warning: 0 backoff probability mass left for "bye-bye thanks" -- incrementing denominator
+warning: 0 backoff probability mass left for "away did" -- incrementing denominator
+warning: 0 backoff probability mass left for "sea deep" -- incrementing denominator
+warning: 0 backoff probability mass left for "brothers younger" -- incrementing denominator
+warning: 0 backoff probability mass left for "public national" -- incrementing denominator
+warning: 0 backoff probability mass left for "not tend" -- incrementing denominator
+warning: 0 backoff probability mass left for "checking my" -- incrementing denominator
+warning: 0 backoff probability mass left for "spare my" -- incrementing denominator
+warning: 0 backoff probability mass left for "kind we're" -- incrementing denominator
+warning: 0 backoff probability mass left for "sort we're" -- incrementing denominator
+warning: 0 backoff probability mass left for "you we're" -- incrementing denominator
+warning: 0 backoff probability mass left for "a hour" -- incrementing denominator
+warning: 0 backoff probability mass left for "you themselves" -- incrementing denominator
+warning: 0 backoff probability mass left for "new rochester" -- incrementing denominator
+warning: 0 backoff probability mass left for "kind were" -- incrementing denominator
+warning: 0 backoff probability mass left for "supposed were" -- incrementing denominator
+warning: 0 backoff probability mass left for "sort were" -- incrementing denominator
+warning: 0 backoff probability mass left for "capital to" -- incrementing denominator
+warning: 0 backoff probability mass left for "trying to" -- incrementing denominator
+warning: 0 backoff probability mass left for "kind to" -- incrementing denominator
+warning: 0 backoff probability mass left for "cope to" -- incrementing denominator
+warning: 0 backoff probability mass left for "law to" -- incrementing denominator
+warning: 0 backoff probability mass left for "do music" -- incrementing denominator
+warning: 0 backoff probability mass left for "kind we've" -- incrementing denominator
+warning: 0 backoff probability mass left for "you we've" -- incrementing denominator
+warning: 0 backoff probability mass left for "familiar real" -- incrementing denominator
+warning: 0 backoff probability mass left for "kind she" -- incrementing denominator
+warning: 0 backoff probability mass left for "kind they" -- incrementing denominator
+warning: 0 backoff probability mass left for "wind they" -- incrementing denominator
+warning: 0 backoff probability mass left for "supposed they" -- incrementing denominator
+warning: 0 backoff probability mass left for "used didn't" -- incrementing denominator
+warning: 0 backoff probability mass left for "used dad" -- incrementing denominator
+warning: 0 backoff probability mass left for "used mother" -- incrementing denominator
+warning: 0 backoff probability mass left for "or whether" -- incrementing denominator
+warning: 0 backoff probability mass left for "am what" -- incrementing denominator
+warning: 0 backoff probability mass left for "needs what" -- incrementing denominator
+warning: 0 backoff probability mass left for "scares what" -- incrementing denominator
+warning: 0 backoff probability mass left for "kinds what" -- incrementing denominator
+warning: 0 backoff probability mass left for "f j" -- incrementing denominator
+warning: 0 backoff probability mass left for "that between" -- incrementing denominator
+warning: 0 backoff probability mass left for "kind sounds" -- incrementing denominator
+warning: 0 backoff probability mass left for "thank okay" -- incrementing denominator
+warning: 0 backoff probability mass left for "got something's" -- incrementing denominator
+warning: 0 backoff probability mass left for "seem never" -- incrementing denominator
+warning: 0 backoff probability mass left for "going never" -- incrementing denominator
+warning: 0 backoff probability mass left for "tends that" -- incrementing denominator
+warning: 0 backoff probability mass left for "ought that" -- incrementing denominator
+warning: 0 backoff probability mass left for "and lots" -- incrementing denominator
+warning: 0 backoff probability mass left for "trying be" -- incrementing denominator
+warning: 0 backoff probability mass left for "kind be" -- incrementing denominator
+warning: 0 backoff probability mass left for "sort be" -- incrementing denominator
+warning: 0 backoff probability mass left for "exposed be" -- incrementing denominator
+warning: 0 backoff probability mass left for "kind feel" -- incrementing denominator
+warning: 0 backoff probability mass left for "kind she's" -- incrementing denominator
+warning: 0 backoff probability mass left for "you she's" -- incrementing denominator
+warning: 0 backoff probability mass left for "do house" -- incrementing denominator
+warning: 0 backoff probability mass left for "able they're" -- incrementing denominator
+warning: 0 backoff probability mass left for "kind they're" -- incrementing denominator
+warning: 0 backoff probability mass left for "supposed they're" -- incrementing denominator
+warning: 0 backoff probability mass left for "sort they're" -- incrementing denominator
+warning: 0 backoff probability mass left for "you our" -- incrementing denominator
+warning: 0 backoff probability mass left for "heaven's for" -- incrementing denominator
+warning: 0 backoff probability mass left for "able not" -- incrementing denominator
+warning: 0 backoff probability mass left for "trying not" -- incrementing denominator
+warning: 0 backoff probability mass left for "supposed not" -- incrementing denominator
+discarded 10919 3-gram contexts containing pseudo-events
+discarded 9 3-gram probs predicting pseudo-events
+discarded 1065659 3-gram probs discounted to zero
+writing 33110 1-grams
+writing 425750 2-grams
+writing 268962 3-grams

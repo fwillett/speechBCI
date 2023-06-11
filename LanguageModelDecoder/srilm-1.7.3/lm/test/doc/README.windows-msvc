@@ -1,0 +1,63 @@
+
+Recommendations for compiling with Microsoft Visual C++
+The build procedure has been tested with the freely available
+Visual C++ 8 that can be downloaded from www.microsoft.com as 
+"Visual C++ 2005 Express Edition".
+
+0) Install the cygwin environment, as described in README.windows-cygwin .
+   Cygwin tools are needed to run the build process and generate program
+   dependencies.
+
+1) SRILM can be set to the cygwin path of the SRILM root directory
+   (e.g., /home/username/srilm)
+
+2) Make sure environment variables are set to locate MSVC tools and files:
+
+	PATH    should include MSVC_INSTALL_DIR/bin and 
+	        MSVC_INSTALL_DIR/Common7/IDE (for dll search)
+        MSVCDIR should be set to MSVC_INSTALL_DIR
+	INCLUDE should be set to MSVC_INSTALL_DIR/include
+	LIB     should be set to MSVC_INSTALL_DIR/lib
+
+   Note: PATH needs to use cygwin pathname conventions, but MSVCDIR,
+   INCLUDE and LIB must use Windows paths.  For example:
+
+	PATH="/cygdrive/c/Program Files/Microsoft Visual Studio 8/VC/bin:/cygdrive/c/Program Files/Microsoft Visual Studio 8/Common7/IDE:$PATH"
+	MSVCDIR="c:\\Program Files\\Microsoft Visual Studio 8\\VC"
+	INCLUDE="$MSVCDIR\\include"
+	LIB="$MSVCDIR\\lib"
+	export PATH MSVCDIR INCLUDE LIB
+
+   could be used in bash given the default installation location of Visual
+   C++ 2005 Express Edition under c:\Program Files\Microsoft Visual Studio 8.
+
+   Alternatively, you could use the vcvars32.bat script that comes with
+   MSVC to set these environment variables.
+
+3) Build in a cygwin shell with
+
+	make MACHINE_TYPE=msvc
+
+   or
+
+	make MACHINE_TYPE=msvc64
+
+   to generate 64bit binaries.
+
+   As with MinGW, some functionality is not supported:
+
+    - compressed file I/O other than gzip files
+    - nbest-optimize and lattice-tool -max-time option
+
+   Also note that make will try to determine if certain libraries
+   are installed on your system and enable the /openmp option if so.
+   This means that binaries built with the full Visual Studio compiler
+   might not run on systems that have only Visual Studio Express.
+   To avoid this disable /openmp by commenting out the corresponding
+   line containing "/openmp" in common/Makefile.machine.msvc.
+
+4) Run test suite with
+
+	cd test
+	make MACHINE_TYPE=msvc try
+

@@ -1,0 +1,115 @@
+
+NEW SRI-LM LIBRARY AND TOOLS -- OVERVIEW 
+
+Design Goals
+
+- coverage of state-of-the-art LM methods
+- extensible vehicle for LM research 
+- code reusability
+- tool versatility
+- speed 
+
+Implementation language: C++ (GNU compiler)
+
+
+
+LM CLASS HIERARCHY
+
+   LM
+     Ngram			-- arbitrary-order N-gram backoff models
+	  DFNgram		-- N-grams including disfluency model
+	  VarNgram		-- variable-order N-grams
+          TaggedNgram		-- word/tag N-grams
+     CacheLM			-- unigram from recent history
+     DynamicLM			-- changes as a function of external info
+     BayesMix			-- mixture of LMs with contextual adaptation
+		
+
+
+
+OTHER CLASSES
+
+   Vocab			-- word string/index mapping
+      TaggedVocab		-- same for word/tag pairs
+
+   LMStats			-- statistics for LM estimation
+      NgramStats		-- N-gram counts
+          TaggedNgramStats	-- word/tag N-gram counts
+
+   Discount			-- backoff probality discounting
+      GoodTuring		-- standard
+      ConstDiscount		-- Ney's method
+      NaturalDiscount		-- Ristad's method
+
+
+
+HELPER LIBRARIES
+
+   libdstruct			-- template data structures
+
+      Array			-- self-extending arrays
+
+      Map
+         SArray			-- sorted arrays
+         LHash			-- linear hash tables
+
+      Trie			-- index trees (based on a Map type)
+
+      MemStats			-- memory usage tracking
+         
+
+   libmisc			-- convenience functions:
+					option parsing,
+					compressed file i/o,
+					object debugging
+ 
+
+
+TOOLS
+
+   ngram-count			-- N-gram counting and model estimation
+   ngram-merge			-- N-gram count merging
+   ngram			-- N-gram model scoring, perplexity,
+				   sentence generation, mixing and 
+				   interpolation
+
+
+
+LM INTERFACE
+
+LogP wordProb(VocabIndex word, const VocabIndex *context)
+LogP wordProb(VocabString word, const VocabString *context)
+
+LogP sentenceProb(const VocabIndex *sentence, TextStats &stats)
+LogP sentenceProb(const VocabString *sentence, TextStats &stats)
+
+unsigned pplFile(File &file, TextStats &stats, const char *escapeString = 0)
+setState(const char *state); 
+
+wordProbSum(const VocabIndex *context)
+
+VocabIndex generateWord(const VocabIndex *context)
+VocabIndex *generateSentence(unsigned maxWords,  VocabIndex *sentence)
+VocabString *generateSentence(unsigned maxWords, VocabString *sentence)
+
+Boolean isNonWord(VocabIndex word)
+Boolean read(File &file);
+void write(File &file);
+
+
+
+
+EXTENSIBILITY/REUSABILITY
+
+
+
+
+
+
+
+THINGS TO DO
+
+- Node array interface
+- General interpolated LMs
+- LM "shell" for interactive model manipulation and use (Tcl based)
+

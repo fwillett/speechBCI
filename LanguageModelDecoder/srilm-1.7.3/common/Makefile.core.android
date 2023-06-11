@@ -1,0 +1,182 @@
+#
+#    File:   Makefile.core.android
+#    Author: Mike Frandsen
+#    Date:   2010/08/03
+#
+#    Description:
+#	Machine dependent compilation options and variable definitions
+#	for Android, core file
+#
+#    Copyright (c) 1999-2010 SRI International.  All Rights Reserved.
+#
+#    $Header: /home/srilm/CVS/srilm/common/Makefile.core.android,v 1.14 2019/07/16 23:29:36 victor Exp $
+#
+
+# This version designed for Android NDK r20 setup as follows:
+# Get android-ndk-r20 for linux.  This is already a standalone toolchain.  It only supports the llvm STL library.
+# wget -q --output-document=android-ndk-r20.zip https://dl.google.com/android/repository/android-ndk-r20-linux-x86_64.zip
+# unzip android-ndk-r20.zip
+
+# Build on Linux using environment setup as follows:
+# export ANDROID_TOP=/path/to/dir/with/ndk
+# export ANDROID_HOST=linux-x86_64 
+# export ANDROID_NDK=${ANDROID_TOP}/android-ndk-r20
+# export ANDROID_TOOLCHAIN_PATH=$ANDROID_NDK/toolchains/llvm/prebuilt/linux-x86_64
+# export ANDROID_TOOLCHAIN_VERSION=4.9
+# export ANDROID_VERSION=android-23
+# export ANDROID_LINK_VERSION=android-23
+# 64 bit
+# export ARCH_NAME=aarch64-linux-android
+# export ANDROID_TOOLCHAIN_NAME=${ARCH_NAME}-4.9
+# export ANDROID_TOOLCHAIN_NAME=${ARCH_NAME}
+# export SYSROOT=${ANDROID_NDK}/sysroot
+# Export PATH to contain directories of clang and aarch64-linux-android-* utilities
+# export PATH=${ANDROID_NDK}/toolchains/aarch64-linux-android-4.9/prebuilt/linux-x86_64/bin/:$PATH
+# same as ANDROID_TOOLCHAIN_PATH
+# export PATH=${ANDROID_NDK}/toolchains/llvm/prebuilt/linux-x86_64/bin:$PATH
+# export CFLAGS="--sysroot=${SYSROOT} -fPIC -march=armv8-a"
+# export CXXFLAGS="--sysroot=${SYSROOT} -fPIC -march=armv8-a"
+# export AR=$ANDROID_TOOLCHAIN_PATH/bin/aarch64-linux-android-ar
+# export AS=$ANDROID_TOOLCHAIN_PATH/bin/aarch64-linux-android-as
+# export NM=$ANDROID_TOOLCHAIN_PATH/bin/aarch64-linux-android-nm
+# export CC=$ANDROID_TOOLCHAIN_PATH/bin/aarch64-linux-android23-clang
+# export CXX=$ANDROID_TOOLCHAIN_PATH/bin/aarch64-linux-android23-clang++
+# export LD=$ANDROID_TOOLCHAIN_PATH/bin/aarch64-linux-android-ld
+# export RANLIB=$ANDROID_TOOLCHAIN_PATH/bin/aarch64-linux-android-ranlib
+# export STRIP=$ANDROID_TOOLCHAIN_PATH/bin/aarch64-linux-android-strip
+# export STRINGS=$ANDROID_TOOLCHAIN_PATH/bin/aarch64-linux-android-strings
+
+
+# This Makefile only included by core x86 or arm Android Makefiles.
+
+# Override this if you are not building on Linux or set to
+# linux-x86_64 if your host is 64 bit.
+ANDROID_HOST ?= linux-x86_64
+
+# Need to set ndk directory; assume >= NDK r5b which bundles STL.
+# Use ?= so environment variables will override.
+#ANDROID_NDK ?= ~/android-ndk-r6b
+ANDROID_NDK ?= ~/android-ndk-r8e
+ANDROID_VERSION ?= android-23
+
+# formerly used ":="
+SYSROOT = $(ANDROID_NDK)/toolchains/llvm/prebuilt/linux-x86_64/sysroot
+
+# Set as follows for NDK r8b
+# 4.4.3 should also be available in r8b
+ANDROID_TOOLCHAIN_VERSION := 4.9
+# Newer versions add "/4.4.3" or "/4.6" to include and lib paths
+OPT_GCC_VER := /$(ANDROID_TOOLCHAIN_VERSION)
+OPT_GCC_VER =
+ANDROID_API_VERSION = 23
+
+ANDROID_TOOLCHAIN_NAME_ALT ?= $(ANDROID_TOOLCHAIN_NAME)
+ANDROID_SRILM_BIN := $(ANDROID_NDK)/toolchains/llvm/prebuilt/$(ANDROID_HOST)/bin
+GCC = $(ANDROID_SRILM_BIN)/$(ANDROID_TOOLCHAIN_NAME)$(ANDROID_API_VERSION)-clang
+GPP = $(ANDROID_SRILM_BIN)/$(ANDROID_TOOLCHAIN_NAME)$(ANDROID_API_VERSION)-clang++
+AR = $(ANDROID_SRILM_BIN)/$(ANDROID_TOOLCHAIN_NAME)-ar
+
+# Other possible options:
+# As above:
+#   (arm-eabi-)+(gcc,g++,ar)
+#   (arm-linux-androideabi-)+(gcc,g++,ar)
+# Others:
+#   ()+(gcc,g++,ar)
+#   (i686-android-linux-)+(gcc,g++,ar)
+
+ARCHIVE = $(AR) crsuv
+
+# Use the GNU C compiler.
+WARNING_FLAGS := -Wreturn-type  -Wimplicit  -Wuninitialized -Wdeprecated  -Wpointer-arith -Wstrict-overflow -Woverlength-strings -Wunused-variable
+# ARCH_FLAGS = -march=armv8-a -Wl,--no-warn-mismatch -DANDROID -DNO_EXCEPTIONS
+GCC_FLAGS = $(ARCH_FLAGS) $(WARNING_FLAGS) -DNO_ZIO -DNO_ICONV
+CC = $(GCC) $(GCC_FLAGS) --sysroot=$(SYSROOT)
+CXX = $(GPP) $(GCC_FLAGS) -DINSTANTIATE_TEMPLATES --sysroot=$(SYSROOT)
+
+# avoid gcc warning that all code is PIC
+# Victor 4/25/16: Actually need -fPIC to build SRINTERP .so
+# PIC_FLAG = -fpic
+
+# suffix used for executable files
+EXE_SUFFIX =
+
+# Optional compilation flags.
+# -Os is optimize for size
+OPTIMIZE_FLAGS = -g -O2 -Os -DNDEBUG -ffunction-sections -funwind-tables -fno-short-enums
+DEBUG_FLAGS = -g -DDEBUG
+PROFILE_FLAGS = -g -pg -O2
+
+# Optional linking flags.
+EXPORT_LDFLAGS = -s
+
+# Shared compilation flags.
+CFLAGS = $(ADDITIONAL_CFLAGS) $(INCLUDES)
+CXXFLAGS = $(ADDITIONAL_CXXFLAGS) $(INCLUDES)
+
+# Shared linking flags.
+LDFLAGS = $(ADDITIONAL_LDFLAGS) -L$(SRILM_LIBDIR)
+
+# Other useful compilation flags.
+# Turn off thread local storage; single instance assumed
+# on Android and can conflict with other libraries.
+ADDITIONAL_CFLAGS = -DNEED_RAND48 -DNO_TLS -DNO_BLOCK_MALLOC
+ADDITIONAL_CXXFLAGS = -DNEED_RAND48 -DNO_TLS -DNO_BLOCK_MALLOC
+
+# Other useful include directories.
+ADDITIONAL_INCLUDES = -I$(SYSROOT)/usr/include  -I$(SYSROOT)/usr/include/aarch64-linux-android 
+
+# Other useful linking flags.
+ADDITIONAL_LDFLAGS =
+
+# Other useful libraries.
+# r6b and earlier
+#ADDITIONAL_LIBRARIES = -lm -lstdc++ -lgcc
+# r8b
+# -rpath-link was recommended but not needed as -Wl option
+# The -Wl,--entry=main gets rid of the warnings like "cannot find entry symbol _start"
+ANDROID_CUST_DIR_ALT ?= $(ANDROID_CUST_DIR)
+IS_HARD := $(findstring -hard,$(ANDROID_CUST_DIR))
+
+ifneq ($(IS_HARD),)
+# hard
+# probably doesn't work anymore...
+ADDITIONAL_LIBRARIES += -Wl,--entry=main -L$(ANDROID_NDK)/sources/cxx-stl/llvm-libc++$(OPT_GCC_VER)/libs/$(ANDROID_CUST_DIR_ALT) -lm_hard -lgnustl_static -lsupc++ -lgcc -lc
+MATH_LIBRARY = -lm_hard
+else
+# not hard
+# works for 64 bit build
+ADDITIONAL_LIBRARIES += -Wl,--entry=main -L$(ANDROID_NDK)/sources/cxx-stl/llvm-libc++$(OPT_GCC_VER)/libs/$(ANDROID_CUST_DIR_ALT) -lc++_static -lgcc -lm  -lc -ldl
+endif
+
+# run-time linker path flag
+RLD_FLAG = -R
+
+# Tcl support (part of cygwin)
+TCL_INCLUDE =
+TCL_LIBRARY =
+NO_TCL = X
+
+# No ranlib
+RANLIB = :
+
+# Not needed
+DEMANGLE_FILTER =
+
+# Generate dependencies from source files.
+# Use clang now...
+GEN_DEP = $(GCC) $(CFLAGS) -MM
+GEN_DEP.cc = $(GPP) $(CXXFLAGS) -MM
+
+# Run lint.
+LINT = lint
+LINT_FLAGS = -DDEBUG $(CFLAGS)
+
+# Location of gawk binary
+GAWK = /usr/bin/gawk
+
+# Location of perl binary
+PERL = /usr/bin/perl
+
+# Fix __dso_handle errors
+# ADDITIONAL_LIBRARIES += $(SYSROOT)/usr/lib/crtbegin_so.o
+# ADDITIONAL_LIBRARIES += $(ANDROID_NDK)/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/lib/aarch64-linux-android/23/crtbegin_so.o

@@ -1,0 +1,33 @@
+#
+#    File:   Makefile.machine.android-arm64-v8a
+#    Author: Mike Frandsen, Victor Abrash
+#    Date:   2010/08/03
+#
+#    Description:
+#	Machine dependent compilation options and variable definitions
+#	for Android on ARM, v8a
+#
+#    Copyright (c) 1999-2016 SRI International.  All Rights Reserved.
+#
+#    $Header: /home/srilm/CVS/srilm/common/Makefile.machine.android-arm64-v8a.r16b,v 1.1 2019/07/16 23:19:49 victor Exp $
+#
+
+# Now disallow env override to maintain compatibility.
+# V7 was armeabi-v7a, use arm64-v8a for new 64-bit architecture
+ANDROID_CUST_DIR := arm64-v8a
+
+# -ldl fixes link error
+ADDITIONAL_LIBRARIES += -Wl,--no-warn-mismatch -ldl
+
+# ANDROID_ARCH used in older sysroot paths:
+ANDROID_ARCH := arch-arm64
+ANDROID_TOOLCHAIN_NAME := aarch64-linux-android
+
+# Used in ARCH_FLAGS below:
+ANDROID_CUST_CFLAGS :=  -march=armv8-a -Wl,--no-warn-mismatch
+
+# Removed old flags -fno-exceptions and -fno-rtti so we can use Kaldi
+# Used in GCC_FLAGS:
+ARCH_FLAGS = -nostdlib $(ANDROID_CUST_CFLAGS) -DANDROID -DNO_EXCEPTIONS
+
+include $(SRILM)/common/Makefile.core.android

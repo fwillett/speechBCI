@@ -1,0 +1,133 @@
+reading 33110 1-grams
+reading 425750 2-grams
+reading 268962 3-grams
+processing hyps for sw_40008_A_0003136_0003462.score
+processing hyps for sw_40008_A_0003654_0004241.score
+processing hyps for sw_40008_A_0004340_0004457.score
+processing hyps for sw_40008_A_0004577_0004913.score
+processing hyps for sw_40008_A_0004903_0005087.score
+processing hyps for sw_40008_A_0005188_0005508.score
+processing hyps for sw_40008_A_0005498_0005837.score
+processing hyps for sw_40008_A_0005946_0006191.score
+processing hyps for sw_40008_A_0006352_0006570.score
+processing hyps for sw_40008_A_0006920_0007092.score
+processing hyps for sw_40008_A_0007340_0007478.score
+processing hyps for sw_40008_A_0007577_0007798.score
+processing hyps for sw_40008_A_0008275_0008469.score
+processing hyps for sw_40008_A_0008458_0009001.score
+processing hyps for sw_40008_A_0009103_0009736.score
+processing hyps for sw_40008_A_0009726_0009869.score
+processing hyps for sw_40008_A_0009859_0010181.score
+processing hyps for sw_40008_A_0010336_0010950.score
+processing hyps for sw_40008_A_0010940_0011139.score
+processing hyps for sw_40008_A_0011128_0011419.score
+processing hyps for sw_40008_A_0011409_0011599.score
+processing hyps for sw_40008_A_0011706_0011953.score
+processing hyps for sw_40008_A_0012048_0012152.score
+processing hyps for sw_40008_A_0012376_0012559.score
+processing hyps for sw_40008_A_0013103_0014151.score
+processing hyps for sw_40008_A_0014140_0014400.score
+processing hyps for sw_40008_A_0014752_0014953.score
+processing hyps for sw_40008_A_0015271_0015405.score
+processing hyps for sw_40008_A_0015814_0016128.score
+processing hyps for sw_40008_A_0016636_0016827.score
+processing hyps for sw_40008_A_0016922_0017479.score
+processing hyps for sw_40008_A_0017469_0018121.score
+processing hyps for sw_40008_A_0018111_0018657.score
+processing hyps for sw_40008_A_0018940_0019116.score
+processing hyps for sw_40008_A_0019273_0019764.score
+processing hyps for sw_40008_A_0020241_0020392.score
+processing hyps for sw_40008_A_0020381_0020626.score
+processing hyps for sw_40008_A_0020615_0021064.score
+processing hyps for sw_40008_A_0021197_0022563.score
+processing hyps for sw_40008_A_0022772_0022949.score
+processing hyps for sw_40008_A_0023445_0023662.score
+processing hyps for sw_40008_A_0024220_0024402.score
+processing hyps for sw_40008_A_0024391_0024610.score
+processing hyps for sw_40008_A_0025080_0025522.score
+processing hyps for sw_40008_A_0025684_0025836.score
+processing hyps for sw_40008_A_0025941_0026086.score
+processing hyps for sw_40008_A_0026075_0026330.score
+processing hyps for sw_40008_A_0026319_0026703.score
+processing hyps for sw_40008_A_0026693_0027310.score
+processing hyps for sw_40008_A_0027475_0027814.score
+processing hyps for sw_40008_A_0027803_0028050.score
+processing hyps for sw_40008_A_0028152_0028295.score
+processing hyps for sw_40008_A_0028575_0028796.score
+processing hyps for sw_40008_A_0028785_0028932.score
+processing hyps for sw_40008_A_0029045_0029456.score
+processing hyps for sw_40008_A_0029988_0030938.score
+processing hyps for sw_40008_A_0030928_0031128.score
+processing hyps for sw_40008_A_0031245_0031532.score
+processing hyps for sw_40008_A_0031882_0032515.score
+processing hyps for sw_40008_A_0032505_0032663.score
+processing hyps for sw_40008_A_0033030_0033199.score
+processing hyps for sw_40008_A_0033189_0033694.score
+processing hyps for sw_40008_A_0033684_0034178.score
+processing hyps for sw_40008_A_0034168_0034310.score
+processing hyps for sw_40008_A_0034300_0034912.score
+sw_40008_A_0003136_0003462: best hyp is 8
+sw_40008_A_0003654_0004241: best hyp is 1
+sw_40008_A_0004340_0004457: best hyp is 1
+sw_40008_A_0004577_0004913: best hyp is 3
+sw_40008_A_0004903_0005087: best hyp is 1
+sw_40008_A_0005188_0005508: best hyp is 1
+sw_40008_A_0005498_0005837: best hyp is 1
+sw_40008_A_0005946_0006191: best hyp is 194
+sw_40008_A_0006352_0006570: best hyp is 2
+sw_40008_A_0006920_0007092: best hyp is 1
+sw_40008_A_0007340_0007478: best hyp is 1
+sw_40008_A_0007577_0007798: best hyp is 1
+sw_40008_A_0008275_0008469: best hyp is 1
+sw_40008_A_0008458_0009001: best hyp is 2
+sw_40008_A_0009103_0009736: best hyp is 1
+sw_40008_A_0009726_0009869: best hyp is 2
+sw_40008_A_0009859_0010181: best hyp is 1
+sw_40008_A_0010336_0010950: best hyp is 222
+sw_40008_A_0010940_0011139: best hyp is 1
+sw_40008_A_0011128_0011419: best hyp is 21
+sw_40008_A_0011409_0011599: best hyp is 3
+sw_40008_A_0011706_0011953: best hyp is 8
+sw_40008_A_0012048_0012152: best hyp is 1
+sw_40008_A_0012376_0012559: best hyp is 1
+sw_40008_A_0013103_0014151: best hyp is 1326
+sw_40008_A_0014140_0014400: best hyp is 202
+sw_40008_A_0014752_0014953: best hyp is 1
+sw_40008_A_0015271_0015405: best hyp is 1
+sw_40008_A_0015814_0016128: best hyp is 1
+sw_40008_A_0016636_0016827: best hyp is 1
+sw_40008_A_0016922_0017479: best hyp is 53
+sw_40008_A_0017469_0018121: best hyp is 37
+sw_40008_A_0018111_0018657: best hyp is 1
+sw_40008_A_0018940_0019116: best hyp is 1
+sw_40008_A_0019273_0019764: best hyp is 745
+sw_40008_A_0020241_0020392: best hyp is 1
+sw_40008_A_0020381_0020626: best hyp is 1
+sw_40008_A_0020615_0021064: best hyp is 1
+sw_40008_A_0021197_0022563: best hyp is 238
+sw_40008_A_0022772_0022949: best hyp is 1
+sw_40008_A_0023445_0023662: best hyp is 1
+sw_40008_A_0024220_0024402: best hyp is 1
+sw_40008_A_0024391_0024610: best hyp is 1
+sw_40008_A_0025080_0025522: best hyp is 813
+sw_40008_A_0025684_0025836: best hyp is 1
+sw_40008_A_0025941_0026086: best hyp is 1
+sw_40008_A_0026075_0026330: best hyp is 9
+sw_40008_A_0026319_0026703: best hyp is 1697
+sw_40008_A_0026693_0027310: best hyp is 39
+sw_40008_A_0027475_0027814: best hyp is 1
+sw_40008_A_0027803_0028050: best hyp is 5
+sw_40008_A_0028152_0028295: best hyp is 2
+sw_40008_A_0028575_0028796: best hyp is 1
+sw_40008_A_0028785_0028932: best hyp is 23
+sw_40008_A_0029045_0029456: best hyp is 1
+sw_40008_A_0029988_0030938: best hyp is 240
+sw_40008_A_0030928_0031128: best hyp is 1
+sw_40008_A_0031245_0031532: best hyp is 726
+sw_40008_A_0031882_0032515: best hyp is 98
+sw_40008_A_0032505_0032663: best hyp is 4
+sw_40008_A_0033030_0033199: best hyp is 1
+sw_40008_A_0033189_0033694: best hyp is 1
+sw_40008_A_0033684_0034178: best hyp is 3
+sw_40008_A_0034168_0034310: best hyp is 1
+sw_40008_A_0034300_0034912: best hyp is 17

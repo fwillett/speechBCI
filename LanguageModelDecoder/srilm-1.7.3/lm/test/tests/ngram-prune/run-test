@@ -1,0 +1,33 @@
+#!/bin/sh
+
+smooth="-wbdiscount1 -wbdiscount2 -wbdiscount3"
+
+if [ -f ../ngram-count-gt/swbd.3grams.gz ]; then
+	gz=.gz
+else
+	gz=
+fi
+
+# create LM from counts
+ngram-count -debug 1 \
+	$smooth \
+	-read ../ngram-count-gt/swbd.3grams$gz \
+	-vocab ../ngram-count-gt/eval2001.vocab \
+	-nonevents nonevents.vocab \
+	-lm swbd.3bo$gz
+
+ngram -debug 0 \
+        -lm swbd.3bo$gz \
+        -ppl ../ngram-count-gt/eval97.text
+
+ngram -debug 1 \
+	-lm swbd.3bo$gz \
+	-nonevents nonevents.vocab \
+	-prune 1e-7 \
+	-write-lm pruned$gz 
+
+ngram -debug 0 \
+        -lm pruned$gz \
+        -ppl ../ngram-count-gt/eval97.text
+
+rm -f swbd.3bo$gz pruned$gz

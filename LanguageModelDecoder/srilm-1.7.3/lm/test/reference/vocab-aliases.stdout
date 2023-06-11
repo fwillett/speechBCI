@@ -1,0 +1,10 @@
+I AM HERE
+	p( i | <s> ) 	= [2gram] 0.0488589 [ -1.31106 ]
+	p( am | i ...) 	= [3gram] 0.00723492 [ -2.14057 ]
+	p( here | am ...) 	= [3gram] 0.00180851 [ -2.74268 ]
+	p( </s> | here ...) 	= [2gram] 0.158005 [ -0.80133 ]
+1 sentences, 3 words, 0 OOVs
+0 zeroprobs, logprob= -6.99563 ppl= 56.0929 ppl1= 214.722
+
+file -: 1 sentences, 3 words, 0 OOVs
+0 zeroprobs, logprob= -6.99563 ppl= 56.0929 ppl1= 214.722

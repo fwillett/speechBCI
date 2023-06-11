@@ -1,0 +1,45 @@
+#!/bin/sh
+
+if [ -f ../ngram-count-gt/swbd.3grams.gz ]; then
+	gz=.gz
+else
+	gz=
+fi
+
+ngram -debug 1 -lm ../ngram-count-gt/swbd.3bo$gz \
+				-server-port 5001 2> server.log &
+
+serverpid=$!
+
+# wait for server to start up, but only if it hasn't died yet
+while kill -0 $serverpid 2>/dev/null; do
+	if [ -f server.log ]; then
+		break
+	fi
+	sleep 3
+done
+
+while kill -0 $serverpid 2>/dev/null; do
+	case `tail -1 server.log` in
+	'starting prob server'*) break ;;
+	esac
+
+	sleep 3
+done
+
+sleep 1
+
+ngram -use-server 5001@localhost -ppl ../ngram-count-gt/eval97.text
+
+sleep 1
+
+# avoid "PID Terminated" message
+exec 2>/dev/null
+kill $serverpid
+
+echo "*** SERVER LOG ***"
+# strip incidental port numbers from output
+sed 's,client .*@,client @,' server.log
+
+rm -f server.log
+

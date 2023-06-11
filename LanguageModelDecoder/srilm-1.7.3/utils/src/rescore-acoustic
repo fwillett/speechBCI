@@ -1,0 +1,70 @@
+#!/bin/sh
+#
+# rescore-acoustic --
+#       Replace acoustic Nbest scores with a weighted combination of
+#       old and new acoustic scores
+#
+# $Header: /home/srilm/CVS/srilm/utils/src/rescore-acoustic,v 1.8 2015-07-03 03:45:39 stolcke Exp $
+#
+
+if [ $# -lt 5 ]; then
+        echo "usage: $0 old-nbest-dir old-ac-weight new-score-dir1 new-ac-weight1 new-score-dir2 new-ac-weight2 ... new-nbest-dir [max-nbest]" >&2
+        echo "    or $0 old-file-list old-ac-weight new-score-dir1 new-ac-weight1 new-score-dir2 new-ac-weight2 ... new-nbest-dir [max-nbest]" >&2
+        exit 1
+fi
+
+old_nbest=${1}
+old_acw=${2}
+shift; shift
+
+new_scores=
+new_acw=
+while [ $# -ge 3 ]
+do
+	new_scores="$new_scores $1"
+	new_acw="$new_acw $2"
+	shift; shift
+done
+new_nbest=${1}
+max_nbest=${2-0}
+
+set -e
+
+tmpdir=${TMPDIR-/tmp}
+join1="$tmpdir/join1_$$"
+join2="$tmpdir/join2_$$"
+trap "rm -f $join1 $join2" 0 1 2 15
+
+echo "generating sentids ..." >&2
+if [ -d $old_nbest ]; then
+	find $old_nbest/. -follow -type f -print
+else
+	cat $old_nbest 
+fi | \
+sed -e 's,.*,& &,' -e 's,[^ ]*/,,' -e 's,\.gz , ,' -e 's,\.score , ,' | \
+sort -k 1,1 > $join1
+
+echo "`wc -l < $join1` utterances" >&2
+
+for d in $new_scores
+do
+	echo "joining $d ..." >&2
+	find $d/. -follow -type f -print | \
+	sed -e 's,.*,& &,' -e 's,[^ ]*/,,' -e 's,\.gz , ,' |\
+	sort -k 1,1 | \
+	/usr/local/gnu/bin/join $join1 - > $join2
+	mv $join2 $join1
+done
+echo "`wc -l < $join1` utterances after joining" >&2
+
+mkdir -p $new_nbest
+
+cat $join1 | \
+while read sentid scorefiles
+do
+	echo $sentid >&2
+	combine-acoustic-scores -v "weights=$old_acw $new_acw" \
+		-v max_nbest=$max_nbest $scorefiles | \
+		gzip > $new_nbest/$sentid.score.gz 
+done
+

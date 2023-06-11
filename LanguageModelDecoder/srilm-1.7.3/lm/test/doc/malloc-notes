@@ -1,0 +1,12 @@
+
+size of ngram reading Switchboard trigram
+
+SunOS5.5.1 libc malloc		12M
+	   -lmalloc		12M
+
+IRIX5.1 libc malloc		12M
+	-lmalloc MX_FAST = 24	11M
+		 MX_FAST = 10   12M
+		 MX_FAST = 32   11M
+	
+

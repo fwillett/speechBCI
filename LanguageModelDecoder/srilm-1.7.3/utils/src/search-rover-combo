@@ -1,0 +1,267 @@
+#!/bin/sh
+#
+# search-rover-combo --
+#	search for best rover combination from a list of systems
+#
+# $Header: /home/srilm/CVS/srilm/utils/src/search-rover-combo,v 1.14 2016-12-10 18:20:33 stolcke Exp $
+#
+
+
+scriptdir=`dirname $0`
+score_script=$scriptdir/score-hyps
+datadir=SEARCH-DATA
+weights="1"
+smooth_weight=
+sentids=-
+njobs=1
+refs=
+
+# collect options
+while [ $# -gt 0 ]; do
+    case "$1" in
+    -rover)	shift
+		run_rover=1
+		break ;;
+    -rover-optimize)	shift
+		run_rover_optimize=1
+		break ;;
+    -scorer)	score_script="$2";
+		shift; shift ;;
+    -weights)	weights="$2";
+		shift; shift ;;
+    -smooth-weight)	
+		smooth_weight="$2";
+		shift; shift ;;
+    -smooth-control)	
+		smooth_control="$2";
+		shift; shift ;;
+    -datadir)	datadir="$2";
+		shift; shift ;; 
+    -sentids)	sentids="$2";
+		shift; shift ;; 
+    -refs)	refs="$2"
+		shift; shift ;; 
+    -J)		njobs=$2
+		shift; shift ;; 
+    -*)		echo "usage: $0 [-scorer SCRIPT] [-weights=\"W1 W2 ...\" | -refs REFS] [-smooth-weight S] [-datadir DIR] [-sentids LIST] LIST-OF-CONTROL-FILES" >&2
+		exit 2 ;;
+    *)		break ;;
+    esac
+done
+
+# see if this is a recursive evaluation to run a single nbest-rover
+if [ -n "$run_rover" ]; then
+	# sentids control-file hyps-out
+	nbest-rover $1 $2 > $3
+	exit
+elif [ -n "$run_rover_optimize" ]; then
+	# sentids control-file hyps-out refs
+	nbest-rover $1 $2 /dev/null > $3-0 2>&1 \
+		-refs $4 -write-ref-posteriors $3.ref-posteriors
+	rm $3-0
+	tying=`rover-control-tying $2`
+	compute-best-rover-mix tying="$tying" $3.ref-posteriors > $3.optimize 2>&1
+
+	weights=`${GAWK-gawk} '/best lambda/ { sub(".*[(]", "", $0); sub("[)]", "", $0); print }' $3.optimize `
+
+	rover-control-weights weights="$weights" $2 > $2.optimized1
+
+	if [ -n "$smooth_weight" -a -n "$smooth_control" ]; then
+	    combine-rover-controls keeppaths=1 lambda=$smooth_weight $smooth_control $2.optimized1 > $2.optimized
+	else
+	    mv $2.optimized1 $2.optimized
+	fi
+
+	nbest-rover $1 $2.optimized > $3
+	exit
+fi
+
+rexport=${REXPORT-rexport.gnumake -exit-on-error -J $njobs -f}
+
+input_list=${1-SYSTEM-LIST}
+# backward compatibility for 2nd argument
+score_script=${2-$score_script}
+# backward compatibility for 3rd argument
+datadir=${3-$datadir}
+
+set -e
+
+mkdir -p $datadir
+
+
+#
+# Step 1:  compute errors for individual systems
+#
+
+system_errors=$datadir/system-errors
+cmdlist=$datadir/score.rexports
+
+tmpctrl=$datadir/tmp.control
+tmphyps=$datadir/tmp.hyps
+tmpscore=$datadir/tmp.score
+
+sort $input_list > $datadir/sorted_inputs
+
+iter=0
+iterdir=$datadir/$iter
+mkdir -p $iterdir
+
+system_errors=$iterdir/system_errors
+
+if [ ! -s $system_errors ]; then
+    count=1
+    > $cmdlist
+
+    cat $datadir/sorted_inputs | \
+    while read roverctrl
+    do
+	# rewrite rover control file to adjust directory paths
+	combine-rover-controls $roverctrl > $tmpctrl.$count
+
+	echo "$0 -rover $sentids $tmpctrl.$count $tmphyps.$count; \
+	      echo $roverctrl \`$score_script $tmphyps.$count\` > $tmpscore.$count" >> $cmdlist
+
+	count=`expr $count + 1`
+    done
+
+    # run the scoring jobs
+    if [ $njobs -lt 2 ]; then
+	sh -ex $cmdlist >$cmdlist.log 2>&1
+    else
+        $rexport $cmdlist >$cmdlist.log 2>&1
+    fi
+    sort +0 -1 $tmpscore.* > $system_errors
+
+    rm -f $tmpctrl.* $tmphyps.* $tmpscore.*
+fi # system_errors exists
+
+best_system=`sort +1n -2 $system_errors | ${GAWK-gawk} '{ print $1; exit }' `
+best_error=`sort +1n -2 $system_errors | ${GAWK-gawk} '{ print $2; exit }' `
+
+echo "FIRST SYSTEM" >&2
+echo $best_system >&2
+echo "ERROR $best_error" >&2
+
+echo "$best_system 1" > $iterdir/combo
+join -v 1 $datadir/sorted_inputs $iterdir/combo > $iterdir/unused
+cat $best_system > $iterdir/rover.control
+
+tryall=yes
+
+# if weigh testimation is used it we always add the new system at a fixed lower weight
+# than the sum of prior systems
+if [ -n "$refs" ]; then
+    weights=0.5
+fi
+
+while [ -s $iterdir/unused ]
+do
+    newiter=`expr $iter + 1`
+    newiterdir=$datadir/$newiter
+    mkdir -p $newiterdir
+
+    echo "ITER $newiter" >&2
+
+    system_errors=$newiterdir/system_errors
+
+    if [ ! -s $system_errors ]; then
+
+	for weight in $weights
+	do
+	    count=1
+	    > $cmdlist
+
+	    cat $iterdir/unused | \
+	    while read roverctrl
+	    do
+		combine-rover-controls keeppaths=1 lambda="1 $weight" $iterdir/rover.control $roverctrl > $tmpctrl.$count
+
+		if [ -n "$refs" ]; then
+		    # evaluate rover control file with weight optimization
+		    if [ -n "$smooth_weight" ]; then
+			smooth="-smooth-weight $smooth_weight -smooth-control $iterdir/rover.control"
+		    fi
+		    echo "$0 $smooth -rover-optimize $sentids $tmpctrl.$count $tmphyps.$count $refs; \
+		          echo $roverctrl $weight \`$score_script $tmphyps.$count\` $tmpctrl.$count.optimized > $tmpscore.$count" >> $cmdlist
+		else
+		    # evaluate rover control file without weight optimization
+		    echo "$0 -rover $sentids $tmpctrl.$count $tmphyps.$count; \
+		          echo $roverctrl $weight \`$score_script $tmphyps.$count\` $tmpctrl.$count > $tmpscore.$count" >> $cmdlist
+		fi
+
+		count=`expr $count + 1`
+	    done
+
+	    # run the scoring jobs
+	    if [ $njobs -lt 2 ]; then
+		sh -ex $cmdlist >$cmdlist.log 2>&1
+	    else
+		$rexport $cmdlist >$cmdlist.log 2>&1
+	    fi
+	    sort +0 -1 $tmpscore.* > $system_errors
+
+	    ${GAWK-gawk} -v old_error=$best_error '$3 < old_error' $system_errors > $system_errors.improved
+
+	    if [ -s $system_errors.improved ]; then
+		# we found at least one improvement; stop trying weights
+		break;
+	    fi
+	done
+    else
+	# restart search at this iteration
+        ${GAWK-gawk} -v old_error=$best_error '$3 < old_error' $system_errors > $system_errors.improved
+    fi
+
+    if [ -s $system_errors.improved ]; then
+	best_system=`sort +2n -3 $system_errors.improved | ${GAWK-gawk} '{ print $1; exit }' `
+	best_weight=`sort +2n -3 $system_errors.improved | ${GAWK-gawk} '{ print $2; exit }' `
+	best_error=`sort +2n -3 $system_errors.improved | ${GAWK-gawk} '{ print $3; exit }' `
+	best_control=`sort +2n -3 $system_errors.improved | ${GAWK-gawk} '{ print $4; exit }' `
+
+	echo "NEXT SYSTEM" >&2
+	echo "$best_system $best_weight" >&2
+	echo "ERROR $best_error" >&2
+
+	if [ ! -s $newiterdir/rover.control ]; then
+	    cat $best_control > $newiterdir/rover.control
+	fi
+
+	{ cat $iterdir/combo; echo "$best_system $best_weight"; } | sort +0 -1 > $newiterdir/combo
+	${GAWK-gawk} '{ print $1 }' $system_errors.improved | \
+	join -v 1 - $newiterdir/combo > $newiterdir/unused
+
+	tryall=yes
+    else
+	cat $iterdir/combo > $newiterdir/combo
+	cat $iterdir/rover.control > $newiterdir/rover.control
+    fi
+
+    rm -f $tmpctrl.* $tmphyps.* $tmpscore.*
+
+    if [ ! -s $newiterdir/unused -a "$tryall"  ]; then
+	
+	# no improvement -- add all previously discarded systems back into the running
+	echo "EXPANDING SEARCH" >&2
+
+	if [ ! -f $newiterdir/combo ]; then
+	    # try extending the same combo again in next iteration
+	    cat $iterdir/combo > $newiterdir/combo
+	    cat $iterdir/rover.control > $newiterdir/rover.control
+	fi
+
+	join -v 1 $datadir/sorted_inputs $newiterdir/combo > $newiterdir/unused
+
+	# do this only once until we can add a new system 
+	tryall=
+    fi
+
+    iter=$newiter
+    iterdir=$newiterdir
+done
+
+echo "BEST COMBO" >&2
+cat $iterdir/combo >&2
+echo "ERROR $best_error" >&2
+
+cat $iterdir/rover.control
+

@@ -1,0 +1,43 @@
+#!/bin/bash
+
+# Run from top-level as:
+# common/runmake-msvc MACHTYPE [OPTION=OPT EXTRA_ARGS]
+# where can specify MACHTYPE directly or use
+#   common/Makefile.machine.fullname
+
+# Before running this script, it's assumed that the version of "cl"
+# in your path is the intended MSVC compiler to use.
+
+# Usage should be:
+# make common/Makefile.machine.*
+# or could simply specify machine type as we strip through that part below
+
+if [ "$1" = "" ]; then
+    echo "Usage: $0 common/Makefile.machine.msvc-{...} [OPTION=_c] [args]"
+    echo "   or: $0 msvc-{...} [OPTION=_c] [args]"
+    echo "Examples (below with 64 bit vs2012 cl in path):"
+    echo "   $0 msvc-vs2012-64-md-static OPTION=_c clean"
+    echo "   $0 msvc-vs2012-64-md-static OPTION=_c"
+    exit 1
+fi
+
+COMMON_FILE=$1
+shift
+
+# This forces SRILM to be a cygwin style path
+export SRILM=`pwd`
+
+# Get path to cl compiler both using Cygwin and Windows paths
+MYCL_CYG=`which cl`
+MYCL_WIN=`cygpath -m "$MYCL_CYG"`
+
+# Set MSVCDIR/Dir variants to use appropriate cl
+export MSVCDIR=`echo $MYCL_WIN | sed 's/\([\/\\][vV][cC]\)[\/\\].*/\1/'`
+export MSVCDir=$MSVCDIR
+
+# Strip out everything through common/Makefile.machine. to get MACHINE_TYPE
+MACH=`echo $COMMON_FILE | sed 's/.*machine[.]//'`
+
+# XXX Here, could sanity check that MSVCDIR and cl match up
+
+make MACHINE_TYPE=$MACH "$@"

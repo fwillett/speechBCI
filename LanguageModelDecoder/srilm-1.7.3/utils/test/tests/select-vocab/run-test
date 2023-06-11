@@ -1,0 +1,21 @@
+#!/bin/sh
+
+lmdir=../../../../lm/test/tests/ngram-count-gt
+
+if [ -f $lmdir/swbd.3bo.gz ]; then
+	gz=.gz
+else
+	gz=
+fi
+
+heldout=$lmdir/eval97.text
+
+select-vocab -scale 10000 -heldout $heldout \
+		$lmdir/swbd.3bo$gz \
+		$lmdir/swbd.3grams$gz \
+			> weighted.vocab
+
+sort -k 2rn,2 weighted.vocab | head -20
+
+rm -f weighted.vocab
+

@@ -1,0 +1,97 @@
+I found gzip in your path.  So I'll support compressed input.
+Adding words from text file ../../../../lm/test/tests/ngram-count-gt/eval97.text into vocabulary.
+Adding words from ARPA-style LM file ../../../../lm/test/tests/ngram-count-gt/swbd.3bo.gz into vocabulary.
+Adding words from counts file ../../../../lm/test/tests/ngram-count-gt/swbd.3grams.gz into vocabulary.
+Estimating logprobs for ../../../../lm/test/tests/ngram-count-gt/swbd.3bo.gz. It has all but 377 vocabulary words.
+	Sum of counts in ../../../../lm/test/tests/ngram-count-gt/swbd.3bo.gz is only 0.922905325050722
+	Will distribute probabilty mass of 0.077094674949278 over novel words
+Estimating logprobs for ../../../../lm/test/tests/ngram-count-gt/swbd.3grams.gz. It has all but 6913 vocabulary words.
+Iter 0: lambdas = (0.5 0.5)
+Iter 1: lambdas = (0.549276 0.450724) log P(held-out) = -287946.1370 PPL = 746.3490
+Iter 2: lambdas = (0.591725 0.408275) log P(held-out) = -287551.6197 PPL = 739.6150
+Iter 3: lambdas = (0.628514 0.371486) log P(held-out) = -287252.8750 PPL = 734.5562
+Iter 4: lambdas = (0.660565 0.339435) log P(held-out) = -287021.2123 PPL = 730.6572
+Iter 5: lambdas = (0.688620 0.311380) log P(held-out) = -286838.2576 PPL = 727.5926
+Iter 6: lambdas = (0.713278 0.286722) log P(held-out) = -286691.6837 PPL = 725.1467
+Iter 7: lambdas = (0.735029 0.264971) log P(held-out) = -286572.9082 PPL = 723.1706
+Iter 8: lambdas = (0.754279 0.245721) log P(held-out) = -286475.7721 PPL = 721.5586
+Iter 9: lambdas = (0.771364 0.228636) log P(held-out) = -286395.7423 PPL = 720.2332
+Iter 10: lambdas = (0.786566 0.213434) log P(held-out) = -286329.4103 PPL = 719.1365
+Iter 11: lambdas = (0.800123 0.199877) log P(held-out) = -286274.1652 PPL = 718.2243
+Iter 12: lambdas = (0.812239 0.187761) log P(held-out) = -286227.9752 PPL = 717.4626
+Iter 13: lambdas = (0.823086 0.176914) log P(held-out) = -286189.2372 PPL = 716.8244
+Iter 14: lambdas = (0.832812 0.167188) log P(held-out) = -286156.6704 PPL = 716.2882
+Iter 15: lambdas = (0.841548 0.158452) log P(held-out) = -286129.2413 PPL = 715.8370
+Iter 16: lambdas = (0.849403 0.150597) log P(held-out) = -286106.1078 PPL = 715.4567
+Iter 17: lambdas = (0.856476 0.143524) log P(held-out) = -286086.5784 PPL = 715.1358
+Iter 18: lambdas = (0.862850 0.137150) log P(held-out) = -286070.0814 PPL = 714.8648
+Iter 19: lambdas = (0.868601 0.131399) log P(held-out) = -286056.1413 PPL = 714.6359
+Iter 20: lambdas = (0.873794 0.126206) log P(held-out) = -286044.3609 PPL = 714.4425
+Iter 21: lambdas = (0.878487 0.121513) log P(held-out) = -286034.4065 PPL = 714.2791
+Iter 22: lambdas = (0.882731 0.117269) log P(held-out) = -286025.9975 PPL = 714.1411
+Iter 23: lambdas = (0.886571 0.113429) log P(held-out) = -286018.8968 PPL = 714.0247
+Iter 24: lambdas = (0.890048 0.109952) log P(held-out) = -286012.9040 PPL = 713.9264
+Iter 25: lambdas = (0.893199 0.106801) log P(held-out) = -286007.8492 PPL = 713.8435
+Iter 26: lambdas = (0.896054 0.103946) log P(held-out) = -286003.5885 PPL = 713.7736
+Iter 27: lambdas = (0.898644 0.101356) log P(held-out) = -285999.9995 PPL = 713.7147
+Iter 28: lambdas = (0.900993 0.099007) log P(held-out) = -285996.9787 PPL = 713.6652
+Iter 29: lambdas = (0.903125 0.096875) log P(held-out) = -285994.4379 PPL = 713.6236
+Iter 30: lambdas = (0.905060 0.094940) log P(held-out) = -285992.3024 PPL = 713.5885
+Iter 31: lambdas = (0.906817 0.093183) log P(held-out) = -285990.5091 PPL = 713.5591
+Iter 32: lambdas = (0.908413 0.091587) log P(held-out) = -285989.0041 PPL = 713.5345
+Iter 33: lambdas = (0.909864 0.090136) log P(held-out) = -285987.7419 PPL = 713.5138
+Iter 34: lambdas = (0.911182 0.088818) log P(held-out) = -285986.6843 PPL = 713.4964
+Iter 35: lambdas = (0.912380 0.087620) log P(held-out) = -285985.7985 PPL = 713.4819
+Iter 36: lambdas = (0.913469 0.086531) log P(held-out) = -285985.0572 PPL = 713.4698
+Iter 37: lambdas = (0.914459 0.085541) log P(held-out) = -285984.4372 PPL = 713.4596
+Iter 38: lambdas = (0.915360 0.084640) log P(held-out) = -285983.9189 PPL = 713.4511
+Iter 39: lambdas = (0.916179 0.083821) log P(held-out) = -285983.4859 PPL = 713.4440
+Iter 40: lambdas = (0.916924 0.083076) log P(held-out) = -285983.1243 PPL = 713.4381
+Iter 41: lambdas = (0.917602 0.082398) log P(held-out) = -285982.8225 PPL = 713.4331
+Iter 42: lambdas = (0.918219 0.081781) log P(held-out) = -285982.5707 PPL = 713.4290
+Iter 43: lambdas = (0.918781 0.081219) log P(held-out) = -285982.3608 PPL = 713.4256
+Iter 44: lambdas = (0.919291 0.080709) log P(held-out) = -285982.1858 PPL = 713.4227
+Iter 45: lambdas = (0.919756 0.080244) log P(held-out) = -285982.0400 PPL = 713.4203
+Iter 46: lambdas = (0.920180 0.079820) log P(held-out) = -285981.9185 PPL = 713.4183
+Iter 47: lambdas = (0.920565 0.079435) log P(held-out) = -285981.8174 PPL = 713.4167
+Iter 48: lambdas = (0.920916 0.079084) log P(held-out) = -285981.7332 PPL = 713.4153
+Iter 49: lambdas = (0.921235 0.078765) log P(held-out) = -285981.6631 PPL = 713.4141
+Iter 50: lambdas = (0.921526 0.078474) log P(held-out) = -285981.6048 PPL = 713.4132
+Iter 51: lambdas = (0.921790 0.078210) log P(held-out) = -285981.5563 PPL = 713.4124
+Iter 52: lambdas = (0.922031 0.077969) log P(held-out) = -285981.5159 PPL = 713.4117
+Iter 53: lambdas = (0.922251 0.077749) log P(held-out) = -285981.4824 PPL = 713.4112
+Iter 54: lambdas = (0.922450 0.077550) log P(held-out) = -285981.4545 PPL = 713.4107
+Iter 55: lambdas = (0.922632 0.077368) log P(held-out) = -285981.4313 PPL = 713.4103
+Iter 56: lambdas = (0.922798 0.077202) log P(held-out) = -285981.4121 PPL = 713.4100
+Iter 57: lambdas = (0.922949 0.077051) log P(held-out) = -285981.3961 PPL = 713.4098
+Iter 58: lambdas = (0.923086 0.076914) log P(held-out) = -285981.3828 PPL = 713.4096
+Iter 59: lambdas = (0.923212 0.076788) log P(held-out) = -285981.3717 PPL = 713.4094
+Iter 60: lambdas = (0.923325 0.076675) log P(held-out) = -285981.3626 PPL = 713.4092
+Iter 61: lambdas = (0.923429 0.076571) log P(held-out) = -285981.3549 PPL = 713.4091
+Iter 62: lambdas = (0.923524 0.076476) log P(held-out) = -285981.3486 PPL = 713.4090
+Iter 63: lambdas = (0.923610 0.076390) log P(held-out) = -285981.3433 PPL = 713.4089
+Iter 64: lambdas = (0.923688 0.076312) log P(held-out) = -285981.3390 PPL = 713.4088
+Iter 65: lambdas = (0.923760 0.076240) log P(held-out) = -285981.3353 PPL = 713.4088
+Iter 66: lambdas = (0.923825 0.076175) log P(held-out) = -285981.3323 PPL = 713.4087
+Iter 67: lambdas = (0.923884 0.076116) log P(held-out) = -285981.3298 PPL = 713.4087
+Iter 68: lambdas = (0.923938 0.076062) log P(held-out) = -285981.3278 PPL = 713.4086
+Iter 69: lambdas = (0.923987 0.076013) log P(held-out) = -285981.3260 PPL = 713.4086
+Iter 70: lambdas = (0.924032 0.075968) log P(held-out) = -285981.3246 PPL = 713.4086
+Iter 71: lambdas = (0.924073 0.075927) log P(held-out) = -285981.3234 PPL = 713.4086
+Iter 72: lambdas = (0.924110 0.075890) log P(held-out) = -285981.3224 PPL = 713.4086
+Iter 73: lambdas = (0.924144 0.075856) log P(held-out) = -285981.3216 PPL = 713.4085
+Iter 74: lambdas = (0.924174 0.075826) log P(held-out) = -285981.3209 PPL = 713.4085
+Iter 75: lambdas = (0.924202 0.075798) log P(held-out) = -285981.3204 PPL = 713.4085
+Iter 76: lambdas = (0.924228 0.075772) log P(held-out) = -285981.3199 PPL = 713.4085
+Iter 77: lambdas = (0.924251 0.075749) log P(held-out) = -285981.3195 PPL = 713.4085
+Iter 78: lambdas = (0.924273 0.075727) log P(held-out) = -285981.3192 PPL = 713.4085
+Iter 79: lambdas = (0.924292 0.075708) log P(held-out) = -285981.3189 PPL = 713.4085
+Iter 80: lambdas = (0.924309 0.075691) log P(held-out) = -285981.3187 PPL = 713.4085
+Iter 81: lambdas = (0.924326 0.075674) log P(held-out) = -285981.3185 PPL = 713.4085
+Iter 82: lambdas = (0.924340 0.075660) log P(held-out) = -285981.3184 PPL = 713.4085
+Iter 83: lambdas = (0.924353 0.075647) log P(held-out) = -285981.3182 PPL = 713.4085
+Iter 84: lambdas = (0.924366 0.075634) log P(held-out) = -285981.3181 PPL = 713.4085
+Iter 85: lambdas = (0.924377 0.075623) log P(held-out) = -285981.3181 PPL = 713.4085
+Iter 86: lambdas = (0.924387 0.075613) log P(held-out) = -285981.3180 PPL = 713.4085
+Iter 87: lambdas = (0.924396 0.075604) log P(held-out) = -285981.3179 PPL = 713.4085
+Combining counts.

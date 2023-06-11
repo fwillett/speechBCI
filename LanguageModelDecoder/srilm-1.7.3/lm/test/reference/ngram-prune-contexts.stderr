@@ -1,0 +1,8 @@
+reading 5 1-grams
+reading 3 2-grams
+reading 2 3-grams
+pruned 2 2-grams
+warning: distributing 0 left-over probability mass over 1 zeroton words
+writing 5 1-grams
+writing 1 2-grams
+writing 2 3-grams

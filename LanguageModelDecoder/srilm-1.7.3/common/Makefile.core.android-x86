@@ -1,0 +1,33 @@
+#
+#    File:   Makefile.core.android-x86
+#    Author: Mike Frandsen
+#    Date:   2010/08/03
+#
+#    Description:
+#	Machine dependent compilation options and variable definitions
+#	for Android on x86, core file
+#
+#    Copyright (c) 1999-2010 SRI International.  All Rights Reserved.
+#
+#    $Header: /home/srilm/CVS/srilm/common/Makefile.core.android-x86,v 1.4 2013-07-01 22:41:12 frandsen Exp $
+#
+
+   # Child Makefile should include this core after first setting:
+   #   ANDROID_CUST_CFLAGS and ANDROID_CUST_DIR
+   # And, if necessary:
+   #   ANDROID_TOOLCHAIN_NAME_ALT and ANDROID_CUST_DIR_ALT
+
+   ANDROID_ARCH := arch-x86
+   # On previous, is it i686-android-linux (?)
+   ANDROID_TOOLCHAIN_NAME := i686-linux-android
+
+   #ARCH_FLAGS = -nostdlib -fno-exceptions -fno-rtti $(ANDROID_CUST_CFLAGS) -DTARGET_OS=android -D__ANDROID__ -DANDROID -DGNUSOURCE -D_STLP_NEW_DONT_THROW_BAD_ALLOC -D_STLP_GLOBAL_NEW_HANDLER=1 -DEXCEPTIONS='(0 == 0)' -D__BYTE_ORDER=__LITTLE_ENDIAN -D_STLP_GLOBAL_NEW_HANDLER=1 -DGET_THE_DROIDS_MBSTATE -DANDROID_NDK
+
+   ARCH_FLAGS = -nostdlib -fno-exceptions -fno-rtti $(ANDROID_CUST_CFLAGS) -DTARGET_OS=android -D__ANDROID__ -DANDROID -DGNUSOURCE -D_STLP_NEW_DONT_THROW_BAD_ALLOC -D_STLP_GLOBAL_NEW_HANDLER=1 -D__BYTE_ORDER=__LITTLE_ENDIAN -D_STLP_GLOBAL_NEW_HANDLER=1 -DGET_THE_DROIDS_MBSTATE -DANDROID_NDK -DNO_EXCEPTIONS
+
+   include $(SRILM)/common/Makefile.core.android
+
+   # x86 one of: armeabi, mips, armeabi-v7a, x86
+   ADDITIONAL_INCLUDES += -I$(ANDROID_NDK)/sources/cxx-stl/gnu-libstdc++$(OPT_GCC_VER)/libs/x86/include
+   # Now use crtbegin_so.o set in core file
+   #ADDITIONAL_LIBRARIES += $(ANDROID_NDK)/toolchains/$(ANDROID_CUST_DIR_ALT)-$(ANDROID_TOOLCHAIN_VERSION)/prebuilt/$(ANDROID_HOST)/lib/gcc/$(ANDROID_TOOLCHAIN_NAME)/$(ANDROID_TOOLCHAIN_VERSION).x-google/crtbegin.o

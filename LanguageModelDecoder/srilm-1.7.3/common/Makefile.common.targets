@@ -1,0 +1,253 @@
+#
+#    File:   Makefile.common.targets
+#    Author: The SRI DECIPHER (TM) System
+#    Date:   Tue Nov  3 23:45:49 1992
+#
+#    Description:
+#	This file provides the common "make" targets shared by the
+#	DECIPHER (TM) subsystems.  Include this file in the targets
+#	section of a makefile to use the shared definitions. 
+#       (Typically, the "include" should be the last command in the
+#       makefile.) 
+#
+#    Copyright (c) 1992-2001 SRI International.  All Rights Reserved.
+#
+#    $Header: /home/srilm/CVS/srilm/common/Makefile.common.targets,v 1.41 2014-08-04 22:14:44 victor Exp $
+#
+
+
+# Create the initial directory structure (assumes "src" exists).
+init:
+	-cd ..; $(SRILM)/sbin/make-standard-directories
+	$(MAKE) $(OBJDIR_STAMP) $(BINDIR_STAMP)
+
+# Delete all of the files which can be automatically regenerated.
+#pristine:
+#	-cd ..; $(SRILM)/sbin/remove-standard-directories
+
+# Make all, using optimize options.
+optimize:
+	$(MAKE) OPTION=$(OPTIMIZE_OPTION) all
+
+# Make all, using debug options.
+debug:
+	$(MAKE) OPTION=$(DEBUG_OPTION) all
+
+# Make all, using profile options.
+profile:
+	$(MAKE) OPTION=$(PROFILE_OPTION) all
+
+# Make all, using export options.
+export:
+	$(MAKE) OPTION=$(EXPORT_OPTION) all
+
+# Make programs, using purify
+purify:
+	$(MAKE) OPTION=$(OPTION) BIN_OPTION=_pure LINK.c="$(PURIFY) $(PURIFY_FLAGS) $(LINK.c)" LINK.cc="$(PURIFY) $(PURIFY_FLAGS) $(LINK.cc)" PROGRAM_NAMES="$(PROGRAM_NAMES)" programs
+
+.PHONY: libraries programs
+
+# Make all libraries.
+libraries:	$(ALL_LIBRARIES)
+
+# Make all programs.
+programs:	$(ALL_PROGRAMS)
+
+# XXX -- This is disabled for now, since it frequently causes excess re-compilation.
+# Make sure all objects depend on the makefiles.
+#$(ALL_OBJECTS):	Makefile \
+#                       $(SRILM)/common/Makefile.common.variables \
+#                       $(SRILM)/common/Makefile.common.targets
+
+# Cancel the rules which put the compilation results in the source
+#  directory.  (Note:  This avoids problems with source files which
+#  have the same root name as make targets.)
+%:	%.c
+%$(OBJ_SUFFIX):	%.c
+
+
+#
+# These dependencies create the necessary target directories on demand,
+# but avoid doing so only once per module.
+#
+OBJDIR_STAMP = $(OBJDIR)/STAMP
+BINDIR_STAMP = $(BINDIR)/STAMP
+
+$(ALL_OBJECTS): $(OBJDIR_STAMP)
+$(ALL_PROGRAMS): $(BINDIR_STAMP)
+
+$(OBJDIR_STAMP) $(BINDIR_STAMP):
+	-mkdir $(dir $@)
+	touch $@
+
+# Default C compiling pattern-matching rule:
+$(OBJDIR)/%$(OBJ_SUFFIX):	$(SRCDIR)/%.c
+	$(COMPILE.c) $(OPTION_FLAGS) $(OUTPUT_OPTION) $<
+
+# Support for C++ compilation
+%:	%.cc
+%$(OBJ_SUFFIX):	%.cc
+
+# Default C compiling pattern-matching rule:
+$(OBJDIR)/%$(OBJ_SUFFIX):	$(SRCDIR)/%.cc
+	$(COMPILE.cc) $(OPTION_FLAGS) $(OUTPUT_OPTION) $<
+
+# Hack to compile certain sources without optimization
+# (workaround for compiler bugs)
+NO_OPT_PATTERN = -O%
+$(patsubst %,$(OBJDIR)/%$(OBJ_SUFFIX),$(NO_OPT_SOURCES)):
+	$(MAKE) NO_OPT_SOURCES= OPTION_FLAGS="$(filter-out $(NO_OPT_PATTERN), $(OPTION_FLAGS))" $@
+
+# Program linking
+# The heuristic here is that if any C++ source is present at all
+# we use the C++ driver to link the whole thing, otherwise the C driver.
+# The "test -f" at the end is to check for success in creating an
+# output since otherwise failure can be hidden by the DEMANGLE_FILTER.
+#
+# Note that ADDITIONAL_LIBRARIES are sometimes modified in individual
+# library or application Makefiles, and are then included in
+# LIBRARIES; SYS_LIBRARIES are set only in Makefiles in this
+# directory, and is used only in this link rule.  The two are not used
+# consistently.
+#
+$(BINDIR)/%$(EXE_SUFFIX): $(OBJDIR)/%$(OBJ_SUFFIX) $(filter-out -%, $(LIBRARIES))
+ifeq ($(filter %.cc,$(ALL_SOURCES)), )
+	$(LINK.c) $(LD_OPTION_FLAGS) $(LD_OUTPUT_OPTION) $< $(LIBRARIES) $(SYS_LIBRARIES) $(DEMANGLE_FILTER)
+else
+	$(LINK.cc) $(LD_OPTION_FLAGS) $(LD_OUTPUT_OPTION) $< $(LIBRARIES) $(SYS_LIBRARIES) $(DEMANGLE_FILTER)
+endif
+	test -f $@
+	$(POST_LINK)
+
+# revised release targets and dependencies:
+
+.PHONY : release release-headers release-libraries release-programs release-scripts
+
+RELEASED_HEADERS = $(EXPORTED_HEADERS:$(SRCDIR)/%=$(SRILM_INCDIR)/%)
+
+release-headers:	$(RELEASED_HEADERS)
+
+$(SRILM_INCDIR)/%: $(SRCDIR)/%
+	-$(INSTALL) -p 0444 $^ $(SRILM_INCDIR)
+
+RELEASED_LIBRARIES = $(EXPORTED_LIBRARIES:$(OBJDIR)/%$(LIB_SUFFIX)=$(SRILM_LIBDIR)/%$(LIB_SUFFIX))
+
+# We want to re-install only only those binaries that have changed, and
+# use make to figure out the things that need updating.  However,
+# gnumake isn't smart enough to process this dependency in
+# conjunction with the rules for library creation.  So we first make sure
+# all libraries are uptodate, then do a recursive make to do the installation.
+# And take care not to run $(MAKE) without arguments.
+# Same applies to $(RELEASED_PROGRAMS) and $(RELEASED_SCRIPTS) below.
+
+release-libraries:	$(RELEASED_LIBRARIES) $(SRILM_LIBDIR)/SRILM_OPTIONS.mk
+
+$(SRILM_LIBDIR)/%$(LIB_SUFFIX):	$(OBJDIR)/%$(LIB_SUFFIX)
+	-$(INSTALL) 0644 $^ $(SRILM_LIBDIR)
+	$(RANLIB) $@ $(DEMANGLE_FILTER)
+
+$(SRILM_LIBDIR)/SRILM_OPTIONS.mk: $(SRILM)/common/Makefile.common.variables $(RELEASED_LIBRARIES)
+	echo "SRILM_BUILD_LIB_DEPENDENCIES = $(EXPORT_SRILM_BUILD_LIB_DEPENDENCIES)" > $(SRILM_LIBDIR)/SRILM_OPTIONS.mk
+	echo "SRILM_BUILD_ADDITIONAL_CFLAGS = $(ADDITIONAL_CFLAGS)" >> $(SRILM_LIBDIR)/SRILM_OPTIONS.mk
+	echo "SRILM_BUILD_ADDITIONAL_CXXFLAGS = $(ADDITIONAL_CXXFLAGS)" >> $(SRILM_LIBDIR)/SRILM_OPTIONS.mk
+
+RELEASED_PROGRAMS = $(EXPORTED_PROGRAMS:$(BINDIR)/%=$(SRILM_BINDIR)/%)
+
+release-programs:	$(RELEASED_PROGRAMS)
+
+$(SRILM_BINDIR)/%:	$(BINDIR)/%
+	-$(INSTALL) 0555 $^ $(SRILM_BINDIR)
+
+RELEASED_SCRIPTS = $(EXPORTED_SCRIPTS:%=$(SRILM_BIN)/%)
+
+release-scripts:	$(RELEASED_SCRIPTS)
+
+$(SRILM_BIN)/%:	%
+	-$(INSTALL) 0555 $^ $(SRILM_BIN)
+
+# Dependency tracing target
+depend:
+	$(RM) $(DEPENDENCIES)
+ifneq ($(filter %.c,$(ALL_SOURCES)), )
+	$(GEN_DEP) $(filter -D%,$(OPTION_FLAGS)) $(filter %.c,$(ALL_SOURCES)) | sed -e "s&^\([^ ]\)&$(BASE_OBJDIR)"'$$(OBJ_OPTION)'"/\1&g" -e "s&\.o&$(OBJ_SUFFIX)&g" >> $(DEPENDENCIES)
+endif
+ifneq ($(filter %.cc,$(ALL_SOURCES)), )
+	$(GEN_DEP.cc) $(filter -D%,$(OPTION_FLAGS)) $(filter %.cc,$(ALL_SOURCES)) | sed -e "s&^\([^ ]\)&$(BASE_OBJDIR)"'$$(OBJ_OPTION)'"/\1&g" -e "s&\.o&$(OBJ_SUFFIX)&g" >> $(DEPENDENCIES)
+endif
+	$(SRILM)/sbin/generate-program-dependencies $(BASE_BINDIR) $(BASE_OBJDIR) "$(EXE_SUFFIX)" $(ALL_PROGRAM_NAMES) | sed -e "s&\.o&$(OBJ_SUFFIX)&g" >> $(DEPENDENCIES)
+
+# Targets for cleaning up
+clean:		remove-objects
+cleaner:	clean remove-dependencies remove-libraries
+cleanest:	cleaner remove-programs
+superclean:	cleanest remove-exported-headers remove-exported-libraries remove-exported-programs remove-exported-scripts
+# Delete bin and obj directories and files which can be automatically regenerated.  
+# Note that bin and obj directories are only removed when last
+# machine-dependent subdirectory is removed
+pristine:	superclean remove-bin-directory remove-obj-directory
+
+remove-objects:
+	-$(RM) $(OBJDIR)/*$(OBJ_SUFFIX) $(EXTRA_REMOVE_OBJECTS)
+
+remove-dependencies:
+	-$(RM) Dependencies.$(MACHINE_TYPE) $(EXTRA_REMOVE_DEPENDENCIES)
+
+remove-libraries:
+	-$(RM) $(ALL_LIBRARIES) $(EXTRA_REMOVE_LIBRARIES)
+
+remove-programs:
+	-$(RM) $(ALL_PROGRAMS) $(EXTRA_REMOVE_PROGRAMS)
+
+remove-exported-headers:
+ifneq ($(RELEASED_HEADERS), )
+	-$(RM) $(RELEASED_HEADERS)
+endif
+
+remove-exported-libraries:
+ifneq ($(RELEASED_LIBRARIES), )
+	-$(RM) $(RELEASED_LIBRARIES)
+endif
+	-$(RM) $(SRILM_LIBDIR)/SRILM_OPTIONS.mk
+
+remove-exported-programs:
+ifneq ($(RELEASED_PROGRAMS), )
+	-$(RM) $(RELEASED_PROGRAMS)
+endif
+
+remove-exported-scripts:
+ifneq ($(RELEASED_SCRIPTS), )
+	-$(RM) $(RELEASED_SCRIPTS)
+endif
+
+# bin and obj directories only removed when last machine-dependent subdirectory is removed:
+remove-bin-directory:
+	-$(RM) $(BINDIR_STAMP)
+	-$(RMDIR) $(BINDIR)
+	-$(RMDIR) ../bin
+
+remove-obj-directory:
+	-$(RM) $(OBJDIR_STAMP)
+	-$(RMDIR) $(OBJDIR)
+	-$(RMDIR) ../obj
+
+
+sanitize:
+	$(SRILM)/sbin/sanitize-3rdparty /dev/null $(ALL_HEADERS) $(ALL_SOURCES)
+
+desanitize:
+	$(SRILM)/sbin/desanitize-3rdparty /dev/null $(ALL_HEADERS) $(ALL_SOURCES)
+
+# Default Lint pattern-matching rule:
+$(SRCDIR)/%.lint:	$(SRCDIR)/%.c
+	$(LINT) $(LINT_FLAGS) $< > $@
+
+# Lint rules:
+lint:	$(ALL_LINT)
+remove-lint:
+	$(RM) $(ALL_LINT)
+
+
+# Include the dependencies generated by "make depend" if they exist.
+ifeq ($(shell ls $(DEPENDENCIES) 2> /dev/null), $(DEPENDENCIES))
+   include $(DEPENDENCIES)
+endif

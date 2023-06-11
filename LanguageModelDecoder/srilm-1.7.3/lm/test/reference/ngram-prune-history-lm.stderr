@@ -1,0 +1,66 @@
+using ModKneserNey for 1-grams
+modifying 1-gram counts for Kneser-Ney smoothing
+Kneser-Ney smoothing 1-grams
+n1 = 9816
+n2 = 4085
+n3 = 2199
+n4 = 1578
+D1 = 0.545758
+D2 = 1.11864
+D3+ = 1.43346
+using ModKneserNey for 2-grams
+modifying 2-gram counts for Kneser-Ney smoothing
+Kneser-Ney smoothing 2-grams
+n1 = 285491
+n2 = 56303
+n3 = 23782
+n4 = 13283
+D1 = 0.717139
+D2 = 1.09126
+D3+ = 1.39782
+using ModKneserNey for 3-grams
+Kneser-Ney smoothing 3-grams
+n1 = 1058744
+n2 = 127490
+n3 = 46334
+n4 = 23859
+D1 = 0.805911
+D2 = 1.12132
+D3+ = 1.34003
+discarded 1 1-gram probs predicting pseudo-events
+warning: distributing 0.0131266 left-over probability mass over 6550 zeroton words
+discarded 2 2-gram contexts containing pseudo-events
+discarded 2625 2-gram probs predicting pseudo-events
+discarded 10919 3-gram contexts containing pseudo-events
+discarded 6418 3-gram probs predicting pseudo-events
+discarded 1058719 3-gram probs discounted to zero
+inserted 860 redundant 2-gram probs
+writing 33110 1-grams
+writing 423904 2-grams
+writing 267544 3-grams
+using GoodTuring for 1-grams
+Good-Turing discounting 1-grams
+GT-count [0] = 0
+GT-count [1] = 8810
+GT discounting disabled
+using GoodTuring for 2-grams
+Good-Turing discounting 2-grams
+GT-count [0] = 0
+GT-count [1] = 270387
+GT discounting disabled
+discarded 1 1-gram probs predicting pseudo-events
+warning: distributing 0 left-over probability mass over 6550 zeroton words
+discarded 2 2-gram contexts containing pseudo-events
+discarded 2625 2-gram probs predicting pseudo-events
+writing 33110 1-grams
+writing 423044 2-grams
+reading 33110 1-grams
+reading 423904 2-grams
+reading 267544 3-grams
+reading 33110 1-grams
+reading 423044 2-grams
+pruned 266171 3-grams
+pruned 420300 2-grams
+writing 33110 1-grams
+writing 3604 2-grams
+writing 1373 3-grams

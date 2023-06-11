@@ -1,0 +1,200 @@
+Counting counts of order 2
+Counting counts of order 3
+Starting fitting...
+Starting OWL-BFGS with c1=1.56621e-07, sigma2=1.91545e+07, max_iters=1000
+  No of NaNs in logZs: 0, No infs: 0
+  dual is 10.4076
+  regularized dual is 10.4076
+  norm of gradient =0.123202
+  norm of regularized gradient =0.123202
+  No of NaNs in logZs: 0, No infs: 0
+  dual is 10.2844
+  regularized dual is 10.2844
+  norm of gradient =0.123166
+  norm of regularized gradient =0.123166
+Iteration 1
+  No of NaNs in logZs: 0, No infs: 414862
+  dual is inf
+  regularized dual is inf
+  norm of gradient =0.0570465
+  norm of regularized gradient =0.0569476
+  No of NaNs in logZs: 0, No infs: 414862
+  dual is inf
+  regularized dual is inf
+  norm of gradient =0.0950422
+  norm of regularized gradient =0.0949617
+  No of NaNs in logZs: 0, No infs: 0
+  dual is 367.048
+  regularized dual is 367.07
+  norm of gradient =0.932065
+  norm of regularized gradient =0.932086
+  No of NaNs in logZs: 0, No infs: 0
+  dual is 183.778
+  regularized dual is 183.783
+  norm of gradient =0.932065
+  norm of regularized gradient =0.932075
+  No of NaNs in logZs: 0, No infs: 0
+  dual is 92.1425
+  regularized dual is 92.144
+  norm of gradient =0.932065
+  norm of regularized gradient =0.93207
+  No of NaNs in logZs: 0, No infs: 0
+  dual is 46.325
+  regularized dual is 46.3254
+  norm of gradient =0.932065
+  norm of regularized gradient =0.932068
+  No of NaNs in logZs: 0, No infs: 0
+  dual is 23.4163
+  regularized dual is 23.4164
+  norm of gradient =0.932059
+  norm of regularized gradient =0.93206
+  No of NaNs in logZs: 0, No infs: 0
+  dual is 11.9708
+  regularized dual is 11.9708
+  norm of gradient =0.923142
+  norm of regularized gradient =0.923142
+  No of NaNs in logZs: 0, No infs: 0
+  dual is 8.64133
+  regularized dual is 8.64134
+  norm of gradient =0.0945404
+  norm of regularized gradient =0.0945398
+Iteration 2
+  No of NaNs in logZs: 0, No infs: 0
+  dual is 34.1054
+  regularized dual is 34.1068
+  norm of gradient =0.706222
+  norm of regularized gradient =0.706224
+  No of NaNs in logZs: 0, No infs: 0
+  dual is 18.608
+  regularized dual is 18.6084
+  norm of gradient =0.624426
+  norm of regularized gradient =0.624428
+  No of NaNs in logZs: 0, No infs: 0
+  dual is 10.9824
+  regularized dual is 10.9825
+  norm of gradient =0.533057
+  norm of regularized gradient =0.533058
+  No of NaNs in logZs: 0, No infs: 0
+  dual is 7.8286
+  regularized dual is 7.82864
+  norm of gradient =0.249817
+  norm of regularized gradient =0.249818
+Iteration 3
+  No of NaNs in logZs: 0, No infs: 0
+  dual is 7.45703
+  regularized dual is 7.45707
+  norm of gradient =0.0813209
+  norm of regularized gradient =0.0813208
+Iteration 4
+  No of NaNs in logZs: 0, No infs: 0
+  dual is 7.39064
+  regularized dual is 7.39068
+  norm of gradient =0.127326
+  norm of regularized gradient =0.127326
+Iteration 5
+  No of NaNs in logZs: 0, No infs: 0
+  dual is 7.12836
+  regularized dual is 7.12841
+  norm of gradient =0.0591899
+  norm of regularized gradient =0.0591891
+Iteration 6
+  No of NaNs in logZs: 0, No infs: 0
+  dual is 6.89138
+  regularized dual is 6.89144
+  norm of gradient =0.0589756
+  norm of regularized gradient =0.058975
+Iteration 7
+  No of NaNs in logZs: 0, No infs: 0
+  dual is 6.65123
+  regularized dual is 6.65132
+  norm of gradient =0.0819608
+  norm of regularized gradient =0.0819611
+Iteration 8
+  No of NaNs in logZs: 0, No infs: 0
+  dual is 6.43324
+  regularized dual is 6.43334
+  norm of gradient =0.0453901
+  norm of regularized gradient =0.04539
+Iteration 9
+  No of NaNs in logZs: 0, No infs: 0
+  dual is 6.30992
+  regularized dual is 6.31002
+  norm of gradient =0.046045
+  norm of regularized gradient =0.0460448
+Iteration 10
+  No of NaNs in logZs: 0, No infs: 0
+  dual is 6.15734
+  regularized dual is 6.15747
+  norm of gradient =0.0466146
+  norm of regularized gradient =0.0466143
+Iteration 11
+  No of NaNs in logZs: 0, No infs: 0
+  dual is 6.06048
+  regularized dual is 6.06061
+  norm of gradient =0.0313783
+  norm of regularized gradient =0.0313779
+Iteration 12
+  No of NaNs in logZs: 0, No infs: 0
+  dual is 5.90952
+  regularized dual is 5.90969
+  norm of gradient =0.033245
+  norm of regularized gradient =0.0332449
+Iteration 13
+  No of NaNs in logZs: 0, No infs: 0
+  dual is 5.84842
+  regularized dual is 5.8486
+  norm of gradient =0.0535879
+  norm of regularized gradient =0.053588
+Iteration 14
+  No of NaNs in logZs: 0, No infs: 0
+  dual is 5.78115
+  regularized dual is 5.78135
+  norm of gradient =0.0229269
+  norm of regularized gradient =0.0229269
+Iteration 15
+  No of NaNs in logZs: 0, No infs: 0
+  dual is 5.68463
+  regularized dual is 5.68487
+  norm of gradient =0.0226541
+  norm of regularized gradient =0.0226541
+Iteration 16
+  No of NaNs in logZs: 0, No infs: 0
+  dual is 5.59716
+  regularized dual is 5.59745
+  norm of gradient =0.0356965
+  norm of regularized gradient =0.0356963
+Iteration 17
+  No of NaNs in logZs: 0, No infs: 0
+  dual is 5.52393
+  regularized dual is 5.52426
+  norm of gradient =0.0488195
+  norm of regularized gradient =0.0488196
+Iteration 18
+  No of NaNs in logZs: 0, No infs: 0
+  dual is 5.4645
+  regularized dual is 5.46485
+  norm of gradient =0.0167226
+  norm of regularized gradient =0.0167224
+Iteration 19
+  No of NaNs in logZs: 0, No infs: 0
+  dual is 5.39032
+  regularized dual is 5.39073
+  norm of gradient =0.018022
+  norm of regularized gradient =0.0180213
+Iteration 20
+  No of NaNs in logZs: 0, No infs: 0
+  dual is 5.32994
+  regularized dual is 5.33042
+  norm of gradient =0.0235084
+  norm of regularized gradient =0.0235079
+Iteration 21
+  No of NaNs in logZs: 0, No infs: 0
+  dual is 5.23868
+  regularized dual is 5.2393
+  norm of gradient =0.0242542
+  norm of regularized gradient =0.0242539
+Iteration 22
+  No of NaNs in logZs: 0, No infs: 0
+  dual is 5.21165
+  regularized dual is 5.21235
+  norm of gradient =0.0344378

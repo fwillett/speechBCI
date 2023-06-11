@@ -1,0 +1,176 @@
+#!/bin/sh
+#
+# rexport --
+#	retrying export with customs, via gnumake
+#
+# $Header: /home/srilm/CVS/srilm/utils/src/rexport.gnumake,v 1.2 2011/07/21 19:48:19 stolcke Exp $
+#
+
+usage() {
+	echo "usage: $0 [-m] [-J numjobs] [-delay D] [-check-exec] [-f] [-debug] [-same] [-exclusive] [-exit-on-error] [-uselocal] [-attr value] ... command [args ...]" >&2
+}
+
+# allow as many file descriptors as possible for pmake
+# (this command may fail in old versions of sh -- we ignore that)
+ulimit -n `ulimit -H -n 2>/dev/null` >/dev/null 2>&1
+
+set -e 
+
+jobs=1
+makemode=0
+delay=
+check_exec=0
+exit_on_error=0
+
+#
+# parse options
+#
+attributes=
+while [ $# -gt 0 ]; do
+	case "$1" in
+	-m)	makemode=1
+		shift ;;
+	-same)	attributes="$attributes SAME"
+		shift ;;
+	-exclusive)
+		attributes="$attributes EXCLUSIVE"
+		shift ;;
+	-uselocal)
+		attributes="$attributes USELOCAL"
+		shift ;;
+	-attr)	attributes="$attributes $2"
+		shift; shift;;
+	-debug)	debug=1
+		shift ;;
+	-f)	readfiles=1;
+		shift ;;
+	-J)	jobs="$2"
+		shift; shift ;;
+	-delay)	delay="$2"
+		shift; shift ;;
+	-check-exec)
+		check_exec=1
+		shift ;;
+	-exit-on-error)
+		exit_on_error=1
+		shift ;;
+	-*)	usage
+		exit 2 ;;
+	*)
+		break ;;
+	esac
+done
+
+#
+# parse command
+#
+
+# find tmp file that doesn't exist yet
+for suffix in a b c d e f g h i j k l m n o p q r s t u v x y z
+do
+	mkfile=/tmp/export$$$suffix
+	if [ ! -f $mkfile ]; then
+		break
+    	fi
+done
+
+trap "rm -f $mkfile; exit 1" 1 2 15
+
+#
+# create makefile
+#
+if [ "$#" -eq 0 -o "$readfiles" ]; then
+	# read commands from files or stdin
+	cat "$@"
+else
+	# use what's on the command line
+	echo "$@"
+fi | \
+gawk '
+BEGIN {
+	ld_lib_path_var = "LD_LIBRARY_PATH";
+}
+NR == 1 {
+	# always use /bin/sh for portability across platforms
+	print "SHELL=/bin/sh"
+	print ".cleanup: ; @/bin/rm -f " mkfile
+	
+	jobnum = 0;
+}
+NF > 0 {
+	jobnum ++;
+
+	job = ".job" jobnum;
+	alljobs = alljobs job " ";
+
+	# make sure shell variable expansion is preserved
+	gsub("\\$", "$$");
+
+	delay = delay + 0;
+
+	if (check_exec) {
+		exec_file = "";
+		for (i = 1; i <= NF; i ++) {
+		    if ( $i ~ "^/") {
+			exec_file = $i;
+			break;
+		    }
+		}
+		if (exec_file) {
+		    sub("[;&|].*", "", exec_file);
+		    $0 = "while [ ! -x " exec_file " ]; do sleep 5; done; " $0
+		}
+	}
+
+	if (ld_lib_path_var in ENVIRON) {
+		    $0 = ld_lib_path_var "=" ENVIRON[ld_lib_path_var] "; export " ld_lib_path_var "; " $0
+	}
+
+	if (njobs > 1) {
+		if (delay > 0 && jobnum > 1) {
+			prev_delay_target = delay_target;
+			delay_target = "delay" jobnum;
+			print delay_target ": " prev_delay_target \
+					"; @sleep " delay;
+		} else {
+			delay_target = "";
+		}
+
+		print job ": " delay_target "; " $0;
+	} else {
+		print job ": ; @" $0;
+	}
+	if (makemode) {
+		print "\t@touch " job;
+	}
+}
+END {
+	print "all: " alljobs;
+
+	print alljobs ": .cleanup";
+	
+	if (jobnum == 0) {
+		print "warning: empty command list" > "/dev/stderr";
+	}
+}
+' makemode=$makemode attributes="$attributes" mkfile="$mkfile" \
+	njobs="$jobs" delay="$delay" check_exec=$check_exec \
+	exit_on_error=$exit_on_error > $mkfile
+
+if [ "$debug" ]; then
+	cat $mkfile
+	rm -f $mkfile
+	exit
+fi
+
+# avoid illegal values when make is invoked from other makes
+MAKEFLAGS=
+MFLAGS=
+export MAKEFLAGS MFLAGS
+
+if [ $exit_on_error = 0 ]; then
+	ignoreflag=-k
+fi
+
+exec make -j $jobs $ignoreflag -f $mkfile all
+

@@ -1,0 +1,16 @@
+#
+#    File:   Makefile.machine.iPhoneOS-8.1-armv7s
+#    Author: Mike Frandsen
+#    Date:   Tue Jul 21, 2015
+#
+#    Description:
+#	Machine dependent compilation options and variable definitions
+#	for iOS to be built on a Mac. Relies on import of
+#	Makefile.core.iOS.
+#
+
+LOCAL_PLATFORM_NAME = iPhoneOS
+XCODE_SDK_VERSION = 8.4
+LOCAL_TARGET_ARCH = arm64
+
+include $(SRILM)/common/Makefile.core.iOS

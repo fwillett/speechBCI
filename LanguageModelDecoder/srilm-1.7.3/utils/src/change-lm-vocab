@@ -1,0 +1,78 @@
+#!/bin/sh
+#
+# change-lm-vocab --
+#	create a language model from an existing one by changing its
+#	vocabulary.
+#	All n-grams in the new vocab are retained with their original
+#	probabilities.  Backoff weights are recomputed and backed-off
+#	unigrams for all new words are added.
+#	-subset option performs subsetting of the vocabulary without adding
+#	new words.
+#
+# usage: change-lm-vocab [-subset] -vocab vocabfile -lm oldlm -write-lm newlm
+#
+# $Header: /home/srilm/CVS/srilm/utils/src/change-lm-vocab,v 1.9 2013/03/09 07:13:01 stolcke Exp $
+#
+
+oldlm=-
+newlm=-
+vocab=/dev/null
+
+while [ $# -gt 0 ]; do
+	case "$1" in
+	-vocab)	vocab="$2" ; shift ;;
+	-lm)	oldlm="$2" ; shift ;;
+	-write-lm)	newlm="$2" ; shift ;;
+	-tolower) options="$options $1" ; tolower=1 ;;
+	-subset)  subset=yes ;;
+	*)	options="$options $1" ;;
+	esac
+	shift
+done
+
+# -subset prevents new words being added to the LM
+if [ "$subset" ]; then
+	ngram_vocab="/dev/null"
+else
+	ngram_vocab="$vocab"
+fi
+
+gzip -dcf $oldlm | ${GAWK-gawk} '
+# read the vocab file
+NR == 1 && vocab {
+	# always include sentence begin/end
+	is_word["<s>"] = is_word["</s>"] = 1;
+
+	while ((getline word < vocab) > 0) {
+		is_word[to_lower ? tolower(word) : word] = 1;
+	}
+		
+	close(vocab);
+}
+# process old lm
+NF==0 {
+	print; next;
+}
+/^ngram *[0-9][0-9]*=/ {
+	order = substr($2,1,index($2,"=")-1);
+	print;
+	next;
+}
+/^\\[0-9]-grams:/ {
+	currorder=substr($0,2,1);
+	print;
+	next;
+}
+/^\\/ {
+	print; next;
+}
+currorder {
+	for (i = 2 ; i <= currorder + 1; i ++) {
+		if (!((to_lower ? tolower($i) : $i) in is_word)) next;
+	}
+	print;
+	next;
+}
+{ print }
+' vocab=$vocab to_lower=$tolower | \
+ngram -lm - -vocab "$ngram_vocab" -renorm -write-lm "$newlm" $options

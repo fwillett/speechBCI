@@ -1,0 +1,36 @@
+
+======================================
+   Installation Tidbits for Mac OSX   
+======================================
+
+
+I created a 3-step tutorial on how to install SRILM on Mac OSX (10.7.4). You 
+can find the tutorial here:
+
+   http://www.icsi.berkeley.edu/~wooters/SRILM
+
+Chuck Wooters
+July 9, 2012
+
+------------------------------------
+
+I've added two new MacOSX targets and Makefiles in SRILM/common:
+
+     Makefile.machine.macosx-m32 (MACHINE_TYPE=macosx-m32)
+     Makefile.machine.macosx-m64 (MACHINE_TYPE=macosx-m364
+
+The new targets allow the developer to make an explicit choice whether
+to compile 32- or 64-bit binaries on the most recent version of MacOS
+X.
+
+To build 32-bit binaries on MacOS X 10.6, build using "make MACHINE_TYPE=macosx-m32".
+To build 64-bit binaries on MacOS X 10.6, build using "make MACHINE_TYPE=macosx-m64".
+
+I've left the original Makefile (Makefile.machine.macosx) and target
+as is, for those using older versions of the OS.  On 10.6, this will
+create 64-bit binaries.
+
+Victor Abrash
+May 24, 2011
+
+------------------------------------

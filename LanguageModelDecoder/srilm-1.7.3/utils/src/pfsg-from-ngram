@@ -1,0 +1,23 @@
+#!/bin/sh
+#
+# pfsg-from-ngram --
+#	Convert a bigram or trigram into a Decipher PFSG
+#
+# This is a wrapper that takes care of
+# - eliminating low probability transitions that the recognizer would never use
+# - renormalizing the LM
+# - converting to PFSG
+# - adding pauses between words
+#
+# $Header: /home/srilm/CVS/srilm/utils/src/pfsg-from-ngram,v 1.3 2000/02/04 00:20:32 stolcke Exp $
+#
+
+# get LM from first argument, pass rest to ngram
+# default LM is stdin
+lm=${1--}
+test $# -gt 0 && shift
+
+ngram -debug 1 -prune-lowprobs -lm "$lm" "$@" -write-lm - | \
+make-ngram-pfsg | \
+add-pauses-to-pfsg
+

@@ -1,0 +1,32 @@
+reading references...
+reading nbest lists...
+reading scores...
+computing error counts...
+557 reference words
+Posterior scale step size set to 1
+aligning nbest lists...
+NEW BEST ERROR: 210 (0.37702/word)
+   weights = 0.125 1 0 1 0
+   normed = 1 8 0 8 0
+   scale = 8
+NEW BEST ERROR: 209 (0.375224/word)
+   weights = 0.111111 0.888889 0 0.888889 0
+   normed = 1 8 0 8 0
+   scale = 9
+NEW BEST ERROR: 204 (0.366248/word)
+   weights = 0.125 1.25 0 1 0
+   normed = 1 10 0 8 0
+   scale = 8
+NEW BEST ERROR: 202 (0.362657/word)
+   weights = 0.125 1 0 1 0.125
+   normed = 1 8 0 8 1
+   scale = 8
+NEW BEST ERROR: 199 (0.357271/word)
+   weights = 0.0986842 1.05263 -0.0526316 1.05263 0.0526316
+   normed = 1 10.6667 -0.533333 10.6667 0.533333
+   scale = 10.1333
+NEW BEST ERROR: 197 (0.35368/word)
+   weights = 0.0986842 1.05263 -0.360526 1.28947 0.0526316
+   normed = 1 10.6667 -3.65333 13.0667 0.533333
+   scale = 10.1333
+maximum number of iterations exceeded

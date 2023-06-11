@@ -1,0 +1,68 @@
+#
+# Makefile for SRILM test suite 
+#
+# $Header: /home/srilm/CVS/srilm/common/Makefile.test,v 1.17 2013/03/09 06:54:48 stolcke Exp $
+#
+
+include $(SRILM)/common/Makefile.common.variables
+
+TEST=*
+
+all:	test
+
+test:
+	@PATH=$$SRILM/bin/$${MACHINE_TYPE}${OPTION}:$$SRILM/bin:$$PATH; export PATH; \
+	$(SRILM)/sbin/go.unzip; \
+	for testdir in tests/$(TEST); do \
+	   [ $$testdir = tests/CVS ] || \
+		GAWK=$(GAWK) $(SRILM)/sbin/go.run-test $$testdir; \
+	done
+
+profile:
+	@PATH=$$PWD/../bin/$${MACHINE_TYPE}_p:$$PWD/../src:$$SRILM/bin/$$MACHINE_TYPE:$$SRILM/bin:$$PATH; export PATH; \
+	$(SRILM)/sbin/go.unzip; \
+	for testdir in tests/$(TEST); do \
+	   [ $$testdir = tests/CVS ] || \
+		GAWK=$(GAWK) $(SRILM)/sbin/go.run-test $$testdir; \
+	done
+
+pure:
+	@PATH=$$PWD/../bin/$${MACHINE_TYPE}_pure:$$PWD/../src:$$SRILM/bin/$$MACHINE_TYPE:$$SRILM/bin:$$PATH; export PATH; \
+	$(SRILM)/sbin/go.unzip; \
+	for testdir in tests/$(TEST); do \
+	   [ $$testdir = tests/CVS ] || \
+		GAWK=$(GAWK) $(SRILM)/sbin/go.run-test $$testdir; \
+	done
+
+try:
+	@PATH=$$PWD/../bin/$${MACHINE_TYPE}${OPTION}:$$PWD/../src:$$SRILM/bin/$$MACHINE_TYPE:$$SRILM/bin:$$PATH; export PATH; \
+	echo PATH=$$PATH; \
+	$(SRILM)/sbin/go.unzip; \
+	for testdir in tests/$(TEST); do \
+	   [ $$testdir = tests/CVS ] || \
+		GAWK=$(GAWK) $(SRILM)/sbin/go.run-test $$testdir; \
+	done
+
+try-output:
+	@PATH=$$PWD/../bin/$${MACHINE_TYPE}${OPTION}:$$PWD/../src:$$SRILM/bin/$$MACHINE_TYPE:$$SRILM/bin:$$PATH; export PATH; \
+	echo PATH=$$PATH; \
+	$(SRILM)/sbin/go.unzip; \
+	for testdir in tests/$(TEST); do \
+	   [ $$testdir = tests/CVS ] || \
+		(cd tests/$(TEST); GAWK=$(GAWK) sh -x run-test); \
+	done
+
+refs:
+	[ ! -d reference -o -d reference.old ] || mv reference reference.old
+	mkdir -p reference
+	@for testdir in tests/$(TEST); do \
+	   [ $$testdir = tests/CVS ] || \
+		$(SRILM)/sbin/go.update-refs $$testdir; \
+	done
+
+gzip:
+	$(SRILM)/sbin/go.zip
+
+clean:
+	rm -f output/*
+	find tests \( -name core -o -name gmon.out \) -print | xargs rm -f

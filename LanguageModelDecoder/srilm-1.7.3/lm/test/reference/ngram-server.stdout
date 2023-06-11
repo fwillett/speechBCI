@@ -1,0 +1,9 @@
+file ../ngram-count-gt/eval97.text: 5290 sentences, 38238 words, 0 OOVs
+681 zeroprobs, logprob= -87336.7 ppl= 109.229 ppl1= 211.565
+*** SERVER LOG ***
+reading 33110 1-grams
+reading 425750 2-grams
+reading 268962 3-grams
+starting prob server on port 5001
+client @127.0.0.1: connection accepted
+client @127.0.0.1: 43528 probabilities served

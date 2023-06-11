@@ -1,0 +1,17 @@
+warning: discount coeff 1 is out of range: -0
+warning: count of count 8 is zero -- lowering maxcount
+warning: count of count 7 is zero -- lowering maxcount
+warning: count of count 6 is zero -- lowering maxcount
+warning: count of count 5 is zero -- lowering maxcount
+warning: discount coeff 1 is out of range: -0.666667
+warning: discount coeff 2 is out of range: -2.5
+warning: discount coeff 3 is out of range: 16
+warning: count of count 8 is zero -- lowering maxcount
+warning: count of count 7 is zero -- lowering maxcount
+warning: count of count 6 is zero -- lowering maxcount
+warning: count of count 5 is zero -- lowering maxcount
+warning: discount coeff 1 is out of range: 0
+warning: discount coeff 3 is out of range: 1.46667
+reading 17 1-grams
+reading 28 2-grams
+reading 8 3-grams

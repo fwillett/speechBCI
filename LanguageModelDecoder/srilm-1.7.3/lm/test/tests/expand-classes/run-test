@@ -1,0 +1,27 @@
+#!/bin/sh
+
+if [ -f ../class-ngram/spine2000+2001-gridlabel+spell.4bo.gz ]; then
+	gz=.gz
+else
+	gz=
+fi
+
+ngram -debug 0 \
+	-order 2 \
+	-lm ../class-ngram/spine2000+2001-gridlabel+spell.4bo$gz \
+	-classes ../class-ngram/newlabels+spell.classes \
+	-ppl ../class-ngram/devtest.text 
+
+ngram -debug 1 \
+	-order 2 \
+	-lm ../class-ngram/spine2000+2001-gridlabel+spell.4bo$gz \
+	-classes ../class-ngram/newlabels+spell.classes \
+	-expand-classes 4 \
+	-write-lm expanded.4bo$gz
+
+ngram -debug 0 \
+	-ppl ../class-ngram/devtest.text \
+	-order 4 \
+	-lm expanded.4bo$gz
+
+rm -f expanded.4bo$gz

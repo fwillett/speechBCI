@@ -1,0 +1,30 @@
+#!/bin/sh
+
+# test an LM with filled pauses and hidden sentence boundaries
+
+dir=../ngram-count-gt
+
+if [ -f $dir/swbd.3bo.gz ]; then
+	gz=.gz
+else
+	gz=
+fi
+
+# /usr/local/bin/gunzip hangs
+PATH=/usr/bin:$PATH
+export PATH
+
+gunzip -cf $dir/swbd.3bo$gz | \
+make-hiddens-lm > swbd.hiddens.3bo
+
+ngram -debug 2 \
+	-hidden-vocab hidden.vocab \
+	-lm swbd.hiddens.3bo \
+	-ppl $dir/eval97.text \
+		> eval97.hiddens.ppl
+
+grep -c '<#s>' eval97.hiddens.ppl
+tail -2 eval97.hiddens.ppl
+
+rm swbd.hiddens.3bo eval97.hiddens.ppl
+

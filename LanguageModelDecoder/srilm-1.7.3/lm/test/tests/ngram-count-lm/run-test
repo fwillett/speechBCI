@@ -1,0 +1,65 @@
+#!/bin/sh
+
+PATH=$SRILM/lm/bin/$MACHINE_TYPE:$PATH
+
+order=3
+
+dir=../ngram-count-gt
+
+if [ -f $dir/swbd.3grams.gz ]; then
+	gz=.gz
+else
+	gz=
+fi
+
+#
+# Set up count-LM template (see ngram(1) man page -count-lm option)
+#
+cat >swbd.3countlm <<EOF
+countmodulus 1
+mixweights 5
+.5 .5 .5
+.5 .5 .5
+.5 .5 .5
+.5 .5 .5
+.5 .5 .5
+.5 .5 .5
+counts $dir/swbd.3grams$gz
+EOF
+
+#
+# Estimate mixture weights from held-out data
+#
+ngram-count -debug 1 \
+	-order $order \
+	-count-lm \
+	-text $dir/eval97.text \
+	-vocab $dir/eval2001.vocab \
+	-init-lm swbd.3countlm \
+	-em-iters 10 \
+	-lm swbd.3countlm.reest
+
+#
+# Test perplexity (cheating, since using same data as above)
+#
+ngram -debug 0 \
+	-order $order \
+	-count-lm \
+	-lm swbd.3countlm.reest \
+	-vocab $dir/eval2001.vocab \
+	-ppl $dir/eval97.text
+
+#
+# Test perplexity of interpolation with backoff LM
+#
+ngram -debug 0 \
+	-order $order \
+	-count-lm \
+	-lm swbd.3countlm.reest \
+	-mix-lm $dir/swbd.3bo$gz \
+	-lambda 0.5 -bayes 0 \
+	-vocab $dir/eval2001.vocab \
+	-ppl $dir/eval97.text
+
+rm -f swbd.3countlm swbd.3countlm.reest
+

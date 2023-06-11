@@ -1,0 +1,466 @@
+#!/bin/sh
+#
+# rescore-nbest --
+#	generate scores from Decipher(TM) n-best lists
+#
+# $Header: /home/srilm/CVS/srilm/utils/src/rescore-decipher,v 1.40 2017/07/20 05:43:59 stolcke Exp $
+#
+
+bytelog=0
+nodecipherlm=0
+multiwords=0
+norescore=0
+decipher_lmw=8
+decipher_wtw=0
+lm_only=0
+pretty_file=
+filter_command=
+limit_vocab=0
+vocab_aliases=
+fast_rescore=
+ngram_tool=ngram
+ngram_options=
+count_oovs=0
+rescore_option=-rescore
+multichar=_
+tmpdir=${TMPDIR-/tmp}
+
+while [ $# -gt 0 ]
+do
+    case "$1" in
+    -bytelog)	
+	    bytelog=1
+	    ;;
+    -nodecipherlm)
+	    nodecipherlm=1
+	    ;;
+    -multiwords)
+	    multiwords=1
+	    mw_option=-multiwords
+	    smw_option=-split-multiwords
+	    ;;
+    -multi-char)
+    	    multichar="$2"; shift
+	    ;;
+    -norescore)
+	    norescore=1
+	    ;;
+    -lm-only)
+	    lm_only=1
+	    ;;
+    -count-oovs)
+	    count_oovs=1
+	    rescore_option="-debug 1 -ppl"
+	    ;;
+    -pretty)
+	    pretty_file="$2"; shift
+	    ;;
+    -ngram-tool)
+	    ngram_tool="$2"; shift
+	    ;;
+    -filter)
+	    filter_command="$2"; shift
+	    ;;
+    -limit-vocab)
+	    limit_vocab=1
+	    ;;
+    -vocab-aliases)
+	    vocab_aliases="$2"; shift
+	    ;;
+    -fast)
+    	    fast_rescore=1
+	    ;;
+    -*)	echo "$0: unknown option $1" >&2
+	    exit 2 ;;
+    *)	    break
+	    ;;
+    esac
+
+    shift
+done
+
+if [ $# -lt 3  ]; then
+    {
+	echo "usage: $0 [-bytelog] [-nodecipherlm] [-multiwords] [-multi-char C] [-norescore] [-lm-only] [-count-oovs] [-pretty map] [-ngram-tool pgm] [-filter command] [-limit-vocab] [-vocab-aliases map] [-fast] nbest-file-list score-dir lm-options ..." >&2
+	echo "where"
+	echo "	-bytelog	produces bytelog scaled scores"
+	echo "	-nodecipherlm	avoids Decipher LM score computation"
+	echo "	-multiwords	expand multiwords into constituent words"
+	echo "	-multi-char C	redefine multiword separator character"
+	echo "	-norescore	don't rescore LM, just extract scores"
+	echo "	-lm-only	output no N-best lists, only LM scores"
+	echo "	-count-oovs	output number of OOV and zeroprob words"
+	echo "	-pretty map	word mapping file"
+	echo "	-ngram-tool pgm use pgm for LM evaluation"
+	echo "	-filter command	text filter to apply to N-best hyps"
+	echo "	-limit-vocab	limit LM loading to used vocabulary"
+	echo "	-vocab-aliases map	map vocabulary in LM evaluation"
+	echo "	-fast		fast rescoring mode, no text filtering allowed"
+    } >&2
+    exit 1
+fi
+
+filelist="$1"
+scoredir="$2"
+shift; shift
+
+if [ ! -d $scoredir ]; then
+	mkdir $scoredir
+fi
+
+# when not rescoring need to get decipher lmw and wtw from remaining options
+if [ $norescore -gt 0 ]; then
+    while [ $# -gt 0 ]
+    do
+	case "$1" in
+	-decipher-lmw)	
+		decipher_lmw=$2
+		shift
+		;;
+	-decipher-wtw)
+		decipher_wtw=$2
+		shift
+		;;
+	*)	shift
+		;;
+	esac
+    done
+fi
+
+if [ $norescore -eq 0 -a $limit_vocab -gt 0 ]; then
+    #
+    # limit LM vocabulary to words found in the nbest lists
+    #
+
+    nbestvocab="$tmpdir/$$nbest.vocab"
+    trap "rm -f $nbestvocab; exit" 0 1 2 15
+
+    # generate nbest vocabulary
+    if [ -z "$filter_command" ]; then 
+	nbest-lattice -no-rescore -no-reorder \
+		$mw_option -multi-char "$multichar" \
+		-nbest-files "$filelist" -write-vocab $nbestvocab
+    else
+	cat "$filelist" | xargs gzip -dcf | \
+	eval "$filter_command" | \
+	ngram -rescore - -null -no-reorder \
+			$smw_options -multi-char "$multichar" \
+			-write-vocab $nbestvocab >/dev/null
+    fi
+
+    # tell ngram to use this vocab
+    ngram_options="-limit-vocab -vocab $nbestvocab"
+
+fi
+
+if [ $norescore -eq 0 -a -n "$vocab_aliases" ]; then
+    if [ $limit_vocab -gt 0 ]; then
+	nbestvocabalias="$tmpdir/$$nbest.vocabalias"
+	trap "rm -f $nbestvocab $nbestvocabalias; exit" 0 1 2 15
+
+	sort -k 2,2 $vocab_aliases | \
+	join -1 2 -o 1.1,1.2 - $nbestvocab > $nbestvocabalias
+
+	# tell ngram to use these vocab-aliases
+	ngram_options="$ngram_options -vocab-aliases $nbestvocabalias"
+    else
+	# tell ngram to use this vocab-alias
+	ngram_options="-vocab-aliases $vocab_aliases"
+    fi
+fi
+
+if [ -n "$fast_rescore" ]; then
+
+#
+# Fast rescoring mode:
+#	Hand N-best lists directly to ngram. No text filtering is supported
+#
+
+	if [ -n "$pretty_file" -o -n "$filter_command" -o $lm_only -gt 0 -o $count_oovs -gt 0 ]
+        then
+		echo "Text filtering, -lm-only, and -count-oovs not supported with -fast" >&2
+		exit 2
+    	fi
+
+	if [ $nodecipherlm -eq 0 ]; then
+		echo "Must use -nodecipherlm with -fast" >&2
+		exit 2
+    	fi
+
+	if [ $norescore -gt 0 ]; then
+		nbest-lattice -no-rescore -no-reorder $mw_option \
+			-nbest-files "$filelist" \
+			-write-nbest-dir "$scoredir"
+	else 
+		if [ "$multiwords" -gt 0 ]; then
+			mw_option=-split-multiwords
+		fi
+		$ngram_tool \
+			-no-reorder $mw_option -multi-char "$multichar" \
+			-nbest-files "$filelist" \
+			-write-nbest-dir "$scoredir" \
+			-rescore-lmw 1 -rescore-wtw 1 \
+			$ngram_options "$@"
+	fi
+
+else # fast_rescore 
+
+#
+# General rescoring mode:
+#	Concatenate hyps for all nbest list, record number of hyps for
+#		each file in the output stream
+#	Feed to ngram -rescore (using lm-options)
+#		or using -ppl for counting OOVs
+#	Parse ngram output into lm scores and deposit into target files
+#
+
+escape="***FILE:"
+
+cat $filelist | ( \
+while read filename rest; do
+	case $filename in
+	# preserve LMstate labels in the file list and pass them to ngram
+	"<LMstate>")	echo $filename $rest
+			continue ;;
+	esac
+	gzip -dcf $filename | \
+${GAWK-gawk} '
+BEGIN {
+	filename = "";
+	numhyps = 0;
+	nbestformat = 0;
+
+	# constants
+	bytelogscale = 2.30258509299404568402 * 10000.5 / 1024.0;
+	pause = "-pau-";
+}
+
+function bytelog2log10(x) {
+	return x / bytelogscale;
+}
+
+NR == 1 {
+	sentid = filename;
+	sub("^.*/", "", sentid);
+	sub("\\.gz$", "", sentid);
+	sub("\\.Z$", "", sentid);
+	sub("\\.score$", "", sentid);
+	sub("\\.wv$", "", sentid);
+	sub("\\.wav$", "", sentid);
+	sub("\\.wav_cep$", "", sentid);
+
+	# read pretty map file
+	if (pretty_file) {
+	    while ((getline mapline < pretty_file) > 0) {
+		npretty = split(mapline, pretty_list);
+		word = pretty_list[1];
+		pretty_map[word] = "";
+		for (i = 2; i <= npretty; i ++) {
+		    pretty_map[word] = pretty_map[word] " " pretty_list[i];
+		}
+	    }
+	}
+
+	print escape, sentid;
+}
+
+function pretty_up(start) {
+	for (i = start; i <= NF; i ++) {
+	    if ($i in pretty_map) {
+		$i = pretty_map[$i];
+	    }
+	    if (multiwords) gsub(multichar, " ", $i);
+	}
+}
+
+/^NBestList1\.0/ {
+	nbestformat = 1;
+	if (nodecipherlm) {
+	    printf "%s: -nodecipherlm ineffective for NBestList1.0\n", filename > "/dev/stderr" ;
+	}
+	next;
+}
+/^NBestList2\.0/ {
+	nbestformat = 2;
+	next;
+}
+{
+	numhyps ++;
+	if (nbestformat == 0) {
+	    pretty_up(4);
+	    if (count_oovs) {
+		# output only the words, add <s> to handle empty hyps
+		$1 = $2 = $3 = "";
+		print "<s>", $0;
+	    } else {
+		print;
+	    }
+	} else if (nbestformat == 1) {
+	    pretty_up(2);
+
+	    if (count_oovs) {
+		# output only the words, add <s> to handle empty hyps
+		$1 = "";
+		print "<s>", $0;
+	    } else if (norescore) {
+		# convert to SRILM format
+		score = substr($1,2,length($1)-2);
+		$1 = "";
+	    	print bytelog2log10(score), 0, 0, $0;
+	    } else {
+		# keep Decipher format
+		print;
+	    }
+	} else if (nbestformat == 2) {
+	    score = substr($1,2,length($1)-2);
+
+	    # compute total AC and LM scores 
+	    lm_score = 0;
+	    num_words = 0;
+	    num_pauses = 0;
+
+	    words = "";
+	    prev_end_time = -1;
+	    for (i = 2; i <= NF; i += 11) {
+		start_time = $(i + 3);
+		end_time = $(i + 5);
+
+		# skip tokens that are subsumed by the previous word
+		# (this eliminates phone and state symbols)
+		# XXX: due to a bug in Decipher some state tags have incorrect
+		# timemarks.  We filter them based on their token string.
+		if (start_time > prev_end_time && !($i ~ /-[0-9]$/)) {
+		    words = words " " $i;
+
+		    num_words ++;
+		    if ($i == pause) num_pauses ++;
+
+		    lm_score += $(i + 7);
+
+		    prev_end_time = end_time;
+		}
+	    }
+
+	    $0 = $1 " " words;
+
+	    pretty_up(2);
+
+	    # Compute AC score from total and lm scores. This takes into
+	    # account that the recognizer might sum scores of equivalent hyps
+	    # (e.g., those differing only in pauses or pronunciations) and
+	    # reflect the summing in the total score, but not in the word AC
+	    # scores.
+	    ac_score = score - lm_score;
+
+	    if (count_oovs) {
+		# output only the words, add <s> to handle empty hyps
+		$1 = "";
+		print "<s>", $0;
+	    } else if (norescore) {
+		# convert to SRILM nbest format
+		# NOTES:
+		# - subtract Decipher WTW (including for pauses!)
+		# - compute number of words WITHOUT pauses for output
+		$1 = "";
+		print bytelog2log10(ac_score), \
+			bytelog2log10(lm_score/decipher_lmw) - \
+				numwords * decipher_wtw,  \
+			split(words, dummy) - num_pauses, $0;
+	    } else if (nodecipherlm) {
+		# output only acoustic score in Decipher format
+		$1 = "(" ac_score ")";
+		print;
+	    } else {
+		# output combined score in Decipher format
+		print;
+	    }
+	}
+}
+END {
+	if (numhyps == 0) {
+		print "WARNING: nbest list " filename " is empty" \
+			> "/dev/stderr" ;
+	}
+}
+' filename=$filename escape="$escape" count_oovs=$count_oovs \
+  nodecipherlm=$nodecipherlm multiwords=$multiwords \
+  multichar="$multichar" pretty_file="$pretty_file" \
+  norescore=$norescore decipher_lmw=$decipher_lmw decipher_wtw=$decipher_wtw 
+done
+) | \
+if [ $norescore -gt 0 -a -z "$filter_command" ]; then
+    # no rescoring and no filtering
+    cat
+elif [ $norescore -gt 0 ]; then
+    # no resoring, but filter hyps
+    eval "$filter_command"
+elif [ -z "$filter_command" ]; then
+    # standard rescoring without filtering
+    $ngram_tool -debug 1 $rescore_option - -rescore-lmw 1 -rescore-wtw 1 \
+		-escape "$escape " $ngram_options "$@" 
+else
+    # rescoring with filtering
+    eval "$filter_command" | \
+    $ngram_tool -debug 1 $rescore_option - -rescore-lmw 1 -rescore-wtw 1 \
+		-escape "$escape " $ngram_options "$@" 
+fi | \
+${GAWK-gawk} -v bytelog=$bytelog '
+BEGIN {
+	currentfile = "";
+	scoredir = "";
+	scorefile = "";
+	numhyps = 0;
+	bytelogscale = 2.30258509299404568402 * 10000.5 / 1024.0;
+}
+$1 == escape {
+	if (currentfile) {
+		close(scorefile);
+	}
+	currentfile = $2;
+	sub("$", "", currentfile);
+	if (!lm_only && !count_oovs) {
+	    # backward compatibility
+	    currentfile = currentfile ".score";
+	}
+	scorefile = "gzip > " scoredir "/" currentfile ".gz";
+	printf "processing hyps for %s\n", currentfile \
+		> "/dev/stderr" ;
+	hypno = 0;
+	next;
+}
+# parse ngram -ppl output to get OOV (including zeroprobs) count
+count_oovs && $6 == "OOVs" {
+	num_oovs = $5;
+	next;
+}
+count_oovs && $2 == "zeroprobs," {
+	num_oovs += $1;
+	print num_oovs | scorefile;
+	next;
+}
+# process ngram -rescore output
+!count_oovs {
+	if ($2 ~ /NaN/) {
+	    print "WARNING: LM score in nbest list " currentfile " is NaN" \
+							    > "/dev/stderr" ;
+	    $2 = -100000;
+	}
+		
+	if (bytelog) {
+	    $1 = $1 * bytelogscale;
+	    $2 = $2 * bytelogscale;
+	}
+	if (lm_only) {
+	    print $2 | scorefile;
+	} else  {
+	    print | scorefile;
+	}
+}
+END {
+	if (currentfile) {
+		close(scorefile);
+	}
+}
+' scoredir=$scoredir escape="$escape" bytelog=$bytelog lm_only=$lm_only count_oovs=$count_oovs
+
+fi # fast_rescore

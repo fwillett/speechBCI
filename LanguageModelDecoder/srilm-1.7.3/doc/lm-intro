@@ -1,0 +1,184 @@
+
+SRI Object-oriented Language Modeling Libraries and Tools
+
+BUILD AND INSTALL
+
+See the INSTALL file in the top-level directory.
+
+FILES
+
+All mixed-case .cc and .h files contain C++ code for the liboolm
+library. 
+All lower-case .cc files in this directory correspond to executable commands.
+Each program is option driven. The -help option prints a list of 
+available options and their meaning.
+
+N-GRAM MODELS
+
+Here we only cover arbitary-order n-grams (no classes yet, sorry).
+
+	ngram-count		manipulates n-gram counts and
+				estimates backoff models
+	ngram-merge		merges count files (only needed for large
+				corpora/vocabularies)
+	ngram			computes probabilities given a backoff model
+				(also does mixing of backoff models)
+
+Below are some typical command lines.
+
+NGRAM COUNT MANIPULATION
+
+       ngram-count -order 4 -text corpus -write corpus.ngrams
+
+   Counts all n-grams up to length 4 in corpus and writes them to 
+   corpus.ngrams. The default n-gram order (if not specified) is 3.
+
+       ngram-count -vocab 30k.vocab -order 4 -text corpus -write corpus.ngrams
+
+   Same, but restricts the vocabulary to what is listed in 30k.vocab
+   (one word per line).  Other words are replaced with the <unk> token.
+
+       ngram-count -read corpus.ngrams -vocab 20k.vocab -write-order 3 \
+			       -write corpus.20k.3grams
+
+    Reads the counts from corpus.ngrams, maps them to the indicated
+    vocabulary, and writes only the trigrams back to a file.
+
+	ngram-count -text corpus -write1 corpus.1grams -write2 corpus.2grams \
+				       -write3 corpus.3grams
+
+    writes unigrams, bigrams, and trigrams to separate files, in one
+    pass.  Usually there is no reason to keep these separate, which is
+    why by default ngrams of all lengths are written out together.
+    The -recompute flag will regenerate the lower-order counts from the
+    highest order one by summation by prefixes.
+
+    The -read and -text options are additive, and can be used to merge
+    new counts with old.  Furthermore, repeated n-grams read with -read
+    are also additive.  Thus,
+
+	cat counts1 counts2 ... | ngram-count -read -  
+
+    will merge the counts from counts1, counts2, ...
+
+    All file reading and writing uses the zio routines, so argument "-"
+    stands for stdin/stdout, and .Z and .gz files are handled correctly.
+
+    For very large count files (due to large corpus/vocabulary) this 
+    method of merging counts in-memory is not suitable.  Alternatively,
+    counts can sorted and then merged.
+    First, generate counts for portions of the training corpus and 
+    save them with -sort:
+
+	ngram-count -text part1.text -sort -write part1.ngrams.Z
+	ngram-count -text part2.text -sort -write part2.ngrams.Z
+
+    Then combine these with
+
+	ngram-merge part?.ngrams.Z > all.ngrams.Z
+
+    (Although ngram-merge can deal with any number of files >= 2 ,
+    it is most efficient to combined two parts at a time, then
+    from the resulting new count files, again two at a time, using
+    a binary tree merging scheme.)
+
+BACKOFF MODEL ESTIMATION
+
+        ngram-count -order 2 -read corpus.counts -lm corpus.bo
+
+    generates a bigram backoff model in ARPA (aka Doug Paul) format 
+    from corpus.counts and writes is to corpus.bo.
+
+    If counts fit into memory (and hence there is no reason for the
+    merging schemes described above) it is more convenient and faster
+    to go directly from training text to model:
+
+	ngram-count -text corpus -lm corpus.bo
+      
+    The built-in discounting method used in building backoff models
+    is Good Turing.  The lower exclusion cutoffs can be set with
+    options (-gt1min ... -gt6min), the upper discounting cutoffs are
+    selected with -gt1max ... -gt6max.  Reasonable defaults are
+    provided that can be displayed as part of the -help output.
+
+    When using limited vocabularies it is recommended to compute the
+    discount coeffiecients on the unlimited vocabulary (at least for
+    the unigrams) and then apply them to the limited vocabulary
+    (otherwise the vocabulary truncation would produce badly skewed
+    counts frequencies at the low end that would break the GT algorithm.)
+    For this reason, discounting parameters can be saved to files and
+    read back in.
+    For example
+
+	ngram-count -text corpus -gt1 gt1.params -gt2 gt2.params \
+					-gt3 gt3.params
+
+    saves the discounting parameters for unigrams, bigrams and trigams
+    in the files as indicated.  These are short files that can be
+    edited, e.g., to adjust the lower and upper discounting cutoffs.
+    Then the limited vocabulary backoff model is estimated using these
+    saved parameters
+
+	ngram-count -text corpus -vocab 20k.vocab \
+		-gt1 gt1.params -gt2 gt2.params gt3.params -lm corpus.20k.bo
+
+MODEL EVALUATION
+
+    The ngram program uses a backoff model to compute probabilities and
+    perplexity on test data.
+
+	ngram -lm some.bo -ppl test.corpus 
+
+    computes the perplexity on test.corpus according to model some.bo.
+    The flag -debug controls the amount of information output:
+
+		-debug 0	only overall statistics
+		-debug 1	statistics for each test sentence
+		-debug 2	probabilities for each word
+		-debug 3	verify that word probabilities over the
+				entire vocabulary sum to 1 for each context
+
+    ngram also understands the -order flag to set the maximum ngram
+    order effectively used by the model.  The default is 3.
+    It has to be explicitly reset to use ngrams of higher order, even
+    if the file specified with -lm contains higher order ngrams.
+
+    The flag -skipoovs establishes compatibility with broken behavior
+    in some old software.  It should only be used with bo model files 
+    produced with the old tools.  It will
+
+     - let OOVs be counted as such even when the model has a probability
+       for <unk>
+     - skip not just the OOV but the entire n-gram context in which any
+       OOVs occur (instead of backing off on OOV contexts).
+
+OTHER MODEL OPERATIONS
+
+    ngram performs a few other operations on backoff models.
+
+	ngram -lm bo1 -mix-lm bo2 -lambda 0.2 -write-lm bo3
+
+    produces a new model in bo3 that is the interpolation of bo1 and bo2
+    with a weight of 0.2 (for bo1).
+
+	ngram -lm bo -renorm -write-lm bo.new
+
+    recomputes the backoff weights in the model bo (thus normalizing
+    probabilities to 1) and leaves the result in bo.new.
+
+API FOR LANGUAGE MODELS
+
+    These programs are just examples of how to use the object-oriented
+    language model library currently under construction.  To use the API
+    one would have to read the various .h files and how the interfaces
+    are used in the example progams.  No comprehensive documentation is
+    available as yet.  Sorry.
+
+AVAILABILITY
+
+    This code is Copyright SRI International, but is available free of
+    charge for non-profit use.  See the License file in the top-level
+    direcory for the terms of use.
+
+Andreas Stolcke
+$Date: 1999/07/31 18:48:33 $

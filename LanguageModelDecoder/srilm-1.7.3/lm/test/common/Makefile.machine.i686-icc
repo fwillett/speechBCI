@@ -1,0 +1,39 @@
+#
+#    File:   Makefile.i686-icc
+#    Author: A. Stolcke
+#    Date:   Tue Jul  1 07:28:55 PDT 2003
+#
+#    Description:
+#	Machine dependent compilation options and variable definitions
+#	for Linux/i686 platform running on Pentium-4 and Xeon using the 
+#	Intel icc compiler.
+#
+#    Copyright (c) 2003 SRI International.  All Rights Reserved.
+#
+#    $Header: /home/srilm/CVS/srilm/common/Makefile.machine.i686-icc,v 1.13 2013/10/22 17:21:53 stolcke Exp $
+#
+
+include $(SRILM)/common/Makefile.machine.i686
+
+   # Use the Intel C++ compiler.
+   # Note: -march=pentiumii disables vectorization, which is actually worse
+   ICC_DIR = /usr/local/lang/intel_cc_80
+   ICC_FLAGS = -wd654 -wd1125 -wd1224 -tpp7 -march=pentiumpro -Wl,-rpath,$(ICC_DIR)/lib -Wl,-z,muldefs
+
+# For Intel c++ 9.x the following seem to be required
+#  ICC_DIR = /usr/local/lang/intel_cc_91
+#  ICC_FLAGS = -gcc-name=/usr/bin/gcc -wd654 -wd1125 -wd1224 -tpp7 -march=pentiumpro -Wl,-rpath,$(ICC_DIR)/lib -Wl,-z,muldefs
+#  ADDITIONAL_LIBRARIES += -lstdc++ -lcxaguard
+
+   CC = $(ICC_DIR)/bin/icc $(ICC_FLAGS)
+   CXX = $(ICC_DIR)/bin/icc $(ICC_FLAGS) -DINSTANTIATE_TEMPLATES
+
+   # Optional compilation flags.
+   # Intel compiler (some versions, anyway) allow packing of the Trie structure
+   # (see dstruct/src/Trie.h)
+   OPTIMIZE_FLAGS = -g -O3 -DUSE_PACKED_TRIE
+   DEBUG_FLAGS = -g -DDEBUG
+   PROFILE_FLAGS = -g -p -O3 -DUSE_PACKED_TRIE
+
+   ADDITIONAL_CFLAGS =
+   ADDITIONAL_CXXFLAGS =

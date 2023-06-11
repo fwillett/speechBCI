@@ -1,0 +1,5 @@
+../ngram-count-gt/eval97.text: line 5293: 5290 sentences, 38238 words, 0 OOVs
+0 zeroprobs, logprob= 0 ppl= 1 ppl1= 1
+using WittenBell for 1-grams
+warning: distributing 0.0720362 left-over probability mass over all 3379 words
+writing 3380 1-grams

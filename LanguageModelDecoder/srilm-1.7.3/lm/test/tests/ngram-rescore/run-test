@@ -1,0 +1,35 @@
+#!/bin/sh
+
+if [ -f ../ngram-count-gt/swbd.3bo.gz ]; then
+	gz=.gz
+else
+	gz=
+fi
+
+lm=../ngram-count-gt/swbd.3bo$gz
+
+# create a bigram LM
+ngram -debug 1 \
+	-lm $lm -order 2 \
+	-write-lm swbd.2bo
+
+# statically interpolate bigram and trigram
+# by rescoring the original trigram
+
+echo "0.7 0.2 0.1"  > WEIGHTS
+
+ngram -debug 1 \
+	-lm $lm \
+	-mix-lm swbd.2bo \
+	-mix-lm2 $lm \
+	-context-priors WEIGHTS \
+	-rescore-ngram $lm \
+	-write-lm rescored.3bo \
+	-ppl ../ngram-count-gt/eval97.text
+
+ngram -debug 0 \
+	-lm rescored.3bo \
+	-ppl ../ngram-count-gt/eval97.text
+
+rm -f swbd.2bo rescored.3bo WEIGHTS
+

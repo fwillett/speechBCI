@@ -1,0 +1,21 @@
+
+Note for Intel x86 platforms:
+
+	The function KneserNey::lowerOrderWeight() seems to trigger a compiler
+	bug in gcc 2.95.3 with optimization, on the i686-pc-linux-gnu,
+	i386-pc-solaris2, and i686-pc-cygwin platforms (and therefore probably
+	on all Intel targets).    The problem manifests itself by the 
+	"ngram-count-kn-int" test in the test/ directory not terminating.
+
+	To work around this problem, compile lm/src/Discount.cc without global
+	optimization:
+
+		cd $SRILM/lm/src
+		rm ../obj/$MACHINE_TYPE/Discount.o
+		gnumake OPTIMIZE_FLAGS=-O1 ngram-count
+		gnumake release
+
+	As of Feb 2002, Cygwin ships with gcc 2.95.3 and therefore suffers from
+	this bug.  gcc 2.95.2 or lower and gcc 3.x versions of the compiler
+	don't seem to be affected, though.
+

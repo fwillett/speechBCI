@@ -1,0 +1,23 @@
+
+				old		w/history LM
+
+3gram, -wbdiscount	
+	unpruned		102.617
+	-prune 1e-7		102.896
+	-prune 1e-6		106.201
+	-prune 1e-5		129.768
+
+3gram, -kndiscount -interpolate
+	unpruned		100.987		
+	-prune 1e-7		101.762		101.586
+	-prune 1e-6		108.958		107.304
+	-prune 1e-5		136.912		128.625
+	-prune 1e-4		220.323		191.641
+
+history_smooth
+	(GT default)				128.625 
+	-cdiscount 0				128.625
+	-wbdiscount				129.449
+	-kndiscount				133.106
+	-addsmooth 1				136.368
+

@@ -1,0 +1,72 @@
+#
+#    File:   Makefile.machine.i686-ubuntu-32
+#    Author: The SRI DECIPHER (TM) System
+#    Date:   Tue Jan 25 13:49:15 PST 2011
+#
+#    Description:
+#	Machine dependent compilation options and variable definitions
+#	for Ubuntu Linux/i686 platform, forcing 32bit build on 64bit systems
+#
+#    Copyright (c) 1999-2011 SRI International.  All Rights Reserved.
+#
+#    $Header: /home/srilm/CVS/srilm/common/Makefile.machine.i686-ubuntu-32,v 1.4 2012/10/18 20:55:18 mcintyre Exp $
+#
+
+   # Use the GNU C compiler.
+   GCC_PATH = /usr/bin/
+   GCC_FLAGS =  -m32 -Wall -Wno-unused-variable -Wno-uninitialized
+   CC = $(GCC_PATH)gcc $(GCC_FLAGS)
+   CXX = $(GCC_PATH)g++ $(GCC_FLAGS) -DINSTANTIATE_TEMPLATES
+
+   # Optional compilation flags.
+   OPTIMIZE_FLAGS = -g -O3
+   DEBUG_FLAGS = -g -DDEBUG
+   PROFILE_FLAGS = -g -pg -O3
+
+   # Optional linking flags.
+   EXPORT_LDFLAGS = -s
+
+   # Shared compilation flags.
+   CFLAGS = -D_FILE_OFFSET_BITS=64 $(ADDITIONAL_CFLAGS) $(INCLUDES)
+   CXXFLAGS = -D_FILE_OFFSET_BITS=64 $(ADDITIONAL_CXXFLAGS) $(INCLUDES)
+
+   # Shared linking flags.
+   LDFLAGS = $(ADDITIONAL_LDFLAGS) -L$(SRILM_LIBDIR)
+
+   # Other useful compilation flags.
+   ADDITIONAL_CFLAGS =
+   ADDITIONAL_CXXFLAGS =
+
+   # Other useful include directories.
+   ADDITIONAL_INCLUDES = 
+
+   # Other useful linking flags.
+   ADDITIONAL_LDFLAGS = 
+
+   # Other useful libraries.
+   SYS_LIBRARIES = -lpthread
+
+   # run-time linker path flag
+   RLD_FLAG = -R
+
+   # No Tcl support by default (32bit libraries generally not present)
+   NO_TCL = X
+   TCL_LIBRARY =
+
+   # No ranlib
+   RANLIB = :
+
+   # Generate dependencies from source files.
+   GEN_DEP = $(CC) $(CFLAGS) -MM
+
+   GEN_DEP.cc = $(CXX) $(CXXFLAGS) -MM
+
+   # Run lint.
+   LINT = lint
+   LINT_FLAGS = -DDEBUG $(CFLAGS)
+
+   # Location of gawk binary
+   GAWK = /usr/bin/awk
+
+   # Location of perl binary
+   PERL = /usr/bin/perl

@@ -1,0 +1,153 @@
+#!/bin/sh
+#
+# compute-sclite-nbest --
+#	Compute errors for nbest hypotheses using sclite
+#	for use with nbest-optimize -errors option
+#
+# $Header: /home/srilm/CVS/srilm/utils/src/compute-sclite-nbest,v 1.5 2016/09/23 20:05:51 stolcke Exp $
+# 
+
+usage () {
+	echo "$0 nbest-files output-dir -r refs [-filter script] [sclite-options]"
+}
+
+if [ $# -lt 2 ]; then
+	usage;
+	exit 2
+fi
+
+filter=cat
+nbest_files=$1
+output_dir=$2
+shift; shift
+
+while [ $# -gt 0 ]
+do
+    case "$1" in
+    -r)		refs=$2
+		shift; shift
+		;;
+    -filter)	filter="$2"
+		shift; shift
+		;;
+    *)		sclite_options="$sclite_options $1"
+		shift
+		;;
+    esac
+done
+
+if [ -z "$refs" ]; then
+    usage
+    exit 2
+fi
+
+TMPDIR=${TMPDIR-/tmp}
+
+sortedrefs=$TMPDIR/sortedrefs.$$
+nbestrefs=$TMPDIR/nbestrefs.$$
+nbesthyps=$TMPDIR/nbesthyps.$$
+scliteout=$TMPDIR/scliteout.$$
+
+trap "/bin/rm -f $sortedrefs $nbestrefs $nbesthyps $scliteout; exit 1" 1 2 13 15
+
+set -e
+
+sort -k 1,1 $refs > $sortedrefs
+
+> $nbestrefs
+> $nbesthyps
+
+#
+# Prepare hyp and reference files
+#
+cat $nbest_files | \
+sed 's,.*/\(.*\).gz$,\1 &,' | \
+sort -k 1,1 | \
+join - $sortedrefs | \
+while read sentid nbestlist refwords
+do
+    if [ -z "$refwords" ]; then
+	echo "warning: $sentid has no reference" >&2
+	continue
+    fi
+    
+    echo $sentid >&2
+
+    gunzip -cf $nbestlist | \
+    nbest-words | \
+    $filter | \
+    ${GAWK-gawk} \
+	-v nbestrefs=$nbestrefs -v nbesthyps=$nbesthyps \
+	-v outdir=$output_dir \
+	-v sentid=$sentid -v refwords="$refwords" '{
+	    if (refwords == "ignore_time_segment_in_scoring") {
+		# this utterance is to be ignored --
+		# we generate dummy error information directly
+		# nbest-optimize(1) error count format is: wcr wer nsub ndel nins nerr nw
+		print 0, 0, 0, 0, 0, 0, 0 | "gzip > " outdir "/" sentid ".gz";
+	    } else {
+		gsub("<[^ ]*>", "");
+		gsub("-pau-", "");
+
+		hypid = sprintf("%s#%05d", sentid, NR);
+		print hypid, refwords >> nbestrefs;
+		print hypid, $0 >> nbesthyps;
+	    }
+	}'
+done 
+
+if [ -s $nbestrefs ]; then
+    # 
+    # Run the scoring
+    #
+    (set -x; compute-sclite \
+	    -raw-sentids \
+	    $sclite_options \
+	    -O $TMPDIR -l 1000 \
+	    -r $nbestrefs \
+	    -h $nbesthyps \
+	    -o pralign )
+
+    #
+    # Extract error counts from sclite pra output
+    #
+    ${GAWK-gawk} -v outdir=$output_dir '
+    $1 == "id:" {
+	    sentid = $2;
+	    sub("^\\(", "", sentid);
+	    # strip the hyp number
+	    sub("#[0-9]*)$", "", sentid);
+
+	    # sclite lowercases sentids
+	    # Heuristically restore channel letters to uppercase
+	    sub("_a_", "_A_", sentid);
+	    sub("_b_", "_B_", sentid);
+	    sub("-a-", "-A-", sentid);
+	    sub("-b-", "-B-", sentid);
+
+	    if (sentid != last_sentid) {
+		if (outfile) close(outfile);
+		outfile = "gzip > " outdir "/" sentid ".gz"
+		last_sentid = sentid;
+	    }
+
+	    next;
+    }
+    $1 == "Scores:" {
+	    corr = $6;
+	    subs = $7;
+	    dels = $8;
+	    inss = $9;
+
+	    words = corr + subs + dels;
+	    errs = subs + dels + inss;
+	    wer = words > 0 ? errs/words : 0;
+	    # nbest-optimize(1) error count format is: wcr wer nsub ndel nins nerr nw
+	    print words-dels-subs, wer, subs, dels, inss, errs, words | outfile;
+    }
+    END {
+	    if (outfile) close(outfile);
+    }' $nbesthyps.pra
+fi
+
+/bin/rm -f $sortedrefs $nbestrefs $nbesthyps $nbesthyps.pra

@@ -1,0 +1,265 @@
+_________________________________________________________________
+
+NNAAMMEE
+     Opt_Parse, Opt_PrintUsage - Manage command line options
+
+SSYYNNOOPPSSIISS
+     ##iinncclluuddee <<ooppttiioonn..hh>>
+
+     int OOpptt__PPaarrssee(_a_r_g_c_, _a_r_g_v_, _o_p_t_i_o_n_A_r_r_a_y_, _n_u_m_O_p_t_i_o_n_s_, _f_l_a_g_s)
+
+     void OOpptt__PPrriinnttUUssaaggee(_c_o_m_m_a_n_d_N_a_m_e_, _o_p_t_i_o_n_A_r_r_a_y_, _n_u_m_O_p_t_i_o_n_s)
+
+AARRGGUUMMEENNTTSS
+     int      _a_r_g_c           (in)      Number   of  arguments  on
+                                       command line.
+
+     char     _*_*_a_r_g_v         (in/out)  Command   line   arguments
+                                       passed to main program.
+
+     char     _*_c_o_m_m_a_n_d_N_a_m_e   (in)      Name  of the program being
+                                       run, usually _a_r_g_v[0].
+
+     Option   _*_o_p_t_i_o_n_A_r_r_a_y   (in)      An   array    of    option
+                                       descriptions.
+
+     int      _n_u_m_O_p_t_i_o_n_s     (in)      Number   of   elements  in
+                                       optionArray,       usually
+                                       obtained     using     the
+                                       OOpptt__NNuummbbeerr   macro,   e.g.
+                                       OOpptt__NNuummbbeerr(optionArray).
+
+     int      _f_l_a_g_s          (in)      If non-zero, then it spec-
+                                       ifies one  or  more  flags
+                                       that  control  the parsing
+                                       of  arguments.   Different
+                                       flags    may    be   OR'ed
+                                       together.  The only  flags
+                                       currently    defined   are
+                                       OPT_ALLOW_CLUSTERING   and
+_______________________________________O_P_T___O_P_T_I_O_N_S___F_I_R_S_T_._________
+
+DDEESSCCRRIIPPTTIIOONN
+     OOpptt__PPaarrssee  parses  the  command  line arguments of a program
+     according to an array of option descriptions.  Starting with
+     _a_r_g_v[1], it parses as many options as it can and returns the
+     rest of the options in the  _a_r_g_v  array,  compacted  to  the
+     beginning  of the array (starting with _a_r_g_v[1]).  The return
+     value indicates how many options are returned  in  the  _a_r_g_v
+     array  (including  _a_r_g_v[0]).  Opt_Parse returns options that
+     don't start with ``-'' unless they are arguments for options
+     that  it parses.  OOpptt__PPaarrssee also returns any options follow-
+     ing an OOPPTT__RREESSTT option (see below for more details).
+
+     Each element of the  array  _o_p_t_i_o_n_A_r_r_a_y  has  the  following
+     structure: ttyyppeeddeeff ssttrruucctt Option {
+         iinntt _t_y_p_e;
+         cchhaarr*_k_e_y;
+         cchhaarr*_v_a_l_u_e_P_t_r;
+         cchhaarr*_d_o_c_M_s_g; } Option;
+
+     The  _k_e_y field is a string that identifies this option.  For
+     example, if _k_e_y is ffoooo, then this Option will match  a  --ffoooo
+     command-line option.  If _k_e_y is the empty string (``'') then
+     it matches a -- command-line option.  If  _k_e_y  is  NULL,  the
+     Option will not match any command-line options (this feature
+     is  only  useful  for  OPT_DOC  options).    _D_o_c_M_s_g   is   a
+     documentation string to print out as part of a help message.
+     The _t_y_p_e field determines what to do  when  this  Option  is
+     matched.   It  also  determines  the meaning of the _v_a_l_u_e_P_t_r
+     field.  _T_y_p_e should always be specified  using  one  of  the
+     following macros:
+
+     OOPPTT__TTRRUUEE
+          Treats  _v_a_l_u_e_P_t_r  as  the  address  of  an integer, and
+          stores the value 1 in that integer.
+
+     OOPPTT__FFAALLSSEE
+          Treats _v_a_l_u_e_P_t_r as the address of an integer and stores
+          the value 0 in that integer.
+
+     OOPPTT__CCOONNSSTTAANNTT(_v_a_l_u_e)
+          This  is  a generalized form of OPT_TRUE and OPT_FALSE.
+          Treats _v_a_l_u_e_P_t_r as the address of an integer and stores
+          _v_a_l_u_e  in that integer.  _V_a_l_u_e must be a positive inte-
+          ger.
+
+     OOPPTT__IINNTT
+          The next argument after the one matching _k_e_y must  con-
+          tain an integer string in the format accepted by ssttrrttooll
+          (e.g. ``0'' and ``0x'' prefixes may be used to  specify
+          octal  or hexadecimal numbers, respectively).  _V_a_l_u_e_P_t_r
+          will be treated as the address of an integer,  and  the
+          value  given by the next argument will be stored there.
+
+     OOPPTT__TTIIMMEE
+          The next argument after the one matching _k_e_y must  con-
+          tain  a  string  that  is  parsable as a date and time.
+          Currently, only two formats are recognized: _s_e_c_o_n_d_s
+
+          and _y_y.._m_m.._d_d.._h_h.._m_m.._s_s
+
+          The first form is simply the number  of  seconds  since
+          the  start  of the epoch (1 January 1970, 0 hours GMT).
+          The second form specifies the year (e.g., 91 or  1991),
+          month  (1-12),  day of the month, hours (0-23), minutes
+          (0-59), and seconds (0-59).  All fields must be  speci-
+          fied.   _V_a_l_u_e_P_t_r  will  be  treated as the address of a
+          ttiimmee__tt (defined in <<ttiimmee..hh>>), and the given  time  will
+          be stored there.  All times are in terms of the current
+          timezone and daylight savings rules.
+
+          Note that this flavor can  clobber  the  static  buffer
+          used by the llooccaallttiimmee library routine.
+
+     OOPPTT__FFLLOOAATT
+          The  next argument after the one matching _k_e_y must con-
+          tain a floating-point number in the format accepted  by
+          ssttrrttooll.   _V_a_l_u_e_P_t_r will be treated as the address of an
+          double-precision floating point value,  and  the  value
+          given by the next argument will be stored there.
+
+     OOPPTT__SSTTRRIINNGG
+          Treats  _v_a_l_u_e_P_t_r  as  the  address  of  a (char *), and
+          stores a pointer to the next argument in  the  location
+          pointed to by _v_a_l_u_e_P_t_r.
+     OOPPTT__DDOOCC
+          This  option is intended primarily as a way of printing
+          extra documentation during help message printouts.   It
+          isn't  normally  used as an actual option (and normally
+          its _k_e_y field is NULL).  If it is invoked as an option,
+          then  the  same thing happens as for the ``-?'' option:
+          descriptions get printed for all options in _o_p_t_i_o_n_A_r_r_a_y
+          and OOpptt__PPaarrssee calls exit(0) to terminate the process.
+
+     OOPPTT__RREESSTT
+          This  option  is  used  by programs that allow the last
+          several of their options to be the name and/or  options
+          for  some  other  program.   If  an  OOPPTT__RREESSTT option is
+          found,  then  OOpptt__PPaarrssee  doesn't  process  any  of  the
+          remaining arguments;  it returns them all at the begin-
+          ning of _a_r_g_v.  In addition, OOpptt__PPaarrssee  treats  _v_a_l_u_e_P_t_r
+          as  the address of an integer value, and stores in that
+          value the index of the first of the OOPPTT__RREESSTT options in
+          the  returned _a_r_g_v.  This allows the program to distin-
+          guish  the  OOPPTT__RREESSTT  options  from  other  unprocessed
+          options that preceeded the OOPPTT__RREESSTT.
+
+     OOPPTT__FFUUNNCC
+          When  one  of these options is encountered, _v_a_l_u_e_P_t_r is
+          treated as the address of  a  function  which  is  then
+          called   with   the  following  calling  sequence:  iinntt
+          _f_u_n_c_(_o_p_t_S_t_r_i_n_g_, _n_e_x_t_A_r_g_)
+              cchhaarr    *_o_p_t_S_t_r_i_n_g;
+              cchhaarr    *_n_e_x_t_A_r_g; { }
+
+          The _o_p_t_S_t_r_i_n_g parameter points to the  current  option,
+          and  _n_e_x_t_A_r_g  points  to  the next option from _a_r_g_v (or
+          NULL if there aren't any more options in _a_r_g_v.  If _f_u_n_c
+          uses  _n_e_x_t_A_r_g  as an argument to the current option (so
+          that Opt_Parse should skip it), then it  should  return
+          1.  Otherwise it should return 0.
+
+     OOPPTT__GGEENNFFUUNNCC
+          Treat  _v_a_l_u_e_P_t_r  as  the address of a function and pass
+          all of the remaining arguments to it in  the  following
+          way: iinntt _g_e_n_f_u_n_c_(_o_p_t_S_t_r_i_n_g_, _a_r_g_c_, _a_r_g_v_)
+              cchhaarr    *_o_p_t_S_t_r_i_n_g;
+              iinntt _a_r_g_c;
+              cchhaarr    **_a_r_g_v; { }
+
+          _A_r_g_c and _a_r_g_v refer to all of the options after the one
+          that triggered the call, and _o_p_t_S_t_r_i_n_g  points  to  the
+          triggering  option.  _G_e_n_f_u_n_c should behave in a fashion
+          similar to OOpptt__PPaarrssee:  parse as many of  the  remaining
+          arguments  as  it can, then return any that are left by
+          compacting them to the beginning of _a_r_g_v  (starting  at
+          _a_r_g_v[0]).   _G_e_n_f_u_n_c  should  return a count of how many
+          arguments are left  in  _a_r_g_v_;  OOpptt__PPaarrssee  will  process
+          them.
+
+
+FFLLAAGGSS
+     OOPPTT__AALLLLOOWW__CCLLUUSSTTEERRIINNGG
+          This  will  permit  several  options  to  be  clustered
+          together with a single ``-'', e.g., ``foo  -abc''  will
+          be   handled   the  same  way  as  ``foo  -a  -b  -c''.
+          OPT_ALLOW_CLUSTERING  is  likely  to  cause   confusing
+          behavior unless each option is identified with a single
+          character.
+
+
+     OOPPTT__OOPPTTIIOONNSS__FFIIRRSSTT
+          This causes OOpptt__PPaarrssee to stop parsing the command  line
+          anytime  something  that  is not an option is detected.
+          Thus, a program that takes some options followed  by  a
+          command  to execute (along with that command's options)
+          can parse  its  own  options  using  OPT_OPTIONS_FIRST.
+          When the command to execute is encountered, assuming it
+          does not begin with a hyphen, OOpptt__PPaarrssee will return the
+          command and its arguments starting at _a_r_g_v[1], ignoring
+          any arguments with hyphens  following  the  first  non-
+          option.
+
+UUSSAAGGEE MMEESSSSAAGGEE
+     OOpptt__PPrriinnttUUssaaggee  may be invoked to print out all the documen-
+     tation strings (plus option names and default values) for  a
+     command's options.  If OOpptt__PPaarrssee encounters an option ``-?''
+     or ``-help'', then it will  call  OOpptt__PPrriinnttUUssaaggee  and  exit.
+     Note:   in  some  shells  the  question-mark must be escaped
+     (e.g., ``foo -\?'' in _c_s_h).
+
+
+EEXXAAMMPPLLEE
+     Here is an example definition of a set  of  option  descrip-
+     tions  and  some  sample command lines that use the options.
+     Note the effect on argc and argv;   command  arguments  that
+     get  interpreted  as options or option values are eliminated
+     from argv, and argc is updated to reflect reduced number  of
+     arguments.  /*
+      * Define and set default values for globals.
+      */  Boolean  debugFlag  =  FALSE;  int  numReps = 100; char
+     defaultFileName[] = "out"; char *fileName = defaultFileName;
+     Boolean exec = FALSE;
+
+     /*
+      * Define option descriptions.
+      */ Option optionArray[] = {
+         OPT_TRUE,  "X",  (char *) &debugFlag, "Turn on debugging
+     printfs",
+         OPT_INT, "N", (char  *)  &numReps,  "Number  of  repeti-
+     tions",
+         OPT_STRING, "of", (char *) &fileName, "Output filename",
+         OPT_REST, "x", (char *) &exec,
+             "File to exec, followed by any  arguments  (must  be
+     last argument).", };
+
+     main(argc, argv)
+         int argc;
+         char *argv[]; {
+         Opt_Parse(argc,            argv,            optionArray,
+     Opt_Number(optionArray),
+                 OPT_ALLOW_CLUSTERING);
+
+         /*
+          * the rest of the program.
+          */ }
+
+     Note that default values can be  assigned  to  option  vari-
+     ables.   Also, numOptions gets calculated by the compiler in
+     this example.  Here are some example command lines and their
+     effects.   prog  -N  200 infile      # just sets the numReps
+     variable to 200 prog -of out200 infile  # sets  fileName  to
+     reference  "out200" prog -XN 10 infile      # sets the debug
+     flag, also sets numReps In all of the  above  examples,  the
+     return  value  from  Opt_Parse  will  be  2, _a_r_g_v[0] will be
+     ``prog'', _a_r_g_v[1] will be ``infile'', and  _a_r_g_v[2]  will  be
+     NULL.
+
+KKEEYYWWOORRDDSS
+     arguments, command line, options
+
+
+
+
+[65;1H[K

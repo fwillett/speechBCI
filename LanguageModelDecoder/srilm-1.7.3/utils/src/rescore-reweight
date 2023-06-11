@@ -1,0 +1,134 @@
+#!/bin/sh
+#
+# rescore-reweight
+#	reweight nbest-list scores and select top hyps
+#
+# $Header: /home/srilm/CVS/srilm/utils/src/rescore-reweight,v 1.20 2013/03/09 07:13:01 stolcke Exp $
+#
+
+multiwords=0
+multichar=_
+
+while [ $# -gt 0 ]
+do
+    case "$1" in
+    -multiwords)
+	    multiwords=1
+	    ;;
+    -multi-char)
+	    multichar="$2"
+	    shift
+	    ;;
+    -*)	echo "$0: unknown option $1" >&2
+	    exit 2 ;;
+    *)	    break
+	    ;;
+    esac
+
+    shift
+done
+
+if [ $# -lt 1 ]; then
+	echo "usage: $0 [-multiwords] [-multi-char C] score-dir [lmw [wtw [scoredir weight ...] [max-nbest]]]" >&2
+	echo "    or $0 [-multiwords] [-multi-char C] file-list [lmw [wtw [scoredir weight ...] [max-nbest]]]" >&2
+	exit 1
+fi
+
+scoredir="$1"
+shift
+
+lmweight="${1-8.0}"
+[ $# -gt 0 ] && shift
+wtweight="${1-0.0}"
+[ $# -gt 0 ] && shift
+
+extra_scoredirs=
+extra_weights=
+while [ $# -gt 1 ]; do
+	extra_scoredirs="$extra_scoredirs $1"
+	extra_weights="$extra_weights $2"
+	shift; shift
+done
+
+maxnbest="${1-100000}"
+
+# prevent "broken pipe" from $cat below when maxnbest truncates list
+trap '' 13
+
+if [ -d $scoredir ]; then
+    find $scoredir -follow -type f \( -name \*.score -o \
+			    -name \*.score.Z -o \
+			    -name \*.gz \) \
+		    -print | sort
+else
+    cat $scoredir
+fi | \
+while read file
+do
+	case $file in
+	*.score.Z)	cat="gzip -dcf"
+		sentid=`basename $file .score.Z`
+		;;
+	*.score.gz)	cat="gzip -dcf"
+		sentid=`basename $file .score.gz`
+		;;
+	*.score)	cat=cat
+		sentid=`basename $file .score`
+		;;
+	*)	# use nbest-lattice to convert Decipher nbest format 
+		cat="nbest-lattice -no-rescore -no-reorder -keep-noise -write-nbest - -nbest"
+		sentid=`basename $file .gz`
+		;;
+	esac
+
+	if [ -z "$extra_scoredirs" ]; then
+	    $cat $file
+	else
+	    extra_scores=
+	    for dir in $extra_scoredirs
+	    do
+		if [ -f $dir/$sentid.gz ]; then
+			extra_scores="$extra_scores $dir/$sentid.gz"
+		elif [ -f $dir/$sentid ]; then
+			extra_scores="$extra_scores $dir/$sentid"
+		else
+			echo "$dir/$sentid" is missing >&2
+			extra_scores="$extra_scores /dev/null"
+		fi
+	    done
+
+	    $cat $file | \
+	    combine-acoustic-scores \
+			-v "weights=1 $extra_weights" \
+			-v max_nbest=$maxnbest \
+			- $extra_scores
+	fi | \
+	${GAWK-gawk} '
+BEGIN {
+	hypnum = 0;
+}
+NF >= 3 {
+	hypnum ++;
+	if (hypnum > maxnbest) exit 0;
+
+	totalscore = $1 + lmweight * $2 + wtweight * $3;
+
+	if (!winner || totalscore > maxscore) {
+		maxscore = totalscore;
+		winner = $0;
+		winrank = hypnum;
+		besthyp = "";
+		for (i = 4; i <= NF; i++) besthyp = besthyp " " $i;
+	}
+}
+END {
+	# resolve multiwords if requested
+	if (multiwords) {
+		gsub(multichar, " ", besthyp);
+	}
+	print sentid besthyp;
+	printf "%s: best hyp is %d\n", sentid, winrank > "/dev/stderr";
+}
+' sentid="$sentid" lmweight="$lmweight" wtweight="$wtweight" maxnbest="$maxnbest" multiwords=$multiwords multichar="$multichar"
+done
+

@@ -1,0 +1,19 @@
+#
+#    File:   Makefile.machine.iPhoneSimulator-10.3-x86_64
+#    Author: Mike Frandsen
+#    Date:   Wed Aug 16, 2017
+#
+#    Description:
+#	Machine dependent compilation options and variable definitions
+#	for iOS to be built on a Mac. Relies on import of
+#	Makefile.core.iOS.
+#
+
+LOCAL_PLATFORM_NAME = iPhoneSimulator
+XCODE_SDK_VERSION = 10.3
+LOCAL_TARGET_ARCH = x86_64
+
+include $(SRILM)/common/Makefile.core.iOS
+
+ADDITIONAL_CFLAGS += -fembed-bitcode
+ADDITIONAL_CXXFLAGS += -fembed-bitcode

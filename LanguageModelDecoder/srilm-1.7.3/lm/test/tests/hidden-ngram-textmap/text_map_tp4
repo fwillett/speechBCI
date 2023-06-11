@@ -1,0 +1,62 @@
+# 0p0011vs
+<s> *noevent*  *noevent*
+find *noevent* 1 <sent> 0
+the *noevent* 1 <sent> 0
+cheapest *noevent* 1 <sent> 0
+fare *noevent* 0.7518 <sent> 0.2482
+between *noevent* 0.8616 <sent> 0.1384
+philadelphia *noevent* 0.8616 <sent> 0.1384
+and *noevent* 0.8212 <sent> 0.1788
+san *noevent* 1 <sent> 0
+francisco *noevent* 0.325 <sent> 0.6750
+# 0p0012vs
+<s> *noevent*  *noevent*
+all *noevent* 1 <sent> 0
+right *noevent* 1 <sent> 0
+what *noevent* 1 <sent> 0
+to *noevent* 1 <sent> 0
+know *noevent* 0.7518 <sent> 0.2482
+the *noevent* 0.8616 <sent> 0.1384
+longest *noevent* 0.8616 <sent> 0.1384
+day *noevent* 1 <sent> 0
+trip *noevent* 0.7518 <sent> 0.2482
+between *noevent* 0.8616 <sent> 0.1384
+philadelphia *noevent* 0.8616 <sent> 0.1384
+and *noevent* 1 <sent> 0
+san *noevent* 1 <sent> 0
+francisco *noevent* 0.325 <sent> 0.6750
+# 0p0013vs
+<s> *noevent*  *noevent*
+please *noevent* 1 <sent> 0
+give *noevent* 1 <sent> 0
+me *noevent* 1 <sent> 0
+flight *noevent* 1 <sent> 0
+information *noevent* 0.325 <sent> 0.6750
+from *noevent* 1 <sent> 0
+denver *noevent* 0.7518 <sent> 0.2482
+to *noevent* 1 <sent> 0
+pittsburgh *noevent* 0.7518 <sent> 0.2482
+to *noevent* 1 <sent> 0
+atlanta *noevent* 0.7518 <sent> 0.2482
+and *noevent* 1 <sent> 0
+return *noevent* 1 <sent> 0
+to *noevent* 1 <sent> 0
+denver *noevent* 0.325 <sent> 0.6750
+# 0p0021vs
+<s> *noevent*  *noevent*
+one *noevent* 1 <sent> 0
+way *noevent* 0.617 <sent> 0.3830
+# 0p0022vs
+<s> *noevent*  *noevent*
+what *noevent* 0.8616 <sent> 0.1384
+is *noevent* 1 <sent> 0
+the *noevent* 1 <sent> 0
+longest *noevent* 0.7518 <sent> 0.2482
+time *noevent* 0.8616 <sent> 0.1384
+on *noevent* 1 <sent> 0
+tuesday *noevent* 0.7518 <sent> 0.2482
+at *noevent* 1 <sent> 0
+san *noevent* 1 <sent> 0
+francisco *noevent* 0.1594 <sent> 0.8406
+from *noevent* 1 <sent> 0
+philadelphia *noevent* 0.4238 <sent> 0.5762

@@ -1,0 +1,37 @@
+# Makefile to augment Makefile.machine.msvc for Visual Studio 2010.
+# Please first set up your environment for Visual Studio 2010 by running
+# the Microsoft .bat setup file:
+# "c:\Program Files\Microsoft Visual Studio 10.0\Common7\Tools\vsvars32.bat"
+#
+# NOTE: The command above may fail if the regedit reg.exe program is not
+# in your path as may be the default case on Windows 7. Typically, ensure
+# C:\windows\system32 is in your path.
+#
+# This Makefile is essentially equivalent to running:
+#  make MACHINE_TYPE=msvc MSVCDir=$VCINSTALLDIR
+# or
+#  make MACHINE_TYPE=msvc MSVCDir="c:\\Program Files\\Microsoft Visual Studio 10.0\\Common7\\Tools\\vsvars32.bat"
+# *EXCEPT* will create binaries in "msvc10*" directories instead of "msvc*".
+#
+# Among others, the following two environment variables should be set:
+#  VCINSTALLDIR
+#  WindowsSdkDir (used to locate mt.exe)
+
+# Use this default location unless overridden on command line
+MSVCDir ?= C:\\Program Files\\Microsoft Visual Studio 10.0\\VC
+
+# The casing we expect to find for Visual Studio 10 is
+# WindowsSdkDir. But, if not set, will fall back on older
+# all caps WINDOWSSDKDIR if set, or common default.
+ifeq ($(WindowsSdkDir), )
+  ifeq ($(WINDOWSSDKDIR), )
+    WindowsSdkDir = C:\\Program Files\\Microsoft SDKs\\Windows\\v7.0A\\
+  else
+    WindowsSdkDir = $(WINDOWSSDKDIR)
+  endif
+endif
+
+# Note that Makefile.machine.msvc internally uses
+# WINDOWSSDKDIR but will take the value from WindowsSdkDir if set.
+
+include $(SRILM)/common/Makefile.machine.msvc

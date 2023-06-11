@@ -1,0 +1,14 @@
+#!/bin/sh
+
+mkdir -p tmpdir
+
+TMPDIR=tmpdir
+export TMPDIR
+
+ls nbest-lists | grep -v CVS | \
+sed -e 's,\.gz$,,' -e 's,\.score$,,' > ids
+
+nbest-rover ids rover.control
+
+rm -rf tmpdir ids
+

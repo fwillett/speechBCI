@@ -1,0 +1,19 @@
+#
+#    File:   Makefile.machine.iPhoneSimulator-8.1-i386
+#    Author: Mike Frandsen
+#    Date:   Tue Jul 21, 2015
+#
+#    Description:
+#	Machine dependent compilation options and variable definitions
+#	for iOS to be built on a Mac. Relies on import of
+#	Makefile.core.iOS.
+#
+
+LOCAL_PLATFORM_NAME = iPhoneSimulator
+XCODE_SDK_VERSION = 9.1
+LOCAL_TARGET_ARCH = i386
+
+include $(SRILM)/common/Makefile.core.iOS
+
+ADDITIONAL_CFLAGS += -fembed-bitcode
+ADDITIONAL_CXXFLAGS += -fembed-bitcode

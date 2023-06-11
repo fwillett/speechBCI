@@ -1,0 +1,51 @@
+#!/bin/sh
+
+if [ -f ../ngram-count-gt/swbd.3bo.gz ]; then
+	gz=.gz
+else
+	gz=
+fi
+
+lm=../ngram-count-gt/swbd.3bo$gz
+
+# create a bigram LM
+ngram -debug 1 \
+	-lm $lm -order 2 \
+	-write-lm swbd.2bo
+
+# statically interpolate bigram and trigram
+
+ngram -debug 1 \
+	-lm $lm -lambda 0.7 \
+	-mix-lm swbd.2bo \
+	-mix-lm2 $lm -mix-lambda2 0.1 \
+	-ppl ../ngram-count-gt/eval97.text
+
+# now the same thing but with prior weights from a file
+
+echo "0.7 0.2 0.1" > PRIORS
+
+# interpolate bigram and trigram
+
+ngram -debug 0 \
+        -lm $lm \
+        -mix-lm swbd.2bo \
+        -mix-lm2 $lm \
+        -context-priors PRIORS \
+        -ppl ../ngram-count-gt/eval97.text
+
+# the same again using -read-mix-lms
+
+cat >MIXLMS <<EOF
+$lm
+swbd.2bo
+$lm 
+EOF
+
+ngram -debug 0 \
+        -read-mix-lms -lm MIXLMS \
+        -context-priors PRIORS \
+        -ppl ../ngram-count-gt/eval97.text
+
+rm -f swbd.2bo PRIORS MIXLMS
+

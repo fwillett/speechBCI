@@ -1,0 +1,21 @@
+# Makefile to augment Makefile.machine.msvc for Visual Studio 2010 for amd64 platform
+
+# Use this default location unless overridden on command line
+MSVCDIR ?= C:\\Program Files\\Microsoft Visual Studio 10.0\\VC
+
+include $(SRILM)/common/Makefile.machine.msvc
+
+# use 64 bit compilers if available or 32 bit cross-compiling binaries
+# if not.
+MSVC_BIN := "$(shell cygpath '$(MSVCDIR)/bin/amd64')"
+ifeq ($(strip $(wildcard "$MSVC_BIN")),)
+  MSVC_BIN := "$(shell cygpath '$(MSVCDIR)/bin/x86_amd64')"
+endif
+
+# 64bit MSVC keeps sizeof(long) = sizeof(int), so tell it to use long long counts
+ADDITIONAL_CFLAGS += -DUSE_LONGLONG_COUNTS
+ADDITIONAL_CXXFLAGS += -DUSE_LONGLONG_COUNTS
+
+# suppress warnings about info loss in conversion from long long to float/double
+MSC_FLAGS += /wd4244
+

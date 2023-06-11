@@ -1,0 +1,79 @@
+#
+#    File:   Makefile.sparc
+#    Author: The SRI DECIPHER (TM) System
+#    Date:   Wed Feb 22 10:56:52 1995
+#
+#    Description:
+#	Machine dependent compilation options and variable definitions
+#	for Sun Sparcstations running SunOS 4.1.3
+#
+#    Copyright (c) 1995-2001 SRI International.  All Rights Reserved.
+#
+#    $Header: /home/srilm/CVS/srilm/common/Makefile.machine.sparc,v 1.14 2008/05/21 22:54:18 stolcke Exp $
+#
+
+   # Use the GNU C compiler.
+   GCC_FLAGS = -Wreturn-type -Wimplicit
+   CC = gcc $(GCC_FLAGS)
+   CXX = g++ $(GCC_FLAGS) -DINSTANTIATE_TEMPLATES
+
+   # Optional compilation flags.
+   OPTIMIZE_FLAGS = -g -O2
+   DEBUG_FLAGS = -g -DDEBUG
+   PROFILE_FLAGS = -pg -g -O2
+
+   # Optional linking flags.
+   EXPORT_LDFLAGS = -static -s
+
+   # Shared compilation flags.
+   CFLAGS = $(ADDITIONAL_CFLAGS) $(INCLUDES)
+   CXXFLAGS = $(ADDITIONAL_CXXFLAGS) $(INCLUDES)
+
+   # Shared linking flags.
+   LDFLAGS = $(ADDITIONAL_LDFLAGS) -L$(SRILM_LIBDIR)
+
+   # Other useful compilation flags.
+   ADDITIONAL_CFLAGS =
+   ADDITIONAL_CXXFLAGS =
+
+   # Other useful include directories.
+   ADDITIONAL_INCLUDES = 
+
+   # Other useful linking flags.
+   ADDITIONAL_LDFLAGS =
+
+   # Other useful libraries.
+   ADDITIONAL_LIBRARIES = -lm
+
+   # Tcl support
+   TCL_INCLUDE = -I/usr/local/include
+   TCL_LIBRARY = -L/usr/local/lib -ltcl
+
+   # Suns require ranlib(1) to be run on libraries.
+   RANLIB = ranlib
+
+   # prefix of C language symbols in object symbol tables
+   SYMBOL_PREFIX = _
+
+   PURIFY_FLAGS += -collector=/usr/local/lib/gcc-lib/sparc-sun-sunos4.1.3/2.8.1/ld
+
+   # Generate dependencies from source files.
+   GEN_DEP = $(CC) $(INCLUDES) -MM
+   GEN_DEP.cc = $(CXX) $(CXXFLAGS) -MM
+
+   # Run lint.
+   LINT = lint
+   LINT_FLAGS = -DDEBUG $(INCLUDES)
+
+ifneq ($(filter 5.%, $(OS_VERSION)), )
+   # we're doing cross compiles on a Solaris machines
+   CC = gcc -bsun4
+   CXX = g++ -bsun4
+   LD = /usr/local/sun4/bin/ld
+   RANLIB = /usr/local/sun4/bin/ranlib
+   AR = /usr/local/sun4/bin/ar
+
+   ADDITIONAL_INCLUDES = -I/home/wimpy-usr/demo/SOUND
+   ADDITIONAL_LIBRARIES = /home/wimpy-usr/demo/SOUND/libaudio.a -lm
+endif
+

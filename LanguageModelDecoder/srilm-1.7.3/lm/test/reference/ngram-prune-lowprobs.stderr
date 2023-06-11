@@ -1,0 +1,7 @@
+reading 33110 1-grams
+reading 425750 2-grams
+reading 268962 3-grams
+pruned 46222 2-grams
+pruned 60544 3-grams
+pruned 2 3-grams
+inserted 3830 redundant 2-gram probs

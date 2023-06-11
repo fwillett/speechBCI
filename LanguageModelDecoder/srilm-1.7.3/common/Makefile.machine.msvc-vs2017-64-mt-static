@@ -1,0 +1,6 @@
+# Makefile to augment Makefile.machine.msvc for Visual Studio 2017 for amd64 platform
+
+include $(SRILM)/common/Makefile.common.msvc-vs2017
+include $(SRILM)/common/Makefile.common.msvc64
+
+MS_CODE_OPTION=/MT

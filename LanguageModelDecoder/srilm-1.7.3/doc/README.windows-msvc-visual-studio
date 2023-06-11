@@ -1,0 +1,71 @@
+
+Recommendations for compiling with Microsoft Visual Studio 2005.
+
+Microsoft Visual Studio projects are available for Microsoft Visual
+Studio 2005. 
+
+The advantages of building directly in Visual Studio are:
+- Build is faster.
+- Integrated debugging.
+- Library projects can be included as dependencies of your own projects.
+
+The disadvantages of building directly in Visual Studio are:
+- Not all parts of the SRILM build process can be completed inside Visual Studio.
+- More cumbersome to build from command line.
+
+The build procedure has been tested with the Visual Studio 2005
+Professional.
+
+0) Open SRILM/visual_studio/vs2005/srilm.sln in Visual Studio 2005.
+
+1) Select either the "Release" or "Debug" targets.
+
+2) Build the solution.  The libraries will be built into
+   SRILM/lib/Release or SRILM/lib/Debug, and the executables will be built
+   into SRILM/bin/Release or SRILM/bin/Debug.
+
+This procedure will NOT produce the central include directory, release
+the SRILM scripts, or build the test environment.
+
+To produce the central include directory or release the SRILM scripts,
+you will have install the cygwin environment and use the included
+Makefiles as described in (3):
+
+(3) Follow steps (0) and (1) from README.windows-msvc:
+
+(3a) Install the cygwin environment, as described in README.windows-cygwin.
+   Cygwin tools are needed to run the build process and generate program
+   dependencies.
+
+(3b) SRILM can be set to the cygwin path of the SRILM root directory
+   (e.g., /home/username/srilm, /cygdrive/c/SRILM)
+
+(3c) To produce the central include directory and release the SRILM
+   scripts, do either:
+
+   % make MACHINE_TYPE=msvc dirs
+   % make MACHINE_TYPE=msvc init
+   % make MACHINE_TYPE=msvc release-headers
+   % make MACHINE_TYPE=msvc release-scripts
+   % cd utils/src; make MACHINE_TYPE=msvc release
+
+or 
+
+   % make MACHINE_TYPE=msvc msvc
+
+If you want to run the SRILM tests, you will have to follow the full
+instructions in README.windows-msvc.
+
+If you want to compile using a different version of MSVC, I suggest
+creating a new subdirectory of SRILM/visual_studio, e.g.,
+"SRILM/visual_studio/vs2010", and copying the contents of the "vs2005"
+directory into your new directory.  Then use MSVC to update your
+projects.  If you need to downgrade to MSVC 2003, it is possible to do
+this by manually editing the project files.
+
+I would like to thank Keith Vertanen (http://www.keithv.com) for
+contributing the original versions of these Microsoft Visual Studio
+projects to SRILM.
+
+Victor Abrash
+victor@speech.sri.com

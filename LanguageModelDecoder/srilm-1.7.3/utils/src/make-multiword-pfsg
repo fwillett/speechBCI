@@ -1,0 +1,70 @@
+#!/bin/sh
+#
+# make-multiword-pfsg --
+#	rewrite a PFSG in terms of multiwords
+#
+# usage: make-multiword-pfsg multiword-defs [pfsg] > new-pfsg
+#
+# $Header: /home/srilm/CVS/srilm/utils/src/make-multiword-pfsg,v 1.5 2015-07-03 03:45:39 stolcke Exp $
+#
+
+multiword_defs=${1}
+shift
+
+tmpdir=${TMPDIR-/tmp}
+name="$tmpdir/name.$$"
+vocab="$tmpdir/vocab.$$"
+old_fsm="$tmpdir/infsm.$$.gz"
+class_fsm="$tmpdir/classfsm.$$"
+class_fsmc="$tmpdir/classfsmc.$$"
+mw_symbols="$tmpdir/mw_symbols.$$"
+word_symbols="$tmpdir/word_symbols.$$"
+
+trap "rm -f $name $vocab $old_fsm $class_fsm $class_fsmc $mw_symbols $word_symbols; exit" 0 1 2 15
+
+#
+# extract vocab and convert PFSG to FSM
+#
+${GAWK-gawk} -v name=$name -v vocab=$vocab '$1 == "name" && !have_name {
+	have_name = 1;
+	print $2 > name;
+}
+$1 == "nodes" {
+	# collect vocabulary
+	for (i = 3; i <= NF; i ++) {
+		if ($i != "NULL") is_word[$i] = 1;
+	}
+}
+{	print;
+}
+END {
+	for (word in is_word) {
+		print word > vocab
+	}
+}' "$@" | \
+pfsg-to-fsm symbolic=1 | \
+gzip > $old_fsm
+
+new_name=`cat $name`_multiwords
+
+#
+# create multiword transducer
+# Note: this is the same as reversed class-transducer
+#
+classes-to-fsm vocab=$vocab symbolic=1 \
+	isymbolfile=$mw_symbols \
+	osymbolfile=$word_symbols \
+	$multiword_defs > $class_fsm
+
+fsmcompile -t -i $mw_symbols -o $word_symbols $class_fsm | \
+	fsminvert > $class_fsmc
+
+#
+# compose original FSM with multiword transducer;
+# then convert back to PFSG
+#
+{ gzip -dcf $old_fsm; rm -f $old_fsm; } | fsmcompile -i $word_symbols | \
+fsmcompose - $class_fsmc | fsmproject -o | \
+fsmprint -i $mw_symbols | fsm-to-pfsg pfsg_name=$new_name 
+
+

@@ -1,0 +1,46 @@
+#
+#    File:   Makefile.i686-m64-icc
+#    Author: A. Stolcke
+#    Date:   Tue Jul  1 07:28:55 PDT 2003
+#
+#    Description:
+#	Machine dependent compilation options and variable definitions
+#	for Linux/x86_64 platform using Intel C++ compiler
+#
+#    Copyright (c) 2006 SRI International.  All Rights Reserved.
+#
+#    $Header: /home/srilm/CVS/srilm/common/Makefile.machine.i686-m64-icc,v 1.5 2013/10/22 17:21:53 stolcke Exp $
+#
+
+include $(SRILM)/common/Makefile.machine.i686-m64
+
+   # Use the Intel C++ compiler.
+   # Note: -march=pentiumii disables vectorization, which is actually worse
+   ICC_FLAGS = -gcc-name=/usr/bin/gcc -wd654 -wd1125 -wd1224 -tpp7 -Wl,-rpath,$(ICC_DIR)/lib -Wl,-z,muldefs
+   CC = $(ICC_PATH)icc $(ICC_FLAGS)
+   CXX = $(ICC_PATH)icc $(ICC_FLAGS) -DINSTANTIATE_TEMPLATES
+
+   # Optional compilation flags.
+   # Intel compiler (some versions, anyway) allow packing of the Trie structure
+   # (see dstruct/src/Trie.h)
+   OPTIMIZE_FLAGS = -g -O3 -DUSE_PACKED_TRIE
+   DEBUG_FLAGS = -g -DDEBUG
+   PROFILE_FLAGS = -g -p -O3 -DUSE_PACKED_TRIE
+
+   ADDITIONAL_CFLAGS =
+   ADDITIONAL_CXXFLAGS =
+
+   ADDITIONAL_LIBRARIES += -lstdc++
+
+# workaround for compiler errors having to do with packed trie structures
+
+NO_OPT_SOURCES = \
+	NgramStatsShort \
+	NgramStatsLong \
+	NgramStatsLongLong \
+	NgramStatsFloat \
+	NgramStatsDouble \
+	NgramStatsXCount \
+	NgramLM \
+	LatticeNgrams \
+	lattice-tool

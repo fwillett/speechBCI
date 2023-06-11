@@ -1,0 +1,121 @@
+#
+#    File:   Makefile.development
+#    Author: The SRI DECIPHER (TM) System
+#    Date:   Thu Dec 17 13:44:23 1992
+#
+#    Description:
+#       This is the makefile for developing a new application
+#       using the DECIPHER System.
+#
+#       To use this makefile:
+#
+#	   0). Make sure you have your SRILM environment variable
+#		set correctly. 
+#
+#          1). Make a development directory (e.g. "~user/dev/src") and
+#               then move to it:
+#
+#		  prompt% mkdir -p ~user/dev/src
+#		  prompt% cd ~user/dev/src
+#
+#	   2). Copy this file to your development directory:
+#
+#		  prompt% cp $SRILM/common/Makefile.development Makefile
+#
+#	   3). Create the directories for object and binary files:
+#
+#	          prompt% gnumake init
+#
+#	   4). Update the list of libraries to reflect those needed to link
+#	       your program.  If it comes from a module directory, use the
+#	       module Makefile as a guide.  Note that order is important in
+#	       this list.
+#
+#	   5). Build your application, using the released versions of the 
+#	       SRILM libraries:
+#
+#	       - Create your application "main()" file, e.g. "app-main.cc".
+#              - Replace the line "PROGRAM_NAMES = none" with
+#                "PROGRAM_NAMES = app-main" to "Makefile".  (Note:
+#                You can have multiple programs defined here, as long
+#                as each one has a single file, named "<ProgramName>.cc"
+#                which provides its "main()" function.)
+#              - Build your application with "gnumake".
+#
+#          6). To replace the released versions of files in the SRILM
+#              libraries with your own modified versions, copy the
+#              files to your development directory and then add each
+#              new source file to the "REPLACEMENT_SOURCES" definition.
+#              Do a  "gnumake depend" on each type of machine, and then 
+#	       remake your application with "gnumake".
+#
+#          7). (Optional) After you have debugged your modifications, have
+#	       them merged into the main SRILM System in "$SRILM".
+#
+#    Copyright (c) 1995-2001 SRI International.  All Rights Reserved.
+#
+#    $Header: /home/srilm/CVS/srilm/common/Makefile.development,v 1.13 2006/01/09 22:47:37 stolcke Exp $
+#
+
+#MACHINE_TYPE := $(shell $(DECIPHER)/bin/machine-type)
+
+# Include common SRILM variable definitions.
+include $(SRILM)/common/Makefile.common.variables
+
+
+# Define variables.
+
+
+# Application variables.
+
+PROGRAM_NAMES = fill-in
+
+PROGRAM_SOURCES = $(foreach prog,$(PROGRAM_NAMES),\
+			$(wildcard $(SRCDIR)/$(prog).c) \
+			$(wildcard $(SRCDIR)/$(prog).cc))
+PROGRAM_OBJECTS = $(PROGRAM_NAMES:%=$(OBJDIR)/%$(OBJ_SUFFIX))
+
+PROGRAMS = $(PROGRAM_NAMES:%=$(BINDIR)/%$(EXE_SUFFIX))
+
+# Replacement files currently under development.
+
+#  XXX -- Files listed as REPLACEMENT_SOURCES must have $(SRCDIR) prepended!
+#         i.e.  They should look like:
+# REPLACEMENT_SOURCES = $(SRCDIR)/my_source.cc
+
+REPLACEMENT_SOURCES = $(SRCDIR)/fill-in.cc
+REPLACEMENT_OBJECTS = $(patsubst $(SRCDIR)/%.cc,$(OBJDIR)/%$(OBJ_SUFFIX),\
+                $(patsubst $(SRCDIR)/%.c,$(OBJDIR)/%$(OBJ_SUFFIX),$(REPLACEMENT_SOURCES)))
+
+
+# Standard SRILM libraries.
+
+LIBRARIES = \
+	$(SRILM_LIBDIR)/$(LIB_PREFIX)lm$(LIB_SUFFIX) \
+	$(SRILM_LIBDIR)/$(LIB_PREFIX)dstruct$(LIB_SUFFIX) \
+	$(SRILM_LIBDIR)/$(LIB_PREFIX)misc$(LIB_SUFFIX) \
+	$(ADDITIONAL_LIBRARIES)
+
+# All files variables.
+
+ALL_SOURCES = $(PROGRAM_SOURCES) \
+	      $(REPLACEMENT_SOURCES)
+
+ALL_OBJECTS = $(PROGRAM_OBJECTS) \
+	      $(REPLACEMENT_OBJECTS)
+
+ALL_PROGRAMS = $(PROGRAMS)
+
+ALL_PROGRAM_NAMES = $(PROGRAM_NAMES)
+
+
+# Define targets.
+
+
+all:	$(PROGRAMS)
+
+$(PROGRAMS):	$(REPLACEMENT_OBJECTS) $(LIBRARIES)
+	$(LINK.cc) $(LD_OUTPUT_OPTION) $(@:$(BINDIR)/%=$(OBJDIR)/%$(OBJ_SUFFIX)) $(REPLACEMENT_OBJECTS) $(LIBRARIES) $(DEMANGLE_FILTER)
+
+# Include common SRILM target definitions.
+include $(SRILM)/common/Makefile.common.targets

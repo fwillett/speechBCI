@@ -1,0 +1,37 @@
+#!/bin/sh
+
+dir=../ngram-count-gt
+
+if [ -f $dir/swbd.3grams.gz ]; then
+	gz=.gz
+else
+	gz=
+fi
+
+text=$dir/eval97.text
+order=4
+
+# count in a single batch
+
+ngram-count -order $order -text $text -sort -write all.ngrams
+
+# count in multiple batches and merge
+
+mkdir -p splits
+
+split -50 $text splits/text.
+
+find splits -type f -print | sort > split.files
+
+# make file listing order independent of locale
+LC_COLLATE=C; export LC_COLLATE
+
+make-batch-counts split.files 5 cat mycounts -order $order
+
+merge-batch-counts -l 3 mycounts
+
+gunzip -cf mycounts/merge-*.ngrams* | \
+(set -x; diff -b - all.ngrams) | \
+wc -l
+
+rm -rf splits split.files mycounts all.ngrams

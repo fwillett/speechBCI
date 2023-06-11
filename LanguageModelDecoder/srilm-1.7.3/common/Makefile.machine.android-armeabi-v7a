@@ -1,0 +1,21 @@
+#
+#    File:   Makefile.machine.android-armeabi-v7a
+#    Author: Mike Frandsen
+#    Date:   2010/08/03
+#
+#    Description:
+#	Machine dependent compilation options and variable definitions
+#	for Android on ARM, v7a
+#
+#    Copyright (c) 1999-2010 SRI International.  All Rights Reserved.
+#
+#    $Header: /home/srilm/CVS/srilm/common/Makefile.machine.android-armeabi-v7a,v 1.10 2013-07-01 22:26:44 frandsen Exp $
+#
+
+   # Now disallow env override to maintain compatibility.
+   # NOTE: For more neon optimizations, use machine variant
+   # with -neon (uses -mfpu=neon versus vfp).
+   ANDROID_CUST_CFLAGS := -march=armv7-a -mfloat-abi=softfp -mfpu=vfp
+   ANDROID_CUST_DIR := armeabi-v7a
+
+   include $(SRILM)/common/Makefile.core.android-arm

@@ -1,0 +1,14 @@
+#
+#    File:   Makefile.macosx
+#    Author: Chuck Wooters
+#    Date:   Mon July 29, 2002
+#
+#    Description:
+#	Machine dependent compilation options and variable definitions
+#	for Mac (PowerPCs) running Mac OS X 10.x (for 64bit binaries)
+#
+
+
+   include $(SRILM)/common/Makefile.machine.macosx
+
+   GCC_FLAGS += -m64

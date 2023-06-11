@@ -1,0 +1,46 @@
+counting in mycounts/split-1.ngrams.gz sources splits/text.aa splits/text.ab splits/text.ac splits/text.ad splits/text.ae
+counting in mycounts/split-2.ngrams.gz sources splits/text.af splits/text.ag splits/text.ah splits/text.ai splits/text.aj
+counting in mycounts/split-3.ngrams.gz sources splits/text.ak splits/text.al splits/text.am splits/text.an splits/text.ao
+counting in mycounts/split-4.ngrams.gz sources splits/text.ap splits/text.aq splits/text.ar splits/text.as splits/text.at
+counting in mycounts/split-5.ngrams.gz sources splits/text.au splits/text.av splits/text.aw splits/text.ax splits/text.ay
+counting in mycounts/split-6.ngrams.gz sources splits/text.az splits/text.ba splits/text.bb splits/text.bc splits/text.bd
+counting in mycounts/split-7.ngrams.gz sources splits/text.be splits/text.bf splits/text.bg splits/text.bh splits/text.bi
+counting in mycounts/split-8.ngrams.gz sources splits/text.bj splits/text.bk splits/text.bl splits/text.bm splits/text.bn
+counting in mycounts/split-9.ngrams.gz sources splits/text.bo splits/text.bp splits/text.bq splits/text.br splits/text.bs
+counting in mycounts/split-10.ngrams.gz sources splits/text.bt splits/text.bu splits/text.bv splits/text.bw splits/text.bx
+counting in mycounts/split-11.ngrams.gz sources splits/text.by splits/text.bz splits/text.ca splits/text.cb splits/text.cc
+counting in mycounts/split-12.ngrams.gz sources splits/text.cd splits/text.ce splits/text.cf splits/text.cg splits/text.ch
+counting in mycounts/split-13.ngrams.gz sources splits/text.ci splits/text.cj splits/text.ck splits/text.cl splits/text.cm
+counting in mycounts/split-14.ngrams.gz sources splits/text.cn splits/text.co splits/text.cp splits/text.cq splits/text.cr
+counting in mycounts/split-15.ngrams.gz sources splits/text.cs splits/text.ct splits/text.cu splits/text.cv splits/text.cw
+counting in mycounts/split-16.ngrams.gz sources splits/text.cx splits/text.cy splits/text.cz splits/text.da splits/text.db
+counting in mycounts/split-17.ngrams.gz sources splits/text.dc splits/text.dd splits/text.de splits/text.df splits/text.dg
+counting in mycounts/split-18.ngrams.gz sources splits/text.dh splits/text.di splits/text.dj splits/text.dk splits/text.dl
+counting in mycounts/split-19.ngrams.gz sources splits/text.dm splits/text.dn splits/text.do splits/text.dp splits/text.dq
+counting in mycounts/split-20.ngrams.gz sources splits/text.dr splits/text.ds splits/text.dt splits/text.du splits/text.dv
+counting in mycounts/split-21.ngrams.gz sources splits/text.dw splits/text.dx splits/text.dy splits/text.dz splits/text.ea
+counting in mycounts/split-22.ngrams.gz sources splits/text.eb
+ITERATION 0, 22 files
+merging mycounts/./split-1.ngrams.gz mycounts/./split-10.ngrams.gz into mycounts/merge-iter0-1.ngrams.gz
+merging mycounts/./split-11.ngrams.gz mycounts/./split-12.ngrams.gz into mycounts/merge-iter0-2.ngrams.gz
+merging mycounts/./split-13.ngrams.gz mycounts/./split-14.ngrams.gz into mycounts/merge-iter0-3.ngrams.gz
+merging mycounts/./split-15.ngrams.gz mycounts/./split-16.ngrams.gz into mycounts/merge-iter0-4.ngrams.gz
+merging mycounts/./split-17.ngrams.gz mycounts/./split-18.ngrams.gz into mycounts/merge-iter0-5.ngrams.gz
+merging mycounts/./split-19.ngrams.gz mycounts/./split-2.ngrams.gz into mycounts/merge-iter0-6.ngrams.gz
+merging mycounts/./split-20.ngrams.gz mycounts/./split-21.ngrams.gz into mycounts/merge-iter0-7.ngrams.gz
+merging mycounts/./split-22.ngrams.gz mycounts/./split-3.ngrams.gz into mycounts/merge-iter0-8.ngrams.gz
+merging mycounts/./split-4.ngrams.gz mycounts/./split-5.ngrams.gz into mycounts/merge-iter0-9.ngrams.gz
+merging mycounts/./split-6.ngrams.gz mycounts/./split-7.ngrams.gz into mycounts/merge-iter0-10.ngrams.gz
+merging mycounts/./split-8.ngrams.gz mycounts/./split-9.ngrams.gz into mycounts/merge-iter0-11.ngrams.gz
+ITERATION 1, 11 files
+merging mycounts/merge-iter0-1.ngrams.gz mycounts/merge-iter0-2.ngrams.gz mycounts/merge-iter0-3.ngrams.gz into mycounts/merge-iter1-1.ngrams.gz
+merging mycounts/merge-iter0-4.ngrams.gz mycounts/merge-iter0-5.ngrams.gz mycounts/merge-iter0-6.ngrams.gz into mycounts/merge-iter1-2.ngrams.gz
+merging mycounts/merge-iter0-7.ngrams.gz mycounts/merge-iter0-8.ngrams.gz mycounts/merge-iter0-9.ngrams.gz into mycounts/merge-iter1-3.ngrams.gz
+merging mycounts/merge-iter0-10.ngrams.gz mycounts/merge-iter0-11.ngrams.gz into mycounts/merge-iter1-4.ngrams.gz
+ITERATION 2, 4 files
+merging mycounts/merge-iter1-1.ngrams.gz mycounts/merge-iter1-2.ngrams.gz mycounts/merge-iter1-3.ngrams.gz into mycounts/merge-iter2-1.ngrams.gz
+linking mycounts/merge-iter1-4.ngrams.gz to mycounts/merge-iter2-2.ngrams.gz
+ITERATION 3, 2 files
+merging mycounts/merge-iter2-2.ngrams.gz mycounts/merge-iter2-1.ngrams.gz into mycounts/merge-iter3-1.ngrams.gz
+final counts in mycounts/merge-iter3-1.ngrams.gz
++ diff -b - all.ngrams

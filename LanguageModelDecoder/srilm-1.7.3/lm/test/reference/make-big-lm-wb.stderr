@@ -1,0 +1,13 @@
++ ngram-count -read - -read-with-mincounts -order 3 -wbdiscount -debug 1 -vocab ../ngram-count-gt/eval2001.vocab -lm swbd.3bo.gz -meta-tag __meta__ 
+using WittenBell for 1-grams
+using WittenBell for 2-grams
+using WittenBell for 3-grams
+discarded 1 1-gram probs predicting pseudo-events
+warning: distributing 0.00825076 left-over probability mass over 6550 zeroton words
+discarded 2 2-gram contexts containing pseudo-events
+discarded 11 2-gram probs predicting pseudo-events
+discarded 10919 3-gram contexts containing pseudo-events
+discarded 55089 3-gram probs predicting pseudo-events
+writing 33110 1-grams
+writing 425750 2-grams
+writing 268962 3-grams

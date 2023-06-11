@@ -1,0 +1,34 @@
+#!/bin/sh
+
+dir=../ngram-count-gt
+
+if [ -f $dir/swbd.3grams.gz ]; then
+	gz=.gz
+else
+	gz=
+fi
+
+smooth="-wbdiscount -gt3min 1 -gt4min 1"
+
+order=2
+counts=$dir/swbd.3grams$gz
+
+#order=3
+#counts=/home/anstolck/data/LM/fisher.4grams.gz
+
+# create LM from counts
+ngram-count -debug 1 \
+	-order $order \
+	-skip -skip-init 0.1 \
+	-em-iters 3 \
+	$smooth \
+	-read $counts \
+	-vocab $dir/eval2001.vocab \
+	-lm skiplm.${order}bo$gz 
+
+ngram -debug 0 -order $order \
+	-skip -lm skiplm.${order}bo$gz \
+	-ppl $dir/eval97.text
+
+rm -f skiplm.${order}bo$gz
+

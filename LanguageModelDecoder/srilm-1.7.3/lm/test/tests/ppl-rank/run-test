@@ -1,0 +1,15 @@
+#!/bin/sh
+
+dir=../ngram-count-gt
+
+if [ -f $dir/swbd.3bo.gz ]; then
+	gz=.gz
+else
+	gz=
+fi
+
+head -100 $dir/eval97.text | \
+ngram -debug 4 \
+	-lm $dir/swbd.3bo$gz \
+	-ppl -
+

@@ -1,0 +1,17 @@
+
+Currently building SRILM for 64-bit development for armv8 using NDK r20
+and clang.
+
+Formerly built both 32-bit and 64-bit using NDK r11c and gcc.
+
+The current setup almost certainly breaks the 32-bit build for armv7.
+
+The last known good 32-bit build is in
+common/Makefile.core.android.r11c, last built using NDK r11c.
+
+To use this, copy Makefile.core.android.r11c to Makefile.core.android.
+
+There is a build configuration for NDK r16b to be found in
+Makefile.core.android.r16b, this is not tested so use at your own risk.
+
+

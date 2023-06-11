@@ -1,0 +1,16 @@
+#
+#    File:   Makefile.machine.iPhoneSimulator-6.0-i386
+#    Author: Mike Frandsen
+#    Date:   Mon Dec 17, 2012
+#
+#    Description:
+#	Machine dependent compilation options and variable definitions
+#	for iOS to be built on a Mac. Relies on import of
+#	Makefile.core.iOS.
+#
+
+LOCAL_PLATFORM_NAME = iPhoneSimulator
+XCODE_SDK_VERSION = 6.0
+LOCAL_TARGET_ARCH = i386
+
+include $(SRILM)/common/Makefile.core.iOS

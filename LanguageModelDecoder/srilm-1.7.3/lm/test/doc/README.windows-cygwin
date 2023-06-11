@@ -1,0 +1,50 @@
+
+SRILM version 1.3 and higher has been successfully built and tested using 
+the CYGWIN environment (http://www.cygwin.com) as of Feb 11, 2002.
+The test used CYGWIN DLL 1.3.9 and gcc 2.95.3 (but note the warning
+in doc/README.x86 regarding a comiler bug), and ran successfully
+on a Windows 98 and a Windows 2000 Professional system.
+
+The following special measures were taken to ensure a successful build:
+
+- Make sure the make, gcc, binutils, libiconv, gzip, tcltk, and gawk packages
+  are installed with CYGWIN.  To run the tests you will also need the
+  diffutils and time packages.
+
+After installation, set your bash environment as follows
+
+    export SRILM=/cygdrive/c/srilm13   # or similar
+		# do NOT use backslash in path names SRILM=C:\... 
+    export MACHINE_TYPE=cygwin
+    export PATH=$PATH:$SRILM/bin:$SRILM/bin/cygwin	# mentioned in INSTALL
+    export MANPATH=$MANPATH:$SRILM/man     		# mentioned in INSTALL
+
+or the equivalent for other shells.
+
+As of version 1.4.5, SRILM can also be built in the MinGW environment
+(http://www.mingw.org).  For this the default (cygwin) has to be overridden
+using
+
+    make MACHINE_TYPE=win32
+
+For 64bit binaries use 
+
+    make MACHINE_TYPE=win64
+
+Of course the corresponding versions of the MinGW development environment
+(C, C++, binutils) have to be installed in Cygwin.  Make sure the Cygwin
+installation is generally up-to-date.
+
+It may be necessary to include the following directories in the PATH
+environment variable for the runtime dynamic libraries to be found:
+
+	/usr/i686-pc-mingw32/sys-root/mingw/bin	(win32)
+	/usr/x86_64-w64-mingw32/sys-root/mingw/bin (win64)
+
+Some functionality is not supported under MinGW:
+
+    - compressed file I/O
+    - nbest-optimize and lattice-tool -max-time option
+
+A. Stolcke
+$Id: README.windows-cygwin,v 1.10 2013/01/31 18:03:33 stolcke Exp $

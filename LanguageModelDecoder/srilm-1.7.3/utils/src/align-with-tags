@@ -1,0 +1,194 @@
+#!/bin/sh
+#
+# align-with-tags --
+#	align reference transcript with tags to hypothesized 
+#	transcripts, merging the tags into the latter
+#
+# $Header: /home/srilm/CVS/srilm/utils/src/align-with-tags,v 1.7 2015-07-03 03:45:38 stolcke Exp $
+#
+
+usage () {
+	echo "usage: $0 [-r ref -h hyp] [-dictionary D] [-aligndir A] [-options...]" >&2
+	exit 2;
+}
+
+ref=/dev/null
+hyp=/dev/null
+dictionary=/dev/null
+
+while [ $# -gt 0 ]; do
+	case "$1" in
+	-r)	ref="$2"
+		shift; shift;;
+	-h)	hyp="$2"
+		shift; shift;;
+	-dictionary)
+		dictionary=$2
+		shift; shift;;
+	-aligndir)
+		aligndir=$2
+		shift; shift;;
+	-\?)	usage;;
+	-*)	pass_options="$pass_option $1"
+		shift;;
+	*)	break;;
+	esac
+done
+
+if [ $# -ge 2 ]; then
+	ref="$1"
+	hyp="$2"
+elif [ $# -gt 0 ]; then
+	usage;
+fi
+
+tmpdir=${TMPDIR-/tmp}
+tmpdict="$tmpdir/dict$$"
+tmptags="$tmpdir/tags$$"
+tmprefs="$tmpdir/refs$$"
+tmphyps="$tmpdir/hyps$$"
+tmpnbest="$tmpdir/nbest$$"
+tmpmerge="$tmpdir/merged$$"
+
+if [ -n "$aligndir" ]; then
+	tmpmerge=
+fi
+
+trap "rm -rf $tmpdict $tmptags $tmprefs $tmphyps $tmpnbest $tmpmerge; exit" 0 1 2 15
+
+if [ -n "$aligndir" ]; then
+	mkdir -p $aligndir
+	tmpmerge=$aligndir
+fi
+
+prepare_text () {
+	${GAWK-gawk} -v tag_file=$2 '
+	BEGIN {
+		tag_list["<default>"] = 1;
+	}
+	function is_tag(x) {
+		return (x ~ /^<.*>$/);
+	}
+	{
+		for (i = 2; i <= NF; i ++) {
+			if (is_tag($i)) {
+				tag_list[$i] = 1;
+			} else {
+				$i = tolower($i);
+			}
+			if (!is_tag($(i - 1)) && !is_tag($i)) {
+				$(i - 1) = $(i - 1) " <default>";
+			}
+		}
+		if (!is_tag($NF)) {
+			$NF = $NF " <default>";
+		}
+		print $0;
+	}
+	END {
+		if (tag_file) {
+			for (tag in tag_list) {
+				print tag > tag_file;
+			}
+		}
+	}' $1;
+}
+
+parse_alignment () {
+	gzip -d -c -f < $1 | \
+	${GAWK-gawk} -v sentid=$2 'BEGIN {
+		output = sentid;
+
+		show_refs = 1;
+	}
+
+	function is_empty(x) {
+		return x == "<default>" || tolower(x) == "*delete*";
+	}
+
+	function is_tag(x) {
+		return x ~ /^<.*>$/;
+	}
+
+	$1 == "align" {
+		if (NF == 4 && $4 == 1) {
+			# matching hyp and ref
+			if (!is_empty($3)) {
+				output = output " " $3;
+			}
+		} else if (NF == 6 && $4 == 1 && $6 == 0) {
+			# mismatched hyp and ref
+			if (is_empty($3)) {
+				if (is_tag($5)) {
+					if (!is_empty($5)) \
+						output = output " " $5;
+				} else if (showrefs) {
+					output = output " (" $5 ")";
+				}
+			} else {
+				if (is_empty($5) || !showrefs) {
+					output = output " " $3;
+				} else {
+					output = output " " $3 " (" $5 ")";
+				}
+			}
+		} else  {
+			print "unexpected alignment: " $0 > "/dev/stderr";
+		}
+	}
+	END {
+		print output;
+	}'
+}
+
+set -e
+
+#
+# format hyps and refs for alignment
+#
+prepare_text $ref $tmptags > $tmprefs
+prepare_text $hyp > $tmphyps
+
+#
+# add tag pronunciations to the dictionary
+#
+if [ $dictionary != /dev/null ]; then 
+	gzip -d -c -f $dictionary > $tmpdict
+else
+	> $tmpdict
+fi
+${GAWK-gawk} '{ print $1, "**TAG**" }' $tmptags >> $tmpdict
+
+#
+# do the alignments
+#
+mkdir -p $tmpnbest $tmpmerge
+
+cat $tmphyps | \
+while read sentid words
+do
+	echo "0 0 0 $words" > $tmpnbest/$sentid
+
+	echo $tmpnbest/$sentid
+done | \
+nbest-lattice -nbest-files - \
+	-use-mesh \
+	-dictionary $tmpdict \
+	-keep-noise \
+	-refs "$tmprefs" \
+	$pass_options \
+	-write-dir $tmpmerge | \
+(
+	last_sentid=
+	while read sentid rest
+	do
+		if [ -n "$last_sentid" ]; then
+			parse_alignment $tmpmerge/$last_sentid.gz $last_sentid
+		fi
+		last_sentid=$sentid
+	done
+	if [ -n "$last_sentid" ]; then
+		parse_alignment $tmpmerge/$last_sentid.gz $last_sentid
+	fi
+)
+

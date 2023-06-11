@@ -1,0 +1,151 @@
+#
+#    File:   Makefile.core.android
+#    Author: Mike Frandsen
+#    Date:   2010/08/03
+#
+#    Description:
+#	Machine dependent compilation options and variable definitions
+#	for Android, core file
+#
+#    Copyright (c) 1999-2010 SRI International.  All Rights Reserved.
+#
+#    $Header: /home/srilm/CVS/srilm/common/Makefile.core.android.r11c,v 1.1 2019/07/16 23:19:48 victor Exp $
+#
+
+# This Makefile only included by core x86 or arm Android Makefiles.
+
+# Override this if you are not building on Linux or set to
+# linux-x86_64 if your host is 64 bit.
+ANDROID_HOST ?= linux-x86_64
+
+# Need to set ndk directory; assume >= NDK r5b which bundles STL.
+# Use ?= so environment variables will override.
+#ANDROID_NDK ?= ~/android-ndk-r6b
+ANDROID_NDK ?= ~/android-ndk-r8e
+ANDROID_VERSION ?= android-23
+
+SYSROOT := $(ANDROID_NDK)/platforms/$(ANDROID_VERSION)/$(ANDROID_ARCH)
+
+# Below was appropriate for NDK r5b
+#ANDROID_SRILM_BIN := $(ANDROID_NDK)/toolchains/arm-eabi-4.4.0/prebuilt/$(ANDROID_HOST)/bin
+#GCC := $(ANDROID_SRILM_BIN)/arm-eabi-gcc
+#GPP := $(ANDROID_SRILM_BIN)/arm-eabi-g++
+#AR := $(ANDROID_SRILM_BIN)/arm-eabi-ar
+#OPT_GCC_VER :=
+
+# Set as follows for NDK r6b
+#ANDROID_TOOLCHAIN_VERSION := 4.4.3
+#OPT_GCC_VER :=
+
+# Set as follows for NDK r8b
+# 4.4.3 should also be available in r8b
+ANDROID_TOOLCHAIN_VERSION := 4.9
+# Newer versions add "/4.4.3" or "/4.6" to include and lib paths
+OPT_GCC_VER := /$(ANDROID_TOOLCHAIN_VERSION)
+
+ANDROID_TOOLCHAIN_NAME_ALT ?= $(ANDROID_TOOLCHAIN_NAME)
+ANDROID_SRILM_BIN := $(ANDROID_NDK)/toolchains/$(ANDROID_TOOLCHAIN_NAME_ALT)-$(ANDROID_TOOLCHAIN_VERSION)/prebuilt/$(ANDROID_HOST)/bin
+GCC := $(ANDROID_SRILM_BIN)/$(ANDROID_TOOLCHAIN_NAME)-gcc
+GPP := $(ANDROID_SRILM_BIN)/$(ANDROID_TOOLCHAIN_NAME)-g++
+AR := $(ANDROID_SRILM_BIN)/$(ANDROID_TOOLCHAIN_NAME)-ar
+
+# Other possible options:
+# As above:
+#   (arm-eabi-)+(gcc,g++,ar)
+#   (arm-linux-androideabi-)+(gcc,g++,ar)
+# Others:
+#   ()+(gcc,g++,ar)
+#   (i686-android-linux-)+(gcc,g++,ar)
+
+ARCHIVE = $(AR) crsuv
+
+# Use the GNU C compiler.
+WARNING_FLAGS := -Wreturn-type  -Wimplicit  -Wuninitialized -Wdeprecated  -Wpointer-arith -Wstrict-overflow -Woverlength-strings -Wunused-variable
+GCC_FLAGS = $(ARCH_FLAGS) $(WARNING_FLAGS) -DNO_ZIO -DNO_ICONV
+CC = $(GCC) $(GCC_FLAGS) --sysroot=$(SYSROOT)
+CXX = $(GPP) $(GCC_FLAGS) -DINSTANTIATE_TEMPLATES --sysroot=$(SYSROOT)
+
+# avoid gcc warning that all code is PIC
+# Victor 4/25/16: Actually need -fPIC to build SRINTERP .so
+# PIC_FLAG = -fpic
+
+# suffix used for executable files
+EXE_SUFFIX =
+
+# Optional compilation flags.
+# -Os is optimize for size
+OPTIMIZE_FLAGS = -g -O2 -Os -DNDEBUG -ffunction-sections -funwind-tables -fno-short-enums
+DEBUG_FLAGS = -g -DDEBUG
+PROFILE_FLAGS = -g -pg -O2
+
+# Optional linking flags.
+EXPORT_LDFLAGS = -s
+
+# Shared compilation flags.
+CFLAGS = $(ADDITIONAL_CFLAGS) $(INCLUDES)
+CXXFLAGS = $(ADDITIONAL_CXXFLAGS) $(INCLUDES)
+
+# Shared linking flags.
+LDFLAGS = $(ADDITIONAL_LDFLAGS) -L$(SRILM_LIBDIR)
+
+# Other useful compilation flags.
+# Turn off thread local storage; single instance assumed
+# on Android and can conflict with other libraries.
+ADDITIONAL_CFLAGS = -DNEED_RAND48 -DNO_TLS -DNO_BLOCK_MALLOC
+ADDITIONAL_CXXFLAGS = -DNEED_RAND48 -DNO_TLS -DNO_BLOCK_MALLOC
+
+# Other useful include directories.
+ADDITIONAL_INCLUDES = -I$(SYSROOT)/usr/include -I$(ANDROID_NDK)/sources/cxx-stl/gnu-libstdc++$(OPT_GCC_VER)/include -I$(ANDROID_NDK)/sources/cxx-stl/gnu-libstdc++$(OPT_GCC_VER)/libs/$(ANDROID_CUST_DIR)/include
+
+# Other useful linking flags.
+ADDITIONAL_LDFLAGS =
+
+# Other useful libraries.
+# r6b and earlier
+#ADDITIONAL_LIBRARIES = -lm -lstdc++ -lgcc
+# r8b
+# -rpath-link was recommended but not needed as -Wl option
+# The -Wl,--entry=main gets rid of the warnings like "cannot find entry symbol _start"
+ANDROID_CUST_DIR_ALT ?= $(ANDROID_CUST_DIR)
+IS_HARD := $(findstring -hard,$(ANDROID_CUST_DIR))
+
+ifneq ($(IS_HARD),)
+# hard
+ADDITIONAL_LIBRARIES += -Wl,--entry=main -L$(ANDROID_NDK)/sources/cxx-stl/gnu-libstdc++$(OPT_GCC_VER)/libs/$(ANDROID_CUST_DIR_ALT) -lm_hard -lgnustl_static -lsupc++ -lgcc -lc
+MATH_LIBRARY = -lm_hard
+else
+# not hard
+ADDITIONAL_LIBRARIES += -Wl,--entry=main -L$(ANDROID_NDK)/sources/cxx-stl/gnu-libstdc++$(OPT_GCC_VER)/libs/$(ANDROID_CUST_DIR_ALT) -lm -lgnustl_static -lsupc++ -lgcc -lc
+endif
+
+# run-time linker path flag
+RLD_FLAG = -R
+
+# Tcl support (part of cygwin)
+TCL_INCLUDE =
+TCL_LIBRARY =
+NO_TCL = X
+
+# No ranlib
+RANLIB = :
+
+# Not needed
+DEMANGLE_FILTER =
+
+# Generate dependencies from source files.
+GEN_DEP = gcc $(CFLAGS) -MM
+
+GEN_DEP.cc = g++ $(CXXFLAGS) -MM
+
+# Run lint.
+LINT = lint
+LINT_FLAGS = -DDEBUG $(CFLAGS)
+
+# Location of gawk binary
+GAWK = /usr/bin/gawk
+
+# Location of perl binary
+PERL = /usr/bin/perl
+
+# Fix __dso_handle errors
+ADDITIONAL_LIBRARIES += $(SYSROOT)/usr/lib/crtbegin_so.o

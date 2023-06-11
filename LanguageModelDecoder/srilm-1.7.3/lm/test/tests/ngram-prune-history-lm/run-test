@@ -1,0 +1,49 @@
+#!/bin/sh
+
+prune=1e-4
+smooth="-kndiscount -interpolate"
+history_smooth="-gt1max 0 -gt2max 0"
+
+if [ -f ../ngram-count-gt/swbd.3grams.gz ]; then
+	gz=.gz
+else
+	gz=
+fi
+
+history_lm=swbd.2bo$gz 
+
+# create LM from counts
+ngram-count -debug 1 \
+	$smooth \
+	-read ../ngram-count-gt/swbd.3grams$gz \
+	-vocab ../ngram-count-gt/eval2001.vocab \
+	-nonevents ../ngram-prune/nonevents.vocab \
+	-lm swbd.3bo$gz
+
+# create history LM from counts
+if [ ! -f $history_lm ]; then
+    ngram-count -debug 1 \
+	-order 2 \
+	$history_smooth \
+	-read ../ngram-count-gt/swbd.3grams$gz \
+	-vocab ../ngram-count-gt/eval2001.vocab \
+	-nonevents ../ngram-prune/nonevents.vocab \
+	-lm $history_lm
+fi
+
+ngram -debug 0 \
+        -lm swbd.3bo$gz \
+        -ppl ../ngram-count-gt/eval97.text
+
+ngram -debug 1 \
+	-lm swbd.3bo$gz \
+	-nonevents ../ngram-prune/nonevents.vocab \
+	-prune $prune \
+	-prune-history-lm $history_lm \
+	-write-lm pruned$gz 
+
+ngram -debug 0 \
+        -lm pruned$gz \
+        -ppl ../ngram-count-gt/eval97.text
+
+rm -f swbd.2bo$gz swbd.3bo$gz pruned$gz

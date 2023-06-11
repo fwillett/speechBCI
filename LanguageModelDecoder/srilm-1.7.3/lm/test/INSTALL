@@ -1,0 +1,170 @@
+
+Here is a brief guide on how to build the SRI LM tools and associated
+libraries.
+
+1 - Unpack.  This should give a top-level directory with the subdirectories
+    listed in README, as well as a few documentation files and a Makefile.
+    For an overview of SRILM, see the paper in doc/paper.ps .
+    For reference information, look in man/html .
+
+2 - Set the SRILM variable in the top-level Makefile to point to this
+    top-level directory (an absolute path).
+
+3 - You need a Linux (i686/x86_64), Mac OSX, Solaris (i386 or amd64),
+    SunOS (Sparc or i386), IRIX 5.x, Alpha OSF, or CYGWIN platform to
+    compile out of the box.  For other OS/cpu combinations you will have
+    to modify the sbin/machine-type script to detect (and name) the
+    platform type, and create a file common/Makefile.machine.<platform>
+    that defines platform-dependent makefile variables.  As a
+    workaround, the MACHINE_TYPE variable can also be set on the make
+    comand line
+			make MACHINE_TYPE=foo ...
+
+    in which case no changes to sbin/machine-type are needed.
+
+    Some platform-specific notes may be found in doc/README.<platform>.
+
+    Even on the known platforms you might have to modify variables defined in
+    common/Makefile.machine.<platform> .  Candidates for changes are
+
+    CC, CXX: 	choose compiler or compiler version.  For example, you might
+		have to specify a directory path to the compiler driver.
+    PIC_FLAG:	define if your compiler uses something other than -fPIC to 
+		generate position-independent code.  In particular, define this
+		to be empty if your compiler does not generate PIC, or does so
+		by default.
+    DEMANGLE_FILTER:  If the "c++filt" program is not installed on your system
+		set this variable to empty.
+    TCL_INCLUDE, TCL_LIBRARY:  to whatever is needed to find the Tcl header
+		files and library.  If Tcl is not available, set NO_TCL=X
+		and leave the above variables empty.
+    NO_ICONV:   Set this variable to anything to turn off 16-bit unicode support
+                and linking with the iconv library.
+
+    It is recommended that you record changes to platform dependent variables
+    in common/Makefile.site.<platform> and leave Makefile.machine.<platform>
+    unchanged.  That makes it easier to upgrade SRILM to future releases 
+    (just copy common/Makefile.site.<platform> to a new installation).
+
+4 - You need the following free third-party software to build SRILM:
+
+	- gcc version 3.4.3 or higher, or Microsoft Visual Studio.
+	  (older versions might work as well, but are no longer supported).
+	  SRILM is occasionally tested with other compilers, see the 
+	  portability notes in the CHANGES file.
+	- Optionally, the libLBFGS optimization library if you want to build
+	  maximum entropy models.  If so, build and install libLBFGS separately
+	  and set HAVE_LIBLBFGS=1  in the platform-specific makefile (see above).
+	- GNU make 
+	- An iconv library, such as the GNU implementation, unless libiconv
+	  is already part of your C library.
+	- John Ousterhout's Tcl toolkit, version 7.3 or higher
+	  (this is currently used only for some test programs, but is needed
+	  for the build to go through without manual intervention).
+	- Additional platform-dependent prerequisites are mentioned in
+	  doc/README.<os>-<machinetype>, e.g., doc/README.windows-cygwin.
+
+    The following tools are needed at runtime only:
+
+	- GNU awk (gawk), to interpret many of the utility scripts
+	- gzip, to read/write compressed files
+	- bzip2, to read/write .bz2 compressed files (optional)
+	- p7zip, to read/write .7z compressed files (optional)
+	- xz, to read/write .xz compressed files (optional)
+
+    For Windows, you will need the CYGWIN UNIX compatibility
+    environment, which includes all of the above.  The MinGW and Visual
+    C platforms will also work, but with some loss of functionality.
+    See doc/README.windows-* for more information.
+
+    Links to these packages can be found on the SRILM download page
+    (http://www.speech.sri.com/projects/srilm/download.html).
+
+5 - In the top-level directory, run
+
+	gnumake World		or 
+	make World		(if the GNU version is the system default)
+
+    This will create the directories
+
+	bin/
+	lib/
+	include/
+
+    build everything and install public commands, libraries and headers in
+    these directories.  Binaries are actually installed in subdirectories
+    indicating the platform type.
+
+    To create binaries for a platform that is not the default on your system,
+    use make MACHINE_TYPE=xxx, e.g.
+
+ 	make MACHINE_TYPE=i686-m64 World	# 64-bit binaries for Linux
+ 	make MACHINE_TYPE=msvc World		# MS Visual C++ on Windows 
+
+6 - The result of the above should be a fair number of .h and .cc files in
+    include/, libraries in lib/$MACHINE_TYPE, and programs in 
+    bin/$MACHINE_TYPE.  In your shell, set the following environment
+    variables:
+
+	PATH		add $SRILM/bin/$MACHINE_TYPE and $SRILM/bin
+	MANPATH		add $SRILM/man
+
+7 - To test the compiled tools, run
+
+	gnumake test
+
+    from the top-level directory.
+
+    This exercises the most important (though not all) functionality in
+    SRILM and compares the results to reference outputs.  If discrepancies are 
+    reported, examine the output files in $SRILM/<module>/test/output and
+    compare them to the corresponding files in $SRILM/<module>/test/reference,
+    where <module> is a subdirectory name (lm, flm, lattice).
+
+8 - After a successful build, clean up the source directories of object and 
+    binary files that are no longer needed:
+
+	gnumake cleanest
+
+9 - (Optional) To build versions of the libraries and executables that are 
+    optimized for space rather than speed, run
+
+	gnumake World OPTION=_c
+	gnumake cleanest OPTION=_c
+
+    The libraries will appear in ${SRILM}/lib/${MACHINE_TYPE}_c, with 
+    executables in ${SRILM}/bin/${MACHINE_TYPE}_c .  The data structures
+    used in these versions use sorted arrays rather than hash tables, which
+    wastes less memory, but is also somewhat slower. The directory suffix "_c"
+    stands for "compact".
+
+    Other versions of the binaries can be built in a similar manner.
+    The compile options currently supported are 
+
+	OPTION=_c	"compact" data structures
+	OPTION=_s	"short" count representation
+	OPTION=_l	"long long" count representation
+	OPTION=_g	debuggable, non-optimized code
+	OPTION=_p	profiling executables
+
+    In addition, if libraries with position-independent code are needed, add
+
+	MAKE_PIC=yes
+
+    to the make command line.  This may incur a slight performance penalty but
+    is necessary for certain software projects that link against SRILM libs.
+
+10 - Recent versions of gawk may not perform correct floating-point arithmetic
+     unless either
+
+		LC_NUMERIC=C	or
+		LC_ALL=C
+
+     is set in the environment.  This affects many of the scripts in utils/.
+
+11 - Be sure to let me know if I left something out.
+
+Andreas Stolcke
+stolcke@speech.sri.com
+$Date: 2014-03-24 17:57:28 $
+

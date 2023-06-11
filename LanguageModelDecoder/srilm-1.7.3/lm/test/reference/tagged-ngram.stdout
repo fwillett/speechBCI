@@ -1,0 +1,35 @@
+-pau-
+.
+</s>
+<s>
+<unk>
+Chinesisch
+Fritz
+Karla
+Spanisch
+Sprache
+andere
+eine
+lernt
+spricht
+/-pau-
+/</s>
+/<s>
+/<unk>
+/Bla
+/Blae
+/Blo
+/Bloe
+/Blubb
+Fritz/Bla lernt/Blo eine/Blubb Sprache/Bla ./Bloe
+	p( Fritz/Bla | <s> ) 	= [2gram] 0.4 [ -0.39794 ]
+	p( lernt/Blo | Fritz/Bla ...) 	= [3gram] 0.65 [ -0.187087 ]
+	p( eine/Blubb | lernt/Blo ...) 	= [2gram] 0.25 [ -0.60206 ]
+	p( Sprache/Bla | eine/Blubb ...) 	= [1gram] 0.0124716 [ -1.90408 ]
+	p( ./Bloe | Sprache/Bla ...) 	= [2gram] 0.5 [ -0.30103 ]
+	p( </s> | ./Bloe ...) 	= [2+Tgram] 0.8 [ -0.09691 ]
+1 sentences, 5 words, 0 OOVs
+0 zeroprobs, logprob= -3.4891 ppl= 3.8152 ppl1= 4.98678
+
+file -: 1 sentences, 5 words, 0 OOVs
+0 zeroprobs, logprob= -3.4891 ppl= 3.8152 ppl1= 4.98678

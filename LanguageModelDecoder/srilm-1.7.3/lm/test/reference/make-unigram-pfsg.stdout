@@ -1,0 +1,13 @@
+name UNIGRAM_PFSG
+nodes 6 NULL NULL NULL gruene kugel rote
+initial 2
+final 1
+transitions 8
+0 1 -11350
+2 0 0
+3 0 0
+0 3 -17229
+4 0 0
+0 4 -11350
+5 0 0
+0 5 -17229

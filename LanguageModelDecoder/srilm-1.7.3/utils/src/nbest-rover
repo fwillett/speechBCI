@@ -1,0 +1,316 @@
+#!/bin/sh
+#
+# nbest-rover --
+#	Combine multiple nbest lists ROVER-style
+#
+# usage: nbest-rover SENTIDS CONTROL-FILE [POSTERIORS]
+#
+# where SENTIDS is list of sentence ids (filenames of nbest lists)
+#		if SENTIDS is "-" the list is inferred from the contents of
+#		the first N-best directory
+#       CONTROL-FILE describes the nbest list sets to be processed
+#	POSTERIORS is an an optional file to which word posterior probabilities
+#			are written.
+#
+# The format for CONTROL-FILE is
+#
+#	DIR1 LMW1 WTW1 W1 [ N1 [ S1 ] ]
+#	DIR2 LMW2 WTW2 W2 [ N2 [ S2 ] ]
+#	...
+#
+# Each DIRi names a directory in which nbest lists are to be found.
+# LMWi and WTWi are the rescoring weights to be used for the corresponding
+# directory.  Wi is the weight to be given to the posteriors compute from
+# the respective list. Ni are optional limits on the number N-best hyps used.
+# Si are optional posterior scaling parameters.
+#
+# $Header: /home/srilm/CVS/srilm/utils/src/nbest-rover,v 1.43 2019/02/28 04:48:21 stolcke Exp $
+#
+
+if [ $# -lt 2 ]; then
+	echo "usage: $0 [ sentid-list | - ] control-file [posteriors [nbest-lattice-options]]"  >&2
+	exit 2
+fi
+
+sentids=$1
+control=$2
+shift; shift
+
+# for new-style gnu sort
+_POSIX2_VERSION=199209
+export _POSIX2_VERSION
+
+amw=1
+default_lmw=8
+default_wtw=0
+default_scale=0
+default_max_nbest=0
+default_weight=1
+
+mesh_option=-use-mesh
+
+if [ $# -gt 0 ]; then
+    posteriors=$1
+    shift
+else 
+    posteriors=/dev/null
+fi
+
+lattice_dir=
+posteriors_dir=
+nbest_dir=
+ref_posteriors=
+filter_script=cat
+missing_nbest=
+use_nbest_scripts=
+debug_level=0
+null_nbest=${TMPDIR-/tmp}/$$null.nbest
+
+# collect remaining options (mostly to pass them to nbest-lattice)
+while [ $# -gt 0 ]; do
+    case "$1" in
+    -debug)	debug_level=$2
+		shift; shift ;;
+    -amw)	amw=$2;
+		shift; shift ;;
+    -write-dir)	lattice_dir=$2
+		options="$options $1 $2"
+		shift; shift ;;
+    -write-nbest-dir)
+		nbest_dir=$2
+		options="$options $1 $2"
+		shift; shift ;;
+    -write-nbest-posteriors)
+		posteriors_dir=$2;
+		shift; shift ;;
+    -write-ref-posteriors)
+		ref_posteriors=$2;
+		options="$options -record-hyps"
+		shift; shift ;;
+    -no-mesh)	mesh_option= ;
+		shift ;;
+    -wer)	# -wer implies -no-mesh
+		mesh_option= ;
+		options="$options $1"
+		shift ;;
+    -missing-nbest)
+		echo "0 0 0" > $null_nbest
+		missing_nbest=1
+		use_nbest_scripts=1
+		shift ;;
+    -nbest-backtrace)
+		# Decipher2 format with backtrace info
+		# -- need to use old nbest helper scripts
+		options="$options $1"
+		use_nbest_scripts=1
+		shift ;;
+    -nbest-backtrace-times-only)
+		# Decipher 2 format - but only timing
+		# information is needed
+		helper_options="-nbest-backtrace -decipher-nbest"
+		options="$options -nbest-backtrace"
+		shift ;;
+    -filter)	filter_script="$2";
+		shift; shift ;;
+    *)		options="$options $1"
+		shift ;;
+    esac
+done
+
+> $posteriors
+
+tmpdir=${TMPDIR-/tmp}
+tmp_post=$tmpdir/post$$
+tmp_sentids=$tmpdir/sentids$$
+tmp_nbest_dir=$tmpdir/nbest.dir$$
+tmp_post_dir=$tmpdir/post.dir$$
+tmp_lat_dir=$tmpdir/lat.dir$$
+
+trap "rm -rf $tmp_post $tmp_sentids $tmp_nbest_dir $tmp_post_dir $tmp_lat_dir $null_nbest; exit" 0 1 2 15
+
+mkdir -p $tmp_nbest_dir $tmp_post_dir $tmp_lat_dir
+
+#
+# make sentid list if none was specified
+#
+if [ "$sentids" = "-" ]; then
+	${GAWK-gawk} '{ print $1; exit }' $control | xargs ls | \
+	sed -e 's,.*/,,' -e 's,\.gz$,,' -e 's,\.score$,,' | \
+	sort > $tmp_sentids
+else
+	sort +0 -1 $sentids > $tmp_sentids
+fi
+
+set -e
+
+#
+# create lattice output directory if needed
+#
+if [ -n "$lattice_dir" ]; then
+    mkdir -p "$lattice_dir"
+elif [ -n "$ref_posteriors" ]; then
+    lattice_dir=$tmp_lat_dir
+    options="$options -write-dir $lattice_dir"
+fi
+
+if [ -n "$nbest_dir" ]; then
+    mkdir -p "$nbest_dir"
+fi
+
+if [ -n "$posteriors_dir" ]; then
+    mkdir -p "$posteriors_dir"
+elif [ -n "$ref_posteriors" ]; then
+    posteriors_dir=$tmp_post_dir
+fi
+
+cat $tmp_sentids | \
+while read sentid refwords
+do
+	extra_weights=
+	extra_scores=
+	extra_wts_and_scores=
+
+	noheader=0
+
+	nbest_tag=1
+
+	if [ -n "$posteriors_dir" ]; then
+		posteriors_file=$posteriors_dir/$sentid
+		> $posteriors_file
+	else
+		posteriors_file=
+	fi
+
+	if [ -n "$use_nbest_scripts" ]; then
+	    # handle DOS EOL, comment and empty lines
+	    sed -e 's,$,,' -e '/^##/d' -e '/^[ 	]*$/d' $control | \
+	    while read dir lmw wtw weight max_nbest scale rest 
+	    do
+		if [ "$wtw" = "+" ]; then
+		    if [ -f $dir/$sentid.gz ]; then
+			    extra_scores="$extra_scores $dir/$sentid.gz"
+			    extra_wts_and_scores="$extra_wts_and_scores $lmw $dir/$sentid.gz"
+		    elif [ -f $dir/$sentid ]; then
+			    extra_scores="$extra_scores $dir/$sentid"
+			    extra_wts_and_scores="$extra_wts_and_scores $lmw $dir/$sentid"
+		    else
+			    echo "$dir/$sentid" is missing >&2
+			    continue
+		    fi
+
+		    extra_weights="$extra_weights $lmw"
+		    continue
+		else
+		    if [ -f $dir/$sentid ]; then
+			    nbest_file=$dir/$sentid
+		    elif [ -f $dir/$sentid.gz ]; then
+			    nbest_file=$dir/$sentid.gz
+		    elif [ -f $dir/$sentid.score.gz ]; then
+			    nbest_file=$dir/$sentid.score.gz
+		    elif [ -f $dir/$sentid.score ]; then
+			    nbest_file=$dir/$sentid.score
+		    else
+			    echo -n "$dir/$sentid.score.gz is missing" >&2
+			    extra_weights=
+			    extra_scores=
+			    extra_wts_and_scores=
+
+			    if [ -n "$missing_nbest" ]; then
+				echo " - using empty hyp" >&2
+				nbest_file=$null_nbest
+			    else
+				echo "" >&2
+				continue
+			    fi
+		    fi
+
+		    if [ "$weight" = "=" ]; then
+			    weight=$last_weight
+		    else
+			    last_weight=$weight
+		    fi
+
+		    if [ -n "$extra_weights" -o "$amw" != 1 ]; then
+			    combine-acoustic-scores \
+				-v "weights=$amw $extra_weights" \
+				-v max_nbest=${max_nbest:-$default_max_nbest} \
+				$nbest_file $extra_scores
+		    else
+			    gzip -dcf $nbest_file
+		    fi | \
+		    nbest-posteriors noheader=$noheader \
+				lmw=${lmw:-$default_lmw} \
+				wtw=${wtw:-$default_wtw} \
+				weight=${weight:-$default_weight} \
+				max_nbest=${max_nbest:-$default_max_nbest} \
+				postscale=${scale:-$default_scale} \
+				nbest_tag=$nbest_tag \
+				output_posteriors=$posteriors_file
+
+		    extra_weights=
+		    extra_scores=
+		    extra_wts_and_scores=
+		    noheader=1
+		    nbest_tag=`expr $nbest_tag + 1`
+		fi
+	    done
+	else # use helper tool
+	    nbest-rover-helper -debug $debug_level \
+				-sentid $sentid \
+				-rover-control $control \
+				-max-nbest $default_max_nbest \
+				-rescore-amw $amw \
+				-rescore-lmw $default_lmw \
+				-rescore-wtw $default_wtw \
+				-posterior-weight $default_weight \
+				-posterior-scale $default_scale \
+				-write-posteriors "$posteriors_file" \
+				$helper_options
+	fi | \
+	eval "$filter_script" \
+		> $tmp_nbest_dir/$sentid
+
+	if [ -n "$posteriors_file" ]; then
+		gzip -f $posteriors_file
+	fi
+
+	echo $tmp_nbest_dir/$sentid 
+done | \
+nbest-lattice -nbest-files - \
+	$mesh_option \
+	-rescore-lmw 0 -rescore-wtw 0 \
+	-posterior-amw 0 -posterior-lmw 0 -posterior-wtw 0 \
+	-debug 2 $options 2>$tmp_post | \
+while read sentid hyp
+do
+	# delete tmp nbest lists to avoid huge data accumulation
+	if [ "$sentid" != "$last_sentid" ]; then
+	    rm -f $tmp_nbest_dir/$sentid
+	    last_sentid=$sentid
+	fi
+
+	echo "$sentid $hyp"
+done
+
+if [ -n "$ref_posteriors" ]; then
+	> $ref_posteriors
+
+	cat $tmp_sentids | \
+	while read sentid refwords
+	do
+		if [ -f $lattice_dir/$sentid.gz ]; then
+			suffix=.gz
+		else
+			suffix=
+		fi
+		gzip -dcf $lattice_dir/$sentid$suffix | \
+		find-reference-posteriors sentid=$sentid \
+		   posteriors_file=$posteriors_dir/$sentid$suffix >> $ref_posteriors
+	done
+fi
+
+# extract posteriors to file; output error messages; ignore others
+${GAWK-gawk} '$2 == "post" { $2 = ""; print; next; }
+      $2 == "err" { next; }
+      { print > "/dev/stderr"; }' $tmp_post > $posteriors
+

@@ -1,0 +1,252 @@
+#!/bin/sh
+#
+# compute-sclite --
+#	compute word error rate from a sentid hyp file and a sentid reference
+#	file, using the NIST 'sclite' program
+#
+# $Header: /home/srilm/CVS/srilm/utils/src/compute-sclite,v 1.49 2016/09/23 20:05:51 stolcke Exp $
+#
+
+# enforce proper sorting order
+LC_COLLATE=C
+export LC_COLLATE
+
+reject="@reject@"
+
+sclite=sclite
+
+subsets=
+remove_periods=
+format_sentids=1
+
+if [ $# -lt 2 ]; then
+	echo "usage: $0 [-v] -h hyps -r refs [-S id-subset] [-M|-multiwords] [-noperiods] [-g glm-file] [sclite-options ...]" >&2
+	echo "   or  $0 hyps refs" >&2
+	exit 2
+elif [ $# -eq 2 ]; then
+	# old syntax
+	hyps=${1}
+	refs=${2}
+else
+	# parse arguments
+	while [ $# -gt 0 ]; do
+		case "$1" in
+		-v)	verbose=1 ;;
+		-r)	refs=$2; shift ;;
+		-h)	hyps="$hyps $2"
+			name=`basename $2`
+			shift ;;
+		-S)	subsets="$subsets $2"; shift ;;
+		-M|-multiwords)
+			multiwords=1 ;;
+		-noperiods)
+			remove_periods=1 ;;
+		-H)	remove_hesitations=1 ;;
+                -keep_bracketed) 
+			keep_bracketed=1 ;;
+		-R)	reject="<>" ;;
+		-g)	glmfile=$2; shift ;;
+		-s)	case_sensitive=1 ;;
+		-overlap-limit)
+			options="$options $1 $2"
+			sclite=asclite
+			shift;;
+		-raw-sentids)
+			format_sentids=0
+			;;
+		*)	options="$options $1" ;;
+		esac
+		shift
+	done
+fi
+
+if [ -n "$case_sensitive" ]; then
+    filter_options="-s";
+    options="$options -s";
+fi 
+
+tmpdir=${TMPDIR-/tmp}
+sentids="$tmpdir/ce.sentids$$"
+speakers="$tmpdir/ce.speakers$$"
+sortedrefs="$tmpdir/ce.refs$$"
+sortedhyps="$tmpdir/ce.hyps$$"
+ignorehyps="$tmpdir/ce.ign$$"
+
+if [ -z "$verbose" ]; then
+    trap '/bin/rm -f $sentids $speakers $sortedrefs $sortedhyps $ignorehyps' \
+	    0 1 2 13 15
+fi
+
+set -e
+
+multijoin () {
+	if [ $# -eq 1 ]; then
+	    cat $1
+	else
+	    join $1 $2 | { shift; shift; multijoin - "$@"; }
+	fi
+}
+
+#
+# extract and sort sentids from hyps
+# (for CTM hyps these are just waveform/channel labels)
+#
+
+case "$hyps" in 
+*.ctm)
+     cat $hyps | \
+	${GAWK-gawk} '!/^;;/ && $7 != "non-lex" && $7 != "fp" { print $1 "_" $2 }' ;;
+*)   cat $hyps | ${GAWK-gawk} '{ print $1 }' ;;
+esac | \
+sort | \
+multijoin - $subsets > $sentids
+
+#
+# extract list of "speakers" (waveform/channel labels)
+#
+case "$hyps" in 
+*.ctm)
+     cat $sentids | uniq | tr '[A-Z]' '[a-z]' | sort > $speakers
+     ;;
+*)   sed 's,\([-_][ABab12]\)[-_].*,\1,' $sentids | uniq | \
+				tr '[A-Z]' '[a-z]' | sort > $speakers 
+     ;;
+esac
+
+#
+# extract and sort refs for these sentids
+#
+case "$refs" in
+*.stm) # NIST scoring: 
+    # filter out speakers not occurring in hyp file
+    ${GAWK-gawk} '!/^;;/ { print tolower($1 "_" $2), $0 }' $refs | \
+    sort -k 1,1 -k 5,5n | \
+    join - $speakers | \
+    ${GAWK-gawk} '{ $1 = ""; if ($7 ~ /^<.*>$/) $7 = "<>"; print }' | \
+    if [ -n "$glmfile" ]; then
+	${GAWK-gawk} '{ gsub("-","_",$1); gsub("-","_",$3); print }' | \
+	csrfilt.sh $filter_options -i stm -t ref -dh $glmfile  
+    else
+	cat
+    fi > $sortedrefs
+    ;;
+*.stm.filt) # NIST scoring with pre-filtered references
+    # filter out speakers not occurring in hyp file
+    ${GAWK-gawk} '!/^;;/ { print tolower($1 "_" $2), $0 }' $refs | \
+    sort -k 1,1 -k 5,5n | \
+    join - $speakers | \
+    ${GAWK-gawk} '{ $1 = ""; if ($7 ~ /^<.*>$/) $7 = "<>"; print }' | \
+    if [ -n "$glmfile" ]; then
+	${GAWK-gawk} '{ gsub("-","_",$1); gsub("-","_",$3); print }'
+    else
+	cat
+    fi > $sortedrefs
+    ;;
+*)  sort "$refs" | join - $sentids | \
+    ${GAWK-gawk} '{ if (multiwords) for (i = 2; i <= NF; i++) \
+		gsub("_", " ", $i); print }'\
+	    multiwords=$multiwords | \
+    sed -e 's,\[[^]]*\],,g' | \
+    sentid-to-sclite format_sentids=$format_sentids | \
+    if [ -n "$glmfile" ]; then
+	csrfilt.sh $filter_options -i trn -t hyp -dh $glmfile
+    else
+	cat
+    fi   > $sortedrefs
+
+    # find segments to ignore
+    ${GAWK-gawk} 'NF == 2 && tolower($2) == "ignore_time_segment_in_scoring" \
+		{ print $1 }' < $refs | \
+    sort > $ignorehyps
+    ;;
+esac
+
+if [ ! -s $sortedrefs ]; then
+	echo "Filtered references are empty" >&2
+	exit 1
+fi
+
+#
+# sort and condition hyps
+#
+case "$refs" in
+*.stm|*.stm.filt) # NIST scoring
+    # sclite will handle ignored segments
+    case "$hyps" in 
+    *.ctm)
+	cat $hyps | ${GAWK-gawk} '!/^;;/ { print tolower($1 "_" $2), $0 }' | \
+	sort -b -k 1,1 -k 2,2 -k 3,3 -k 4,4n | join - $speakers | \
+	${GAWK-gawk} '{ $1 = ""; print }' ;;
+    *)  sort -k 1,1 $hyps | join - $sentids | sentid-to-ctm  ;;
+    esac | \
+    ${GAWK-gawk} '{ # handle new-style CTM format (convert it to old format)
+	    if (NF >= 7) {
+		if ($7 != "lex") next;
+		else $7 = $8 = "";
+	    }
+	    if (remove_periods) gsub("[.]", "", $5);
+	    print;
+	  }' remove_periods=$remove_periods | \
+    if [ -n "$glmfile" ]; then
+	${GAWK-gawk} '{ gsub("-","_",$1); print }' | \
+	csrfilt.sh $filter_options -i ctm -t hyp -dh $glmfile | \
+	if [ -n "$remove_hesitations" ]; then
+	    grep -vi '%HESITATION'
+	else
+	    cat
+	fi
+    else
+	cat
+    fi > $sortedhyps
+    ;;
+*)  # we have to remove ignored segments ourselves
+    sort -k 1,1 $hyps | join - $sentids | join -v 1 - $ignorehyps | \
+     ${GAWK-gawk} '{ if (multiwords) for (i = 2; i <= NF; i++) gsub("_", " ", $i);
+	     if (remove_periods) for (i = 2; i <= NF; i++) gsub("[.]", "", $i);
+	     print }'\
+	    remove_periods=$remove_periods multiwords=$multiwords | \
+     sed -e 's,\[[^]]*\],,g' \
+	    -e "s,$reject,,g" \
+	    -e 's,-pau-,,g' | \
+	if [ -z "$keep_bracketed" ]; then
+            sed -e  's,<[^>]*>,,g'
+        else 
+	    cat
+	fi |\
+     sentid-to-sclite format_sentids=$format_sentids |\
+     if [ -n "$glmfile" ]; then
+	csrfilt.sh $filter_options -i trn -t hyp -dh $glmfile | \
+	if [ -n "$remove_hesitations" ]; then
+	    sed -e 's/\%HESITATION//g' -e 's/\%hesitation//g'
+	else
+	    cat
+	fi
+     else
+	cat
+     fi    > $sortedhyps
+     ;;
+esac
+
+if [ ! -s $sortedhyps ]; then
+	echo "Filtered hypotheses are empty" >&2
+	exit 1
+fi
+
+[ "$verbose" ] && set -x
+
+case $sclite in
+sclite)	options="-n $name $options" ;;
+esac
+
+case "$refs" in
+*.stm|*.stm.filt) # NIST scoring
+    $sclite -f 0 -O . \
+	    -h $sortedhyps ctm $name -r $sortedrefs stm  \
+	    -D $options
+    ;;
+*)  $sclite -f 0 -O . \
+	    -h $sortedhyps trn $name -r $sortedrefs trn  \
+	    -i swb $options
+    ;;
+esac
+

@@ -1,0 +1,19 @@
+#
+#    File:   Makefile.machine.iPhoneOS-11.2-armv7
+#    Author: Mike Frandsen
+#    Date:   Mon Dec 11 17:06:23 MST 2017
+#
+#    Description:
+#	Machine dependent compilation options and variable definitions
+#	for iOS to be built on a Mac. Relies on import of
+#	Makefile.core.iOS.
+#
+
+LOCAL_PLATFORM_NAME = iPhoneOS
+XCODE_SDK_VERSION = 11.2
+LOCAL_TARGET_ARCH = armv7
+
+include $(SRILM)/common/Makefile.core.iOS
+
+ADDITIONAL_CFLAGS += -fembed-bitcode
+ADDITIONAL_CXXFLAGS += -fembed-bitcode

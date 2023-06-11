@@ -1,0 +1,98 @@
+#!/bin/bash
+
+# Usage, from top-level as:
+#   common/runmake-msvc-all [-p] [extra_args]
+# Uses version of "cl" in path to build many target variations,
+# currently for VS2017, VS2015, VS2013, VS2012, VS2010 and VS2008.
+
+# Use "-p" option to output what compile commands would be run.
+# Other args will be passed along to make. For example:
+#   common/runmake-msvc-all clean
+
+PRINT_ONLY=0
+if [ "$1" = "-p" ]; then
+  PRINT_ONLY=1
+  # Pull from args so can pass along any extra options without this
+  shift
+fi
+
+# Get path to cl compiler both using Cygwin and Windows paths
+MYCL_CYG=`which cl`
+MYCL_WIN=`cygpath -m "$MYCL_CYG"`
+
+# Detect compiler and 32 or 64 bit
+
+# Old method to check if 64 bit not as reliable
+#expr match "$MYCL_CYG" '.*amd64' > /dev/null
+# Also needed alternative:
+#expr match "$MYCL_CYG" '.*x64' > /dev/null
+
+# Instead, just running "cl" should report "for x64" to stderr
+cl 2>&1 | grep "for x64"
+if [ $? = 0 ]; then
+  BITS=64
+else
+  BITS=32
+fi
+
+COMP=unk
+expr match "$MYCL_CYG" '.*Studio 14' > /dev/null
+if [ $? = 0 ]; then
+  COMP=vs2015
+else
+  expr match "$MYCL_CYG" '.*Studio 12' > /dev/null
+  if [ $? = 0 ]; then
+    COMP=vs2013
+  else
+    expr match "$MYCL_CYG" '.*Studio 11' > /dev/null
+    if [ $? = 0 ]; then
+      COMP=vs2012
+    else
+      expr match "$MYCL_CYG" '.*Studio 10' > /dev/null
+      if [ $? = 0 ]; then
+        COMP=vs2010
+      else
+        expr match "$MYCL_CYG" '.*Studio 9' > /dev/null
+        if [ $? = 0 ]; then
+          COMP=vs2008
+        else
+          expr match "$MYCL_CYG" '.*Studio 8' > /dev/null
+          if [ $? = 0 ]; then
+            COMP=vs2005
+          else
+            expr match "$MYCL_CYG" '.*2003' > /dev/null
+            if [ $? = 0 ]; then
+              COMP=vs2003
+            else
+              expr match "$MYCL_CYG" '.*2017' > /dev/null
+              if [ $? = 0 ]; then
+                COMP=vs2017
+              fi
+            fi
+          fi
+        fi
+      fi
+    fi
+  fi
+fi
+
+SCR="${BASH_SOURCE[0]}"
+SCR_DIR=`dirname ${BASH_SOURCE[0]}`
+
+VARIATIONS=""
+
+for CTYPE in md mt; do
+  for COPT in "" _c _g; do
+    CFULL="msvc-${COMP}-${BITS}-${CTYPE}-static"
+    COPTFULL="OPTION=${COPT}"
+    VARIATIONS="${VARIATIONS}: ${CFULL} ${COPTFULL}"
+    echo "$SCR_DIR/runmake-msvc ${CFULL} ${COPTFULL} $@"
+    if [ $PRINT_ONLY = 0 ]; then
+      $SCR_DIR/runmake-msvc ${CFULL} ${COPTFULL} "$@"
+    fi
+  done
+done
+
+if [ $PRINT_ONLY = 0 ]; then
+  echo "BUILT ${VARIATIONS}"
+fi

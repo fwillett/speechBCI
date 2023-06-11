@@ -1,0 +1,56 @@
+Multi-Threading Support in SRILM
+---------------------------------------
+
+As of November, 2012 SRILM supports multi-threaded applications. This 
+enhancment applies to the five libraries that comprise SRILM: libmisc, 
+libdstruct, liboolm, libflm and liblattice.  Please note that this does not
+imply that all API methods are thread-safe, but rather that it is possible to
+perform independent SRILM tasks on multiple threads without interference or
+instability. Some APIs that perform read-only calculations may be safe to call
+on objects shared by multiple threads but in general this is not safe, 
+particularly on APIs that mutate data structures not solely owned by the
+current thread. We will attempt to document specific allowances and limitations
+within this README and inline in the code.
+
+SRILM uses TLS (thread-local storage) to support multi-threading. On non-Windows
+platforms, TLS is provided by the pthreads library. On Windows we use the 
+TlsAlloc family of OS calls. This approach covers most platforms. However, for
+platforms that don't support TLS or applications that don't need multiple 
+threads, SRILM can be compiled with -DNO_TLS=X to disable TLS in favor of 
+traditional statics.
+
+If you intend to use SRILM within short-lived threads (threads that will not
+live as long as your process), it is necessary to free thread-local resources
+prior to thread termination. This is achieved by calling the appropriate 
+freeThread() method based on the SRILM modules used by your thread. For
+instance, if your thread calls APIs in libflm, you must call 
+FLMThreads::freeThread, which frees all thread-specific resources used by libflm
+and its dependencies. If your thread only uses APIs in liboolm, you may call
+LMThreads::freeThread. Note that libflm and liblattice don't depend on
+each other, so if your thread utilizes APIs from both you must call both 
+FLMThreads::freeThread and LatticeThreads::freeThread. 
+
+Development Changes for SRILM Contributors
+------------------------------------------
+
+If you contribute to SRILM in a way that affects the 5 libraries, you must
+refrain from using plain statics. Instead, use the various TLSW macros defined
+in misc/src/TLSWrapper.h to declare a TLS Wrapper variable that imitates static
+memory on a per-thread basis. For a basic example see the implementation of
+Vocab::mapToLower in lm/src/Vocab.cc. There are various macros for declaring and
+defining TLSW variables. In the event that NO_TLS is defined, the macros take
+care of declaring equivalent static variables. When adding a new TLSW variable
+you must insure that it will be freed by the freeThread method of the SRILM
+module in which it resides. This is usually achieved by augmenting or adding a
+static freeThread() method to the class that defines the TLSW variable. 
+
+If you wish to use a TLSW varible inside of a template class you must take care
+to define it outside the template definition. Otherwise, the variable will be
+instantiated numerous times and you won't be able to free the memory associated
+with the various instantiations. For an example of this, grep for writeBufferTLS
+in the lm/src directory. 
+
+Lastly, you must take care not to call any libc or other library functions that
+are not thread-safe. We provide a thread-safe replacement for strerr in
+misc/src/tserror.h as well as a thread-safe replacement for strtok in
+MStringTokUtil.h.

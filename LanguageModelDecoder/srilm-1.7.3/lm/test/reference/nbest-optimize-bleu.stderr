@@ -1,0 +1,312 @@
+will optimize BLEU score instead of error rate!
+use minimum bleu reference length
+reading nbest lists...
+SENT1: 10000 hyps
+SENT10: 10000 hyps
+SENT11: 10000 hyps
+SENT12: 2931 hyps
+SENT13: 10000 hyps
+SENT14: 10000 hyps
+SENT15: 10000 hyps
+SENT16: 10000 hyps
+SENT17: 10000 hyps
+SENT18: 10000 hyps
+SENT19: 7896 hyps
+SENT2: 10000 hyps
+SENT20: 10000 hyps
+SENT21: 10000 hyps
+SENT22: 10000 hyps
+SENT23: 10000 hyps
+SENT24: 10000 hyps
+SENT25: 10000 hyps
+SENT26: 38 hyps
+SENT27: 10000 hyps
+SENT28: 10000 hyps
+SENT29: 10000 hyps
+SENT3: 10000 hyps
+SENT30: 10000 hyps
+SENT31: 10000 hyps
+SENT32: 10000 hyps
+SENT33: 10000 hyps
+SENT34: 10000 hyps
+SENT35: 10000 hyps
+SENT36: 10000 hyps
+SENT37: 2034 hyps
+SENT38: 10000 hyps
+SENT39: 10000 hyps
+SENT4: 7150 hyps
+SENT40: 10000 hyps
+SENT41: 887 hyps
+SENT42: 10000 hyps
+SENT43: 10000 hyps
+SENT44: 10000 hyps
+SENT45: 10000 hyps
+SENT46: 10000 hyps
+SENT47: 10000 hyps
+SENT48: 10000 hyps
+SENT49: 10000 hyps
+SENT5: 10000 hyps
+SENT50: 10000 hyps
+SENT6: 10000 hyps
+SENT7: 10000 hyps
+SENT8: 10000 hyps
+SENT9: 10000 hyps
+reading scores...
+reading error counts...
+1442 reference words
+Posterior scale step size set to 0
+Simplex points:
+NEW BEST ERROR: 516591 (358.246/word)
+   normed = 0 1 0 0.2 0.2 0.2 0.2
+   scale = 1
+Point 0 : 1 0 1 0 0.2 0.2 0.2 0.2 errors = 516591
+Point 1 : 1 0 1 0 0.2 0.2 0.2 0.2 errors = 516591
+Point 2 : 1 0.5 1 0 0.2 0.2 0.2 0.2 errors = 516969
+NEW BEST ERROR: 515191 (357.276/word)
+   normed = 0 1.5 0 0.2 0.2 0.2 0.2
+   scale = 1
+Point 3 : 1 0 1.5 0 0.2 0.2 0.2 0.2 errors = 515191
+Point 4 : 1 0 1 0.5 0.2 0.2 0.2 0.2 errors = 516328
+NEW BEST ERROR: 511055 (354.407/word)
+   normed = 0 1 0 0.7 0.2 0.2 0.2
+   scale = 1
+Point 5 : 1 0 1 0 0.7 0.2 0.2 0.2 errors = 511055
+Point 6 : 1 0 1 0 0.2 0.7 0.2 0.2 errors = 522408
+NEW BEST ERROR: 510552 (354.058/word)
+   normed = 0 1 0 0.2 0.2 0.7 0.2
+   scale = 1
+Point 7 : 1 0 1 0 0.2 0.2 0.7 0.2 errors = 510552
+Point 8 : 1 0 1 0 0.2 0.2 0.2 0.7 errors = 516630
+Starting amoeba with 8 dimensions
+Current low 510552: Current high 522408:Current next high 516969
+scale 1
+lambda_0 0
+lambda_1 1
+lambda_2 0
+lambda_3 0.2
+lambda_4 0.2
+lambda_5 0.7
+lambda_6 0.2
+ fractional range 0.0229559
+ limit range 0.01
+ Reflected amoeba returned 514460
+Current low 510552: Current high 516969:Current next high 516630
+ fractional range 0.0124903
+ limit range 0.01
+NEW BEST ERROR: 505723 (350.709/word)
+   normed = -0.46875 1.15625 0.15625 0.35625 0.075 0.35625 0.35625
+   scale = 1
+ Reflected amoeba returned 505723
+ Expanded amoeba by 1.5 returned 507197
+Current low 505723: Current high 516630:Current next high 516591
+scale 1
+lambda_0 -0.46875
+lambda_1 1.15625
+lambda_2 0.15625
+lambda_3 0.35625
+lambda_4 0.075
+lambda_5 0.35625
+lambda_6 0.35625
+ fractional range 0.021338
+ limit range 0.01
+ Reflected amoeba returned 519574
+ Shrunken amoeba by 0.7 returned 511716
+Current low 505723: Current high 516591:Current next high 516591
+ fractional range 0.0212617
+ limit range 0.01
+ Reflected amoeba returned 512033
+Current low 505723: Current high 516591:Current next high 516328
+ fractional range 0.0212617
+ limit range 0.01
+ Reflected amoeba returned 510729
+Current low 505723: Current high 516328:Current next high 515191
+ fractional range 0.0207522
+ limit range 0.01
+ Reflected amoeba returned 508108
+Current low 505723: Current high 515191:Current next high 514460
+ fractional range 0.0185498
+ limit range 0.01
+ Reflected amoeba returned 509185
+Current low 505723: Current high 514460:Current next high 512033
+ fractional range 0.0171284
+ limit range 0.01
+NEW BEST ERROR: 504156 (349.622/word)
+   normed = -0.373926 1.05722 -0.0130939 0.538469 0.429225 0.538469 0.435472
+   scale = 1
+ Reflected amoeba returned 504156
+NEW BEST ERROR: 501600 (347.85/word)
+   normed = -0.498658 1.04027 -0.0476174 0.591836 0.611531 0.591836 0.46309
+   scale = 1
+ Expanded amoeba by 1.5 returned 501600
+ Expanded amoeba by 2.0 returned 511875
+Current low 501600: Current high 512033:Current next high 511716
+scale 1
+lambda_0 -0.498658
+lambda_1 1.04027
+lambda_2 -0.0476174
+lambda_3 0.591836
+lambda_4 0.611531
+lambda_5 0.591836
+lambda_6 0.46309
+ fractional range 0.0205856
+ limit range 0.01
+ Reflected amoeba returned 510559
+Current low 501600: Current high 511716:Current next high 511055
+ fractional range 0.0199664
+ limit range 0.01
+ Reflected amoeba returned 508452
+Current low 501600: Current high 511055:Current next high 510729
+ fractional range 0.0186726
+ limit range 0.01
+ Reflected amoeba returned 509437
+Current low 501600: Current high 510729:Current next high 510559
+ fractional range 0.0180347
+ limit range 0.01
+ Reflected amoeba returned 503951
+Current low 501600: Current high 510559:Current next high 510552
+ fractional range 0.0177028
+ limit range 0.01
+ Reflected amoeba returned 507532
+Current low 501600: Current high 510552:Current next high 509437
+ fractional range 0.017689
+ limit range 0.01
+ Reflected amoeba returned 512111
+ Shrunken amoeba by 0.7 returned 513647
+ Shrunken reflected amoeba by -0.7 returned 509450
+Current low 501600: Current high 509450:Current next high 509437
+ fractional range 0.0155276
+ limit range 0.01
+ Reflected amoeba returned 513647
+ Shrunken amoeba by 0.7 returned 508142
+Current low 501600: Current high 509437:Current next high 509185
+ fractional range 0.0155021
+ limit range 0.01
+ Reflected amoeba returned 506088
+Current low 501600: Current high 509185:Current next high 508452
+ fractional range 0.0150083
+ limit range 0.01
+ Reflected amoeba returned 512911
+ Shrunken amoeba by 0.7 returned 510439
+ Shrunken reflected amoeba by -0.7 returned 512221
+ Shrunken amoeba by 0.5 returned 509734
+ Shrunken reflected amoeba by -0.5 returned 511811
+ Shrunken amoeba by 0.3 returned 507998
+Current low 501600: Current high 508452:Current next high 508142
+ fractional range 0.0135675
+ limit range 0.01
+ Reflected amoeba returned 510792
+ Shrunken amoeba by 0.7 returned 505811
+Current low 501600: Current high 508142:Current next high 508108
+ fractional range 0.0129575
+ limit range 0.01
+ Reflected amoeba returned 514718
+ Shrunken amoeba by 0.7 returned 508142
+ Shrunken reflected amoeba by -0.7 returned 508945
+ Shrunken amoeba by 0.5 returned 509796
+ Shrunken reflected amoeba by -0.5 returned 508409
+ Shrunken amoeba by 0.3 returned 508399
+NEW BEST ERROR: 499142 (346.146/word)
+   normed = -0.501648 0.914252 -0.238287 0.52753 0.382498 0.724405 0.410021
+   scale = 1
+Current low 499142: Current high 516032:Current next high 509689
+scale 1
+lambda_0 -0.501648
+lambda_1 0.914252
+lambda_2 -0.238287
+lambda_3 0.52753
+lambda_4 0.382498
+lambda_5 0.724405
+lambda_6 0.410021
+ fractional range 0.0332742
+ limit range 0.01
+ Reflected amoeba returned 504632
+Current low 499142: Current high 509689:Current next high 509494
+ fractional range 0.0209093
+ limit range 0.01
+ Reflected amoeba returned 506196
+Current low 499142: Current high 509494:Current next high 508893
+ fractional range 0.0205256
+ limit range 0.01
+ Reflected amoeba returned 504127
+Current low 499142: Current high 508893:Current next high 508621
+ fractional range 0.0193462
+ limit range 0.01
+ Reflected amoeba returned 510427
+ Shrunken amoeba by 0.7 returned 510485
+ Shrunken reflected amoeba by -0.7 returned 506590
+Current low 499142: Current high 508621:Current next high 506590
+ fractional range 0.018811
+ limit range 0.01
+ Reflected amoeba returned 499171
+Current low 499142: Current high 506590:Current next high 506516
+ fractional range 0.0148096
+ limit range 0.01
+ Reflected amoeba returned 510091
+ Shrunken amoeba by 0.7 returned 503799
+Current low 499142: Current high 506516:Current next high 506196
+ fractional range 0.0146634
+ limit range 0.01
+ Reflected amoeba returned 508522
+ Shrunken amoeba by 0.7 returned 504394
+Current low 499142: Current high 506196:Current next high 505207
+ fractional range 0.0140326
+ limit range 0.01
+ Reflected amoeba returned 502533
+Current low 499142: Current high 505207:Current next high 504632
+ fractional range 0.0120762
+ limit range 0.01
+ Reflected amoeba returned 505522
+ Shrunken amoeba by 0.7 returned 506616
+ Shrunken reflected amoeba by -0.7 returned 508284
+ Shrunken amoeba by 0.5 returned 504633
+Current low 499142: Current high 504633:Current next high 504632
+ fractional range 0.0109404
+ limit range 0.01
+ Reflected amoeba returned 499922
+Current low 499142: Current high 504632:Current next high 504394
+ fractional range 0.010938
+ limit range 0.01
+NEW BEST ERROR: 498663 (345.814/word)
+   normed = -0.711348 1.01093 -0.0412334 0.430067 0.525576 0.726764 0.50782
+   scale = 1
+ Reflected amoeba returned 498663
+ Expanded amoeba by 1.5 returned 500473
+Current low 498663: Current high 504394:Current next high 504127
+scale 1
+lambda_0 -0.711348
+lambda_1 1.01093
+lambda_2 -0.0412334
+lambda_3 0.430067
+lambda_4 0.525576
+lambda_5 0.726764
+lambda_6 0.50782
+ fractional range 0.0114258
+ limit range 0.01
+ Reflected amoeba returned 506185
+ Shrunken amoeba by 0.7 returned 505039
+ Shrunken reflected amoeba by -0.7 returned 503517
+Current low 498663: Current high 504127:Current next high 503799
+ fractional range 0.0108979
+ limit range 0.01
+ Reflected amoeba returned 507388
+ Shrunken amoeba by 0.7 returned 504811
+ Shrunken reflected amoeba by -0.7 returned 504884
+ Shrunken amoeba by 0.5 returned 501329
+Current low 498663: Current high 503799:Current next high 503517
+ fractional range 0.0102463
+ limit range 0.01
+ Reflected amoeba returned 501073
+Current low 498663: Current high 503517:Current next high 502533
+ fractional range 0.00968712
+ limit range 0.01
+lambda_0 -0.711348 -0.711348
+lambda_1 1.01093 0.65
+lambda_2 -0.0412334 0.65
+lambda_3 0.430067 0.65
+lambda_4 0.525576 0.65
+lambda_5 0.726764 0.65
+lambda_6 0.50782 0.65
+scale 1
+errors 498663
+unchanged for 0 iterations 
+maximum number of iterations exceeded

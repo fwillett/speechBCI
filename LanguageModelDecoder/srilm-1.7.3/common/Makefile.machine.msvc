@@ -1,0 +1,179 @@
+#
+#    File:   Makefile.machine.msvc
+#    Author: The SRI DECIPHER (TM) System
+#    Date:   Fri Feb 19 22:45:31 PST 1999
+#
+#    Description:
+#	Machine dependent compilation options and variable definitions
+#	for x86 with Microsoft Visual C platform
+#
+#    Copyright (c) 2005 SRI International.  All Rights Reserved.
+#
+#    $Header: /home/srilm/CVS/srilm/common/Makefile.machine.msvc,v 1.20 2019/08/14 17:33:05 victor Exp $
+#
+
+   # Use the MSVC compiler (tested with Visual C++ 2005 Express Edition)
+
+   # Note 1: make sure environment is set
+   #
+   #	PATH	should include MSVC_INSTALL_DIR/bin and 
+   #		MSVC_INSTALL_DIR/Common7/IDE (for dll search)
+   #    MSVCDIR should be set to MSVC_INSTALL_DIR
+   #            NOTE: Only set by default on VC6 and VS2003; we
+   #            now look for MSVCDir (different capitalization)
+   #            and update MSVCDIR if set.
+   #	INCLUDE	should be set to MSVC_INSTALL_DIR/include
+   #	LIB	should be set to MSVC_INSTALL_DIR/lib
+   #
+   # Note 2: We use MS-style options here although the MSCV tools convert
+   #	-option to /option.
+   #
+   # Build with
+   #	make MACHINE_TYPE=msvc
+   #
+
+   # On 1/24/2012, updated variables based on different casing
+   ifneq ("$(WindowsSdkDir)", "")
+     WINDOWSSDKDIR=$(WindowsSdkDir)
+   endif
+   ifneq ("$(MSVCDir)", "")
+     MSVCDIR=$(MSVCDir)
+   endif
+
+   # locate the MSVC tools by absolute path.  This is the default location
+   ifeq ("$(MSVCDIR)", "")
+     ifeq ("$(VCINSTALLDIR)", "")
+       # Punt, try default location for VS2005
+       MSVCDIR ?= C:\\Program Files\\Microsoft Visual Studio 8\\VC
+     else
+       # VCINSTALLDIR is set so use it (likely VS2005 or VS2008)
+       MSVCDIR ?= $(VCINSTALLDIR)
+     endif
+   endif
+   MSVC_BIN := "$(shell cygpath '$(MSVCDIR)/bin')"
+   MSVC_LIB := "$(shell cygpath '$(MSVCDIR)/lib')"
+
+   # MWF Added 3/14/2017 since VS2017 doesn't use same convention
+   ifeq ($(strip $(wildcard "$MSVC_BIN")),)
+     # Else, base on cl found in path
+     CL_IN_PATH := $(shell which cl)
+     CL_DIR := $(shell dirname '$(CL_IN_PATH)')
+     MSVC_BIN := "$(shell cygpath '$(CL_DIR)')"
+   endif
+
+   MSC_FLAGS =  /DNEED_RAND48 /EHsc /W2 /nologo /wd4996
+   CC = $(MSVC_BIN)/CL.exe $(MSC_FLAGS) 
+   CXX = $(MSVC_BIN)/CL.exe  $(MSC_FLAGS) /DINSTANTIATE_TEMPLATES
+   AR = $(MSVC_BIN)/LIB.exe /NOLOGO /IGNORE:4006 /IGNORE:4221
+   ARCHIVE = $(AR)
+   LINK.c = $(MSVC_BIN)/LINK.exe $(LDFLAGS)
+   LINK.cc = $(MSVC_BIN)/LINK.exe $(LDFLAGS)
+   # For Visual Studio 2008, need to find mt.exe in SDK directory
+   ifeq ("$(WINDOWSSDKDIR)", "")
+     MSVC_MTEXE := $(MSVC_BIN)/mt.exe
+   else
+     MSVC_MTEXE := "$(shell cygpath '$(WINDOWSSDKDIR)/bin/mt.exe')"
+   endif
+   POST_LINK = if [ -f $@.manifest ]; then $(MSVC_MTEXE) /manifest $@.manifest /outputresource:$@ ; fi
+
+   OUTPUT_OPTION = /Fo$@
+   LD_OUTPUT_OPTION = /OUT:$@
+   AR_OUTPUT_OPTION = /OUT:$@
+
+   # suffixes used for various files
+   EXE_SUFFIX = .exe
+   OBJ_SUFFIX = .obj
+   LIB_SUFFIX = .lib
+   LIB_PREFIX = 
+
+   # Set to /MD for Multithreaded Dll code generation or /MT for Multithreaded
+   # code generation
+   MS_CODE_OPTION=/MD
+
+   # not applicable
+   PIC_FLAG =
+
+   # Optional compilation flags.
+   OPTIMIZE_FLAGS =  /O2 /DNDEBUG /FD /GS $(MS_CODE_OPTION)
+   # Or, choose more aggressive optimization:
+   #OPTIMIZE_FLAGS = /Ox /Og /Ob2 /Oi /Ot /G7 /DNDEBUG /FD /GS $(MS_CODE_OPTION)
+   DEBUG_FLAGS = /DDEBUG /Od /RTC1 /Zi $(MS_CODE_OPTION)d # /ZI
+   PROFILE_FLAGS = /O2 /DNDEBUG /FD /GS $(MS_CODE_OPTION)
+
+   # Optional linking flags.
+   EXPORT_LDFLAGS = /RELEASE
+   DEBUG_LDFLAGS = /DEBUG /OPT:NOICF
+   PROFILE_LDFLAGS = /MAP
+
+   # Linker doesn't want compiler optimization flags
+   LD_OPTION_FLAGS =
+   MATHERR_LINK =
+
+   # Shared compilation flags.
+   CFLAGS = $(ADDITIONAL_CFLAGS) $(INCLUDES)
+   CXXFLAGS = $(ADDITIONAL_CXXFLAGS) $(INCLUDES)
+
+   # Shared linking flags.
+   LDFLAGS = $(ADDITIONAL_LDFLAGS) /LIBPATH:$(SRILM_LIBDIR) /STACK:5000000 /FORCE:MULTIPLE /NOLOGO /IGNORE:4006 /IGNORE:4088 /IGNORE:4221
+
+   # Other useful compilation flags.
+   # Hack to find out if system supports /openmp 
+   OPENMP_FLAG := $(shell [ -f $(MSVC_LIB)/vcomp.lib ] && echo /openmp)
+   # For DynaSpeak, prefer to use -DNO_BLOCK_MALLOC instead of -fopenmp
+   ADDITIONAL_CFLAGS = $(OPENMP_FLAG)
+   ADDITIONAL_CXXFLAGS = $(OPENMP_FLAG)
+
+   # Other useful include directories.
+   ADDITIONAL_INCLUDES = 
+
+   # Other useful linking flags.
+   ADDITIONAL_LDFLAGS = 
+
+   # Other useful libraries.
+   ADDITIONAL_LIBRARIES = 
+
+   # Libraries we don't want Make to look for
+   SYS_LIBRARIES = wsock32.lib
+
+   # Extra files to remove
+   EXTRA_REMOVE_PROGRAMS = $(ALL_PROGRAMS:.exe=.map) \
+			   $(ALL_PROGRAMS:.exe=.pdb) \
+			   $(ALL_PROGRAMS:.exe=.exe.manifest)
+   EXTRA_REMOVE_DEPENDENCIES = vc*.idb
+
+   # run-time linker path flag
+   RLD_FLAG = 
+
+   # no separate math library needed
+   MATH_LIBRARY = 
+
+   LBFGS_LIBRARY = lbfgs.lib
+
+   # Tcl support not available
+   TCL_INCLUDE = 
+   TCL_LIBRARY = 
+   NO_TCL = X
+
+   # No ranlib
+   RANLIB = :
+
+   # prefix of matherr symbol
+   SYMBOL_PREFIX = 
+
+   # Not needed
+   DEMANGLE_FILTER = 
+
+   # Generate dependencies from source files.
+   GEN_DEP = gcc $(INCLUDES) -MM
+
+   GEN_DEP.cc = g++ $(INCLUDES) -MM
+
+   # Run lint.
+   LINT = lint
+   LINT_FLAGS = -DDEBUG $(CFLAGS)
+
+   # Location of gawk binary
+   GAWK = /usr/bin/gawk
+
+   PERL = /usr/bin/perl
+

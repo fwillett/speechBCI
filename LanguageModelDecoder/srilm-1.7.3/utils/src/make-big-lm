@@ -1,0 +1,276 @@
+#!/bin/sh
+#
+# make-big-lm --
+#	Create a large ngram language model
+#
+# This script automates various techniques for building large ngram models.
+# It is useful for building LMs that would exceed available real memory
+# if built in one pass by ngram-count.
+# The techiques employed are
+#	- Assume counts are already produced
+#	  (typically using make-batch-counts/merge-batch-counts)
+#	- Compute Good Turing discounts without loading all counts
+#	  into memory.
+#	- ngram-counts loads only those counts exceeding cutoff values.
+#
+# $Header: /home/srilm/CVS/srilm/utils/src/make-big-lm,v 1.25 2015-05-27 08:10:52 stolcke Exp $
+#
+
+name=biglm
+order=3
+gt1min=1
+gt2min=1
+gt3min=2
+gt4min=2
+gt5min=2
+gt6min=2
+gt7min=2
+gt8min=2
+gt9min=2
+gt1max=7
+gt2max=7
+gt3max=7
+gt4max=7
+gt5max=7
+gt6max=7
+gt7max=7
+gt8max=7
+gt9max=7
+kndiscount1=0
+kndiscount2=0
+kndiscount3=0
+kndiscount4=0
+kndiscount5=0
+kndiscount6=0
+kndiscount7=0
+kndiscount8=0
+kndiscount9=0
+ukndiscount1=0
+ukndiscount2=0
+ukndiscount3=0
+ukndiscount4=0
+ukndiscount5=0
+ukndiscount6=0
+ukndiscount7=0
+ukndiscount8=0
+ukndiscount9=0
+using_kn=
+max_per_file=10000000
+ngram_filter=cat
+subset_filter=cat
+counts=
+test_data=
+
+trust_totals=0
+metatag=__meta__	# lowercase so it works with ngram-count -tolower
+
+# avoid locale problems with gawk script computing discounting parameters
+LC_NUMERIC=C; export LC_NUMERIC
+
+while [ $# -gt 0 ]; do
+    case "$1" in
+    -name)	name=$2; shift ;;
+    -order)	order=$2 ; shift ;;
+    -gt1min)	gt1min=$2; options="$options $1 $2" ; shift ;;
+    -gt2min)	gt2min=$2; options="$options $1 $2" ; shift ;;
+    -gt3min)	gt3min=$2; options="$options $1 $2" ; shift ;;
+    -gt4min)	gt4min=$2; options="$options $1 $2" ; shift ;;
+    -gt5min)	gt5min=$2; options="$options $1 $2" ; shift ;;
+    -gt6min)	gt6min=$2; options="$options $1 $2" ; shift ;;
+    -gt7min)	gt7min=$2; options="$options $1 $2" ; shift ;;
+    -gt8min)	gt8min=$2; options="$options $1 $2" ; shift ;;
+    -gt9min)	gt9min=$2; options="$options $1 $2" ; shift ;;
+    -gt1max)	gt1max=$2; using_gt=1; shift ;;
+    -gt2max)	gt2max=$2; using_gt=1; shift ;;
+    -gt3max)	gt3max=$2; using_gt=1; shift ;;
+    -gt4max)	gt4max=$2; using_gt=1; shift ;;
+    -gt5max)	gt5max=$2; using_gt=1; shift ;;
+    -gt6max)	gt6max=$2; using_gt=1; shift ;;
+    -gt7max)	gt7max=$2; using_gt=1; shift ;;
+    -gt8max)	gt8max=$2; using_gt=1; shift ;;
+    -gt9max)	gt9max=$2; using_gt=1; shift ;;
+    -kndiscount1)	kndiscount1=1; ukndiscount1=1; using_kn=1 ;;
+    -kndiscount2)	kndiscount2=1; ukndiscount1=1; using_kn=1 ;;
+    -kndiscount3)	kndiscount3=1; ukndiscount1=1; using_kn=1 ;;
+    -kndiscount4)	kndiscount4=1; ukndiscount1=1; using_kn=1 ;;
+    -kndiscount5)	kndiscount5=1; ukndiscount1=1; using_kn=1 ;;
+    -kndiscount6)	kndiscount6=1; ukndiscount1=1; using_kn=1 ;;
+    -kndiscount7)	kndiscount7=1; ukndiscount1=1; using_kn=1 ;;
+    -kndiscount8)	kndiscount8=1; ukndiscount1=1; using_kn=1 ;;
+    -kndiscount9)	kndiscount9=1; ukndiscount1=1; using_kn=1 ;;
+    -kndiscount)	kndiscount1=1; kndiscount2=1; kndiscount3=1;
+			kndiscount4=1; kndiscount5=1; kndiscount6=1;
+			kndiscount7=1; kndiscount8=1; kndiscount9=1;
+			using_kn=1 ;;
+    -ukndiscount1)	kndiscount1=1; using_kn=1 ;;
+    -ukndiscount2)	kndiscount2=1; using_kn=1 ;;
+    -ukndiscount3)	kndiscount3=1; using_kn=1 ;;
+    -ukndiscount4)	kndiscount4=1; using_kn=1 ;;
+    -ukndiscount5)	kndiscount5=1; using_kn=1 ;;
+    -ukndiscount6)	kndiscount6=1; using_kn=1 ;;
+    -ukndiscount7)	kndiscount7=1; using_kn=1 ;;
+    -ukndiscount8)	kndiscount8=1; using_kn=1 ;;
+    -ukndiscount9)	kndiscount9=1; using_kn=1 ;;
+    -ukndiscount)	kndiscount1=1; kndiscount2=1; kndiscount3=1;
+			kndiscount4=1; kndiscount5=1; kndiscount6=1;
+			kndiscount7=1; kndiscount8=1; kndiscount9=1;
+    			ukndiscount1=1; ukndiscount2=1; ukndiscount3=1;
+			ukndiscount4=1; ukndiscount5=1; ukndiscount6=1;
+			ukndiscount7=1; ukndiscount8=1; ukndiscount9=1;
+			using_kn=1 ;;
+    -wbdiscount)	using_wb=1 ;;
+    -wbdiscount*|-cdiscount*|-ndiscount*|-addsmooth*)
+		echo "$0: must use one of GT, KN, UKN, or WB discounting for all orders" >&2
+		exit 2 ;;
+    -read)	if [ "$2" = "" -o "$2" = - -o "$2" = "/dev/stdin" ]; then
+			echo "$0: cannot read from stdin" >&2
+			exit 2
+		fi
+		counts="$counts $2" ; shift ;;
+    -trust-totals) trust_totals=1 ;;
+    -max-per-file) max_per_file=$2 ; shift ;;
+    -ngram-filter) ngram_filter="$2" ; shift ;;
+    -text)	test_data="$2"; shift ;;
+    *)		options="$options $1" ;;
+    esac
+    shift
+done
+
+if [ -z "$counts" ]; then
+    echo "No counts specified" >&2
+    echo "usage: $0 -read COUNTS [-name PATH] [-text TESTSET] [-ngram-filter FILTER] [-max-per-file N] [ngram-count-options ...]" >&2
+    exit 2
+fi
+
+if [ -n "$using_gt" -a -n "$using_kn" -o \
+     -n "$using_gt" -a -n "$using_wb" -o \
+     -n "$using_kn" -a -n "$using_wb" ]
+then
+    echo "$0: cannot mix GT, KN, and WB discounting" >&2
+    exit 2
+fi
+
+if [ $trust_totals -eq 0 ]; then
+    options="$options -meta-tag $metatag"
+else
+    if [ "$using_kn" ]; then
+	echo "$0: -trust-totals incompatible with KN discounting; ignoring it" >&2
+	options="$options -meta-tag $metatag"
+    else
+	options="$options -trust-totals"
+    fi
+fi
+
+set -e
+
+#
+# if KN smoothing is used, compute the modified lower-order counts 
+#
+if [ "$using_kn" ]; then
+    kncounts=$name.kncounts.gz
+    if [ -f $kncounts ]; then
+	echo "using existing $kncounts" >&2
+    elif [ $order -eq 1 ]; then
+    	# create a dummy empty file
+	gzip -f < /dev/null > $kncounts
+    else
+	mkdir -p $name.kndir 
+	gzip -dcf $counts | \
+	eval "$ngram_filter" | \
+	(set -x; make-kn-counts \
+		no_max_order=1 max_per_file=$max_per_file \
+		order=$order \
+		kndiscount1=$kndiscount1 kndiscount2=$kndiscount2 \
+		kndiscount3=$kndiscount3 kndiscount4=$kndiscount4 \
+		kndiscount5=$kndiscount5 kndiscount6=$kndiscount6 \
+		kndiscount7=$kndiscount7 kndiscount8=$kndiscount8 \
+		kndiscount9=$kndiscount9 \
+		output=$name.kndir/kncounts)
+	(set -x; merge-batch-counts $name.kndir)
+
+	# this will fail if more than one count file is left in kndir,
+	# i.e., if merging didn't finish successfully
+	mv `find $name.kndir -name \*.ngrams.gz -print ` $kncounts
+    fi
+
+    options="$options -kn-counts-modified"
+fi
+
+#
+# compute counts-of-counts
+#
+if [ "$using_wb" ]; then
+    :
+elif [ -f $name.gt${order}counts ]; then
+    echo "using existing gtcounts" >&2 
+else
+    if [ "$using_kn" ]; then
+	# concatenate KN modified counts with highest-order original counts
+	# Note: even though $kncounts ends in .gz it might be a plain file
+	# if platform doesn't support gzip pipes, so use gzip -df .
+	gzip -dcf $kncounts | ${GAWK-gawk} 'NF < 1+'$order
+	gzip -dcf $counts | eval "$ngram_filter" | ${GAWK-gawk} 'NF == 1+'$order
+    else 
+        gzip -dcf $counts | eval "$ngram_filter"
+    fi | (set -x; get-gt-counts out=$name max=20 maxorder=$order)
+fi
+
+#
+# compute discount factors
+#
+if [ "$using_wb" ]; then
+    # apply WB discount to all ngram orders
+    gtflags=-wbdiscount
+else
+    gtflags=
+fi
+for n in 1 2 3 4 5 6 7 8 9 
+do
+    if [ $n -le $order -a -f $name.gt${n}counts ]; then
+	if (set +e; eval [ \"\$ukndiscount${n}\" -eq 1 ]); then
+	    gtflags="$gtflags -kn${n} $name.kn${n}"
+	    eval make-kn-discounts modified=0 \
+			min=\$gt${n}min $name.gt${n}counts > $name.kn${n}
+	elif (set +e; eval [ \"\$kndiscount${n}\" -eq 1 ]); then
+	    gtflags="$gtflags -kn${n} $name.kn${n}"
+	    eval make-kn-discounts \
+			min=\$gt${n}min $name.gt${n}counts > $name.kn${n}
+	else 
+	    gtflags="$gtflags -gt${n} $name.gt${n}"
+	    eval make-gt-discounts \
+			min=\$gt${n}min max=\$gt${n}max \
+			$name.gt${n}counts > $name.gt${n}
+	fi
+    fi
+done
+
+# if test data is specified compute context ngrams
+if [ -n "$test_data" -a $order -gt 1 ]; then
+    order1=`expr $order - 1`
+    (set -x; \
+    ngram-count -order $order1 -text "$test_data" -sort -write $name.contexts)
+
+    # ... and filter the ngrams to contain only the required contexts
+    subset_filter="subset-context-ngrams contexts=$name.contexts"
+fi
+
+#
+# filter counts and build lm
+#
+if [ "$using_kn" ]; then
+    # concatenate KN modified counts with highest-order original counts
+    # Note: even though $kncounts ends in .gz it might be a plain file
+    # if platform doesn't support gzip pipes, so use gzip -df .
+    gzip -dcf $kncounts | ${GAWK-gawk} 'NF < 1+'$order
+    gzip -dcf $counts | eval "$ngram_filter" | ${GAWK-gawk} 'NF == 1+'$order
+else 
+    gzip -dcf $counts | eval "$ngram_filter"
+fi | \
+eval "$subset_filter" | \
+(set -x;  \
+ngram-count -read - -read-with-mincounts -order $order \
+	$gtflags \
+	$options)
+
+rm -f $name.contexts
+

@@ -1,0 +1,16 @@
+gb.test.txt: line 100: 100 sentences, 1068 words, 0 OOVs
+0 zeroprobs, logprob= 0 ppl= 1 ppl1= 1
+using WittenBell for 1-grams
+using WittenBell for 2-grams
+using WittenBell for 3-grams
+warning: distributing 0.279677 left-over probability mass over all 450 words
+discarded 1 2-gram contexts containing pseudo-events
+discarded 5 2-gram probs predicting pseudo-events
+discarded 70 3-gram contexts containing pseudo-events
+discarded 1 3-gram probs predicting pseudo-events
+discarded 921 3-gram probs discounted to zero
+writing 452 1-grams
+writing 934 2-grams
+writing 61 3-grams
+960 pfsg nodes
+2404 pfsg transitions

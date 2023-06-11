@@ -1,0 +1,56 @@
+#!/bin/sh
+#
+# nbest-error --
+#	compute minimum error of nbest lists
+#
+# $Header: /home/srilm/CVS/srilm/utils/src/nbest-error,v 1.6 2013/03/09 07:13:02 stolcke Exp $
+#
+
+if [ $# -lt 2 ]; then
+	echo "usage: $0 score-dir refs [nbest-lattice-option ...]" >&2
+	echo "    or $0 file-list refs [nbest-lattice-option ...]" >&2
+	exit 2
+fi
+
+scoredir="$1"
+refs="$2"
+shift; shift
+
+option=-nbest-error
+
+case "$*" in
+*-lattice-error*)	option= ;;
+esac
+
+if [ ! -r $scoredir ]; then
+	echo "$0: cannot access $scoredir" >&2
+	exit 1
+fi
+
+if [ ! -r $refs ]; then
+	echo "$0: cannot access $refs" >&2
+	exit 1
+fi
+
+if [ -d $scoredir ]; then
+    find $scoredir -follow \
+	 	 -type f \( -name \*.score -o \
+			    -name \*.Z -o \
+			    -name \*.gz \) \
+		    -print | sort
+else
+    cat $scoredir
+fi | \
+nbest-lattice -nbest-files - -refs $refs $option "$@" | \
+${GAWK-gawk} '
+$2 ~ /^[0-9]*$/ && $10 ~ /^[0-9]*$/ && $9 == "words" {
+	nsents ++;
+	nwords += $10;
+	nerrors += $2;
+	print;
+}
+END {
+	printf "%d sentences, %d words, %d errors (%.2f%%)\n", \
+		nsents, nwords, nerrors, 100*nerrors/nwords;
+}'
+

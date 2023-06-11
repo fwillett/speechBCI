@@ -1,0 +1,77 @@
+#
+#    File:   Makefile.machine.i386-solaris
+#    Author: The SRI DECIPHER (TM) System
+#    Date:   Fri Mar  3 15:30:10 PST 1995
+#
+#    Description:
+#	Machine dependent compilation options and variable definitions
+#	for Intel running SunOS 5.x (a.k.a. Solaris 2.x).
+#
+#    Copyright (c) 1995-2001 SRI International.  All Rights Reserved.
+#
+#    $Header: /home/srilm/CVS/srilm/common/Makefile.machine.i386-solaris-gcc4,v 1.5 2012/10/18 20:55:17 mcintyre Exp $
+#
+
+   # Use the GNU C compiler.
+   GCC_FLAGS = -mtune=pentium3 -Wall -Wno-unused-variable -Wno-uninitialized
+   CC = $(GCC_PATH)gcc $(GCC_FLAGS) -Wimplicit-int
+   CXX = $(GCC_PATH)g++ $(GCC_FLAGS) -DINSTANTIATE_TEMPLATES
+
+   OPTIMIZE_FLAGS = -g -O2 -malign-double 
+   DEBUG_FLAGS = -g -DDEBUG
+   PROFILE_FLAGS = -g -pg -O2
+
+   # Optional linking flags.
+   EXPORT_LDFLAGS = -s
+
+   # Shared compilation flags.
+   CFLAGS = -DSVR4 -D_FILE_OFFSET_BITS=64 $(ADDITIONAL_CFLAGS) $(INCLUDES)
+   CXXFLAGS = -DSVR4 -D_FILE_OFFSET_BITS=64 $(ADDITIONAL_CXXFLAGS) $(INCLUDES)
+
+   # Shared linking flags.
+   LDFLAGS = $(ADDITIONAL_LDFLAGS) -L$(SRILM_LIBDIR)
+
+   # Other useful compilation flags.
+   ADDITIONAL_CFLAGS =
+   ADDITIONAL_CXXFLAGS =
+
+   # Other useful include directories.
+   ADDITIONAL_INCLUDES = 
+
+   # Other useful linking flags.
+   ADDITIONAL_LDFLAGS = 
+
+   # Other useful libraries.
+   SYS_LIBRARIES = -lsocket -lnsl -ldl -lpthread
+
+   # Tcl support
+   TCL_INCLUDE = -I/usr/sfw/include
+   TCL_LIBRARY = -L/usr/sfw/lib -R/usr/sfw/lib -ltcl8.3
+
+   # run-time linker path flag
+   RLD_FLAG = -R
+
+   # several tools are in nonstandard place
+   AR = /usr/ccs/bin/ar
+   LD = /usr/ccs/bin/ld
+
+   # No ranlib -- this is SVR4
+   RANLIB = :
+
+   # Generate dependencies from source files.
+ifneq ($(CC), $(subst gcc,,$(CC)))
+   GEN_DEP = $(CC) $(CFLAGS) -MM
+else
+   GEN_DEP = $(CC) $(CFLAGS) -M
+endif
+
+ifneq ($(CXX), $(subst g++,,$(CXX)))
+   GEN_DEP.cc = $(CXX) $(CXXFLAGS) -MM
+else
+   GEN_DEP.cc = $(CXX) $(CXXFLAGS) -M
+endif
+
+   # Run lint.
+   LINT = lint
+   LINT_FLAGS = -DDEBUG $(CFLAGS)
+

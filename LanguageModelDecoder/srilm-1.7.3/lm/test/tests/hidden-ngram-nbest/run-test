@@ -1,0 +1,15 @@
+#!/bin/sh
+
+if [ -f ../hidden-ngram/conll.lm.gz ]; then
+	gz=.gz
+else
+	gz=
+fi
+
+hidden-ngram -debug 1 \
+	-nbest 10 \
+	-lm ../hidden-ngram/conll.lm$gz \
+	-order 4 \
+	-hidden-vocab ../hidden-ngram/conll.voc \
+        -text conll.txt.10
+

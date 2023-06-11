@@ -1,0 +1,112 @@
+#!/bin/sh
+#
+# make-batch-counts --
+#	generate n-gram counts in batches
+#
+# A list of data files is partitioned into batches, results from each of
+# which are deposited in a separate ngram-count file.
+#
+# usage: make-batch-count file-list [batch-size [filter \
+#		[countdir [options]]]]
+#
+# file-list	is a file containing a list of data files
+#		(lines starting with # are ignored)
+# batch-size	is the number of input files per batch
+# filter	is preprocessor filter to condition the data 
+# countdir	is the directory where count files are deposited
+# options	are arguments passed on to ngram-count
+#
+# $Header: /home/srilm/CVS/srilm/utils/src/make-batch-counts,v 1.8 2013/03/19 18:37:52 stolcke Exp $
+#
+
+if [ $# -lt 1 ]; then
+	echo "usage: $0 file-list [batch-size [filter [countdir [options]]]]" >&2
+	exit 2
+fi
+
+filelist=$1
+batchsize=${2-10}
+filter=${3-/bin/cat}
+countdir=${4-./counts}
+
+case $# in
+1)	shift;;
+2)	shift; shift;;
+3)	shift; shift; shift;;
+4)	shift; shift; shift; shift;;
+esac
+
+options="$@"
+
+what=`basename $filelist .files`
+statsfile=$countdir/$what.stats
+infiles=$countdir/$what.files
+
+set -e
+
+if [ ! -d $countdir ]; then
+	mkdir $countdir
+fi
+
+trap 'rm -f $newfile $test_in $test_out; exit 1' 1 2 15
+
+# determine if ngram-count can generate compressed files
+test_in=$countdir/testin
+test_out=$countdir/testout.gz
+
+echo x > $test_in
+ngram-count -text $test_in -write $test_out
+if gzip -l $test_out >/dev/null 2>&1; then
+	gz=.gz
+else
+	gz=
+fi
+rm $test_in $test_out
+
+> $statsfile
+
+#
+# format filelist into one batch per line, preceded by line number
+#
+${GAWK-gawk} -v batchsize=$batchsize \
+'BEGIN {
+	batchno = 1;
+}
+/^#/ || NF == 0 {
+	next;
+}
+{
+	files = files " " $0;
+	numfiles += 1;
+
+	if (numfiles >= batchsize) {
+		print batchno, files;
+		files = "";
+		numfiles = 0;
+		batchno += 1;
+	}
+}
+END {
+	if (numfiles > 0) {
+		print batchno, files;
+	}
+}' $filelist | \
+while read fileno datafiles; do
+	newfile=$countdir/$what-$fileno.ngrams$gz
+
+	# avoid including $datafiles on command line to avoid length limit
+	cat <<EOF >&2
+counting in $newfile sources $datafiles
+EOF
+	
+	echo $datafiles | \
+	xargs $filter | \
+	ngram-count -text - \
+		-tag $newfile \
+		-sort \
+		-write-order 0 \
+		-write $newfile \
+		$options \
+		2>> $statsfile
+done
+

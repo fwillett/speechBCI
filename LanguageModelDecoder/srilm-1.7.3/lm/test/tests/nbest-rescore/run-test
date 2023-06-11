@@ -1,0 +1,20 @@
+#!/bin/sh
+
+if [ -f ../ngram-count-gt/swbd.3bo.gz ]; then
+	gz=.gz
+else
+	gz=
+fi
+
+find ../nbest-rover/nbest-lists -type f -print | grep -v CVS | sort > nbest.files
+
+mkdir -p nbest.scores
+
+rescore-decipher -nodecipherlm -multiwords \
+	nbest.files \
+	nbest.scores \
+	-lm ../ngram-count-gt/swbd.3bo$gz 
+
+rescore-reweight nbest.scores 8 0 
+
+rm -rf nbest.scores nbest.files

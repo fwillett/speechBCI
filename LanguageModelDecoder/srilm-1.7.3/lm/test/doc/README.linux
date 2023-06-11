@@ -1,0 +1,42 @@
+
+The default Linux Makefile (common/Makefile.machine.i686) uses /usr/bin/gawk
+as the gawk interpreter.  To ensure correct working in UTF-8 locales run
+/usr/bin/gawk --version and make sure it is at least version 3.1.5.
+If not, it is recommended to install the latest version of gawk in
+/usr/local/bin and update the GAWK variable accordingly.
+
+-----------------------------------------------------------------------------
+From:    Alex Franz <alex@google.com>
+Date:    Fri, 06 Oct 2000 16:14:03 PDT
+
+And, here are the details of the malloc problem that I had with the SRI
+LM toolkit:
+
+I compiled it with gcc under Redhat Linux V. 6.2 (or thereabouts). 
+The malloc routine has problems allocating large numbers of 
+small pieces of memory. For me, it usually refuses to allocate
+any more memory once it has allocated about 600 MBytes of memory,
+even though the machine has 2 GBytes of real memory.
+
+This causes a problem when you are trying to build language models
+with large vocabularies. Even though I used -DUSE_SARRAY_TRIE -DUSE_SARRAY
+to use arrays instead of hash tables, it ran out of memory when I was
+trying to use very large vocabulary sizes.
+
+The solution that worked for me was to use Wolfram Gloger's ptmalloc package 
+for memory management instead. You can download it from 
+
+  http://malloc.de/en/index.html
+
+(The page suggests that it is part of the Gnu C library, but I had to
+compile it myself and explicitly link it with the executables.)
+
+One more thing you can do is call the function
+
+  mallopt(M_MMAP_MAX, n);  
+
+with a sufficiently large n; this tells malloc to allow you to
+obtain a large amount of memory.
+
+------------------------------------------------------------------------------
+

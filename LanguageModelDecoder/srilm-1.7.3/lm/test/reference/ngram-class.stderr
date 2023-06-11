@@ -1,0 +1,8 @@
+../disambig/newdevtest.ascii: line 5518: 5518 sentences, 47417 words, 5828 OOVs
+0 zeroprobs, logprob= 0 ppl= 1 ppl1= 1
+5518 sentences, 47417 words, 0 OOVs
+0 zeroprobs, logprob= -117002 ppl= 162.294 ppl1= 293.439
+../disambig/newdevtest.ascii: line 5518: 5518 sentences, 47417 words, 5828 OOVs
+0 zeroprobs, logprob= 0 ppl= 1 ppl1= 1
+5518 sentences, 47417 words, 0 OOVs
+0 zeroprobs, logprob= -117002 ppl= 162.294 ppl1= 293.439

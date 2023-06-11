@@ -1,0 +1,47 @@
+#!/bin/sh
+
+if [ -f ../ngram-count-gt/swbd.3bo.gz ]; then
+	gz=.gz
+else
+	gz=
+fi
+
+ngram -debug 1 \
+	-lm ../ngram-count-gt/swbd.3bo$gz -lambda 0.3 \
+	-mix-lm ../class-ngram-simple/train-400classes.3bo$gz \
+	-classes ../class-ngram-simple/train+unk.400classes$gz \
+	-mix-lm2 ../ngram-count-gt/swbd.3bo$gz -mix-lambda2 0.3 \
+	-bayes 1 \
+	-bayes-scale 0.5 \
+	-ppl ../ngram-count-gt/eval97.text
+
+# now do the same with context-priors file
+
+echo "0.3 0.4 0.3" > PRIORS
+
+ngram -debug 0 \
+	-lm ../ngram-count-gt/swbd.3bo$gz \
+	-mix-lm ../class-ngram-simple/train-400classes.3bo$gz \
+	-classes ../class-ngram-simple/train+unk.400classes$gz \
+	-mix-lm2 ../ngram-count-gt/swbd.3bo$gz \
+	-context-priors PRIORS \
+	-bayes 1 \
+	-bayes-scale 0.5 \
+	-ppl ../ngram-count-gt/eval97.text
+
+# the same again using -read-mix-lms
+
+cat >MIXLM <<EOF
+../ngram-count-gt/swbd.3bo$gz -weight 0.3
+../class-ngram-simple/train-400classes.3bo$gz -weight 0.4 -classes ../class-ngram-simple/train+unk.400classes$gz
+../ngram-count-gt/swbd.3bo$gz -weight 0.3
+EOF
+
+ngram -debug 0 \
+	-read-mix-lms -lm MIXLM \
+	-bayes 1 \
+	-bayes-scale 0.5 \
+	-ppl ../ngram-count-gt/eval97.text
+
+rm -f PRIORS MIXLM
+

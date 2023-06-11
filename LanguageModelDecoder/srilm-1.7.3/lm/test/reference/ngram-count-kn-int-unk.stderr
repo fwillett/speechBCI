@@ -1,0 +1,35 @@
+using ModKneserNey for 1-grams
+modifying 1-gram counts for Kneser-Ney smoothing
+Kneser-Ney smoothing 1-grams
+n1 = 9816
+n2 = 4085
+n3 = 2199
+n4 = 1578
+D1 = 0.545758
+D2 = 1.11864
+D3+ = 1.43346
+using ModKneserNey for 2-grams
+modifying 2-gram counts for Kneser-Ney smoothing
+Kneser-Ney smoothing 2-grams
+n1 = 287188
+n2 = 56707
+n3 = 23987
+n4 = 13383
+D1 = 0.716891
+D2 = 1.09027
+D3+ = 1.40011
+using ModKneserNey for 3-grams
+Kneser-Ney smoothing 3-grams
+n1 = 1065697
+n2 = 128239
+n3 = 46598
+n4 = 23979
+D1 = 0.806018
+D2 = 1.12136
+D3+ = 1.34092
+warning: distributing 0.0130434 left-over probability mass over 6550 zeroton words
+discarded 1 2-gram contexts containing pseudo-events
+discarded 10897 3-gram contexts containing pseudo-events
+writing 33111 1-grams
+writing 425773 2-grams
+writing 1334660 3-grams

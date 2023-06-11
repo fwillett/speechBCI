@@ -1,0 +1,10 @@
+i've_got_a bad feeling
+	p( i've_got_a | <s> ) 	= [2gram][3gram][3gram] 5.09977e-05 [ -4.29245 ]
+	p( bad | i've_got_a ...) 	= [1gram] 6.1656e-05 [ -4.21002 ]
+	p( feeling | bad ...) 	= [1gram] 2.86269e-06 [ -5.54323 ]
+	p( </s> | feeling ...) 	= [1gram] 0.0784572 [ -1.10537 ]
+1 sentences, 3 words, 0 OOVs
+0 zeroprobs, logprob= -15.1511 ppl= 6134.32 ppl1= 112294
+
+file -: 1 sentences, 3 words, 0 OOVs
+0 zeroprobs, logprob= -15.1511 ppl= 6134.32 ppl1= 112294

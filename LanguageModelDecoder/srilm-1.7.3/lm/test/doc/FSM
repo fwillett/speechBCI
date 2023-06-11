@@ -1,0 +1,21 @@
+
+Conversion between Decipher PFSG (probabilistic finite state grammars) and
+AT&T FSA (finite-state acceptor) formats
+
+1. Convert PFSG to FSA format
+
+	pfsg-to-fsm symbolfile=foo.syms foo.pfsg > foo.fsm
+
+2. Compile FSA
+	
+	fsmcompile foo.fsm > foo.fsmc
+
+3. Operate on FSA, e.g., determinize and minimize
+
+	fsmdeterminize foo.fsmc | fsmminimize > foo.min.fsmc
+
+4. Print and convert back to PFSG
+
+	fsmprint -i foo.syms foo.min.fsmc | \
+		fsm-to-pfsg > foo.min.pfsg
+

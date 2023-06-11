@@ -1,0 +1,35 @@
+#
+#    File:   Makefile.machine.android-armeabi-v7a-hard
+#    Author: Mike Frandsen, Victor Abrash
+#    Date:   2010/08/03
+#
+#    Description:
+#	Machine dependent compilation options and variable definitions
+#	for Android on ARM, v7a (hard math)
+#
+#    Copyright (c) 1999-2016 SRI International.  All Rights Reserved.
+#
+#    $Header: /home/srilm/CVS/srilm/common/Makefile.machine.android-armeabi-v7a-hard,v 1.5 2016/05/10 18:15:43 victor Exp $
+#
+
+# Now disallow env override to maintain compatibility.
+# Use armeabi-v7a-hard to match requirements for OpenBLAS
+ANDROID_CUST_DIR := armeabi-v7a-hard
+
+# should really replace -lm, but this *seems* to work...
+ADDITIONAL_LIBRARIES += -Wl,--no-warn-mismatch -lm_hard
+
+ANDROID_ARCH := arch-arm
+ANDROID_TOOLCHAIN_NAME := arm-linux-androideabi
+
+# Good discussion about -mfpu at https://wiki.debian.org/ArmHardFloatPort and https://wiki.debian.org/ArmHardFloatPort/VfpComparison
+#  -mfpu=vfp, -mfpu=vfpv3, -mfpu=vfpv3-d16, -mfpu=neon.
+# Using neon instead of vfpv3 because Samsung Note 5 supports it
+ANDROID_CUST_CFLAGS :=  -march=armv7-a -mfloat-abi=hard -mhard-float  -mfpu=neon -D_NDK_MATH_NO_SOFTFP=1 -marm -Wl,--no-warn-mismatch
+
+# NOTE: For more neon optimizations, use machine variant
+# with -neon (uses -mfpu=neon versus vfp).
+# Removed old flags -fno-exceptions and -fno-rtti so we can use Kaldi
+ARCH_FLAGS = -nostdlib $(ANDROID_CUST_CFLAGS) -DANDROID -DNO_EXCEPTIONS
+
+include $(SRILM)/common/Makefile.core.android

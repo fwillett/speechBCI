@@ -1,0 +1,38 @@
+   normed = 0 1 0 0.2 0.2 0.2 0.2
+   scale = 1
+original bleu = 0.48341
+best bleu = 0.501337
+   normed = -0.711348 1.01093 -0.0412334 0.430067 0.525576 0.726764 0.50782
+   scale = 1
+iteration 1, oracle bleu: 0.604592
+oracleBleu = 0.604592
+==> test.rover-control <==
+tune-f0.scores	0.430067 +
+tune-f1.scores	0.525576 +
+tune-f2.scores	0.726764 +
+tune-f3.scores	0.50782 +
+tune.scores	1.01093 -0.0412334 1.0 0 -0.711348
+
+==> oracle.hyps <==
+SENT1 confirms that ardogan turkey will reject any pressures to urge it to recognize cyprus
+SENT10 said on this subject ardogan said that " this proposal , which can not accept it , is not compatible with the seriousness of such as the european union . "
+SENT11 he added : " we want to start negotiations in the first six months of 2005 , or in the second part of the year if the matter . ( . ) but we can not determine the date of commencement of negotiations in 2006 . "
+SENT12 leader the extradition of the cali cartel to the united states
+SENT13 bogota 4-12 ( afp ) - an agence france presse correspondent reported that the leader of the cali cartel ( south west ) gilberto rodriguez , one of the biggest drug traffickers in the world , was delivered friday evening to the united states .
+SENT14 transfer ( 64 years old ) , who has been held since the year 1995 from prison and taken mechanism in armoured vehicles to a military base nearby airport bogota international where he was handed over to officials of the american agency to combat drugs .
+SENT15 and the protection of transport 120 policemen and soldiers in a convoy of cars , while a helicopter flew over the area police .
+SENT16 in a statement to agence france presse , said colonel oscar naranjo , who is responsible for the extradition process , " we worked in coordination with the american drug control rodriguez at the airport have been conveyed in an aircraft heading directly to the united states . "
+SENT17 appeared calm when he was taken to the american plane that carry him to miami , florida .
+SENT18 the authorities reported that it had allowed him to contact by telephone with his family from the armoured vehicle he was in .
+
+==> 1best.hyps <==
+SENT1 confirms that ardogan turkey would reject any pressure urging them to recognize cyprus
+SENT10 said on this subject ardogan " that this proposal which can not accept it , is not compatible with the seriousness of such as the european union . "
+SENT11 he added : " we want to start negotiations in the first six months of , or in the second part of the year if the matter ( . ) . but we can not determine the date of commencement of negotiations in 2006 . "
+SENT12 the extradition of the leader of the cali cartel to united states
+SENT13 bogota 4-12 ( afp ) - an agence france presse correspondent reported that the leader of the cali cartel ( south west ) gilberto rodriguez , one bulk drug traffickers in the world , peace friday evening to the united states .
+SENT14 and transfer ( 64 years old ) detained since the year 1995 from prison and taken mechanism in armoured military base to neighbouring bogota airport international where he was handed over to officials of the american agency to combat drugs .
+SENT15 and the protection of transport 120 policemen and soldiers in a convoy of cars while flying a helicopter police over the region .
+SENT16 in a statement to agence france presse , said colonel oscar naranjo responsible for the extradition process " we worked in coordination with the american anti-drug rodrigues at the airport has been conveyed in an aircraft heading directly to the united states . "
+SENT17 it seemed calm when taken to the american plane which carry him to miami in florida .
+SENT18 authorities reported that it had allowed him to contact telephone personnel family armoured vehicle where .

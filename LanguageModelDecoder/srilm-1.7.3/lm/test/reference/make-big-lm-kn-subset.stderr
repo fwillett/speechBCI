@@ -1,0 +1,19 @@
++ make-kn-counts no_max_order=1 max_per_file=10000000 order=3 kndiscount1=1 kndiscount2=1 kndiscount3=1 kndiscount4=1 kndiscount5=1 kndiscount6=1 kndiscount7=1 kndiscount8=1 kndiscount9=1 output=biglm.kndir/kncounts 
++ merge-batch-counts biglm.kndir 
+final counts in biglm.kndir/./kncounts-1.ngrams.gz
++ get-gt-counts out=biglm max=20 maxorder=3 
++ ngram-count -order 2 -text ../ngram-count-gt/eval97.text -sort -write biglm.contexts 
++ ngram-count -read - -read-with-mincounts -order 3 -kn1 biglm.kn1 -kn2 biglm.kn2 -kn3 biglm.kn3 -debug 1 -interpolate -gt3min 2 -vocab ../ngram-count-gt/eval2001.vocab -lm swbd.3bo.gz -meta-tag __meta__ -kn-counts-modified 
+read 22040 contexts
+using ModKneserNey for 1-grams
+using ModKneserNey for 2-grams
+using ModKneserNey for 3-grams
+discarded 1 1-gram probs predicting pseudo-events
+warning: distributing 0.0130397 left-over probability mass over 6550 zeroton words
+discarded 2 2-gram contexts containing pseudo-events
+discarded 6 2-gram probs predicting pseudo-events
+discarded 2389 3-gram contexts containing pseudo-events
+discarded 9071 3-gram probs predicting pseudo-events
+writing 33110 1-grams
+writing 297073 2-grams
+writing 143139 3-grams

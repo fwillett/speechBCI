@@ -1,0 +1,14 @@
+#
+#    File:   Makefile.i686
+#    Author: The SRI DECIPHER (TM) System
+#    Date:   Fri Feb 19 22:45:31 PST 1999
+#
+#    Description:
+#	Machine dependent compilation options and variable definitions
+#	for RHEL platform
+#
+#    Copyright (c) 1999-2001 SRI International.  All Rights Reserved.
+#
+#    $Header: /home/srilm/CVS/srilm/common/Makefile.machine.i686-m64-rhel,v 1.1 2011/11/02 22:47:58 bwilliams Exp $
+#
+   include $(SRILM)/common/Makefile.machine.i686-m64

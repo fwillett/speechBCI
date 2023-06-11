@@ -1,0 +1,23 @@
+#
+#    File:   Makefile.machine.android-armeabi
+#    Author: Mike Frandsen
+#    Date:   2010/08/03
+#
+#    Description:
+#	Machine dependent compilation options and variable definitions
+#	for Android running on ARM
+#
+#    Copyright (c) 1999-2010 SRI International.  All Rights Reserved.
+#
+#    $Header: /home/srilm/CVS/srilm/common/Makefile.machine.android-armeabi,v 1.8 2012/08/10 08:29:15 frandsen Exp $
+#
+
+   # WARNING: Use of both r5b and r6b is triggering missing link errors
+   # for such things at STL string. Instead, use either:
+   # android-armeabi-v7a or android-armeabi-v7a-neon
+
+   # Now disallow env override to maintain compatibility.
+   ANDROID_CUST_CFLAGS := -march=armv5te -msoft-float
+   ANDROID_CUST_DIR := armeabi
+
+   include $(SRILM)/common/Makefile.core.android-arm

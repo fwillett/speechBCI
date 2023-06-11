@@ -1,0 +1,25 @@
+#
+#    File:   Makefile.machine.win64
+#    Author: The SRI DECIPHER (TM) System
+#    Date:   Fri Feb 19 22:45:31 PST 1999
+#
+#    Description:
+#	Machine dependent compilation options and variable definitions
+#	for x86_64/win64 platform
+#
+#    Copyright (c) 2005 SRI International, 2012 Microsoft Corp.  All Rights Reserved.
+#
+#    $Header: /home/srilm/CVS/srilm/common/Makefile.machine.win64,v 1.3 2013/02/21 20:08:45 stolcke Exp $
+#
+
+   include $(SRILM)/common/Makefile.machine.win32
+
+   GCC_FLAGS = -DWIN32 -DNEED_RAND48 -Wall -Wno-unused-variable -Wno-uninitialized -Wno-format
+   CC =  COMPILER_PATH=/usr/x86_64-w64-mingw32/bin x86_64-w64-mingw32-gcc $(GCC_FLAGS) -Wimplicit-int
+   CXX = COMPILER_PATH=/usr/x86_64-w64-mingw32/bin x86_64-w64-mingw32-g++ $(GCC_FLAGS) -DINSTANTIATE_TEMPLATES
+
+   ADDITIONAL_CFLAGS += -DUSE_LONGLONG_COUNTS
+   ADDITIONAL_CXXFLAGS += -DUSE_LONGLONG_COUNTS
+
+   RANLIB = /usr/x86_64-w64-mingw32/bin/ranlib
+

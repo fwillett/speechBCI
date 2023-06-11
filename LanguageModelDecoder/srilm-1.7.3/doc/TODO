@@ -1,0 +1,9 @@
+
+compute local entropies, stddev in perplexity output
+
+implement TaggedNgram backoff-weight computation
+
+fix some cases of back-to-back DFs
+	FP-REP2
+
+general mechanism to skip words in ngram contexts, handle non-event tags.
