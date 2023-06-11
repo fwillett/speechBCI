@@ -1,0 +1,40 @@
+#number of units in each GRU layer
+nUnits: 512
+
+#all input layers project down to this number of units before fanning out again into the RNN
+inputLayerSize: 256
+
+# Factor for subsampling RNN final outputs
+subsampleFactor: 1
+
+#l2 regularization cost
+weightReg: 1e-5
+
+# Not used for now
+actReg: 0.0
+
+# Bidirectional RNN
+bidirectional: False
+
+# GRU input linear layer dropout
+dropout: 0.4
+
+# Whether model weights are trainable
+trainable: True
+
+nLayers: 5
+
+stack_kwargs:
+  kernel_size: 14
+  strides: 4
+
+useKL: False
+
+refDistType: Normal
+
+inputNetwork:
+  nInputLayers: 1
+  inputLayerSizes: [256]
+  trainable: True
+  activation: softsign
+  dropout: 0.2

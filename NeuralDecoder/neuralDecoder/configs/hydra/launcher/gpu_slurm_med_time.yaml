@@ -1,0 +1,14 @@
+defaults:
+  - submitit_slurm
+
+timeout_min: 150
+cpus_per_task: 4
+mem_gb: 20
+partition: owners,shenoy
+gpus_per_node: 1
+setup:
+  - ml load cudnn
+additional_parameters:
+  constraint: '[GPU_MEM:16GB|GPU_MEM:24GB|GPU_MEM:32GB|GPU_MEM:40GB]'
+  mail-type: ALL
+array_parallelism: 50

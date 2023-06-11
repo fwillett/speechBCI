@@ -1,0 +1,59 @@
+name: speech
+sessions:
+  - t12.2022.04.28
+  - t12.2022.05.05
+  - t12.2022.05.17
+  - t12.2022.05.19
+  - t12.2022.05.24
+  - t12.2022.05.26
+  - t12.2022.06.02
+  - t12.2022.06.07
+  - t12.2022.06.14
+  - t12.2022.06.16
+  - t12.2022.06.21
+  - t12.2022.06.28
+  - t12.2022.07.05
+  - t12.2022.07.14
+  - t12.2022.07.21
+  - t12.2022.07.27
+  - t12.2022.08.02
+  - t12.2022.08.11
+  - t12.2022.08.13
+datasetToLayerMap: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18]
+datasetProbability: [0.052, 0.052, 0.052, 0.052, 0.052, 0.052, 0.052, 0.052, 0.052, 0.052, 0.052, 0.052, 0.052, 0.052, 0.052, 0.052, 0.052, 0.052, 0.052]
+datasetProbabilityVal: [0.052, 0.052, 0.052, 0.052, 0.052, 0.052, 0.052, 0.052, 0.052, 0.052, 0.052, 0.052, 0.052, 0.052, 0.052, 0.052, 0.052, 0.052, 0.052]
+dataDir:
+  - /oak/stanford/groups/shenoy/fwillett/speechPaperRelease_final/derived/tfRecords
+  - /oak/stanford/groups/shenoy/fwillett/speechPaperRelease_final/derived/tfRecords
+  - /oak/stanford/groups/shenoy/fwillett/speechPaperRelease_final/derived/tfRecords
+  - /oak/stanford/groups/shenoy/fwillett/speechPaperRelease_final/derived/tfRecords
+  - /oak/stanford/groups/shenoy/fwillett/speechPaperRelease_final/derived/tfRecords
+  - /oak/stanford/groups/shenoy/fwillett/speechPaperRelease_final/derived/tfRecords
+  - /oak/stanford/groups/shenoy/fwillett/speechPaperRelease_final/derived/tfRecords
+  - /oak/stanford/groups/shenoy/fwillett/speechPaperRelease_final/derived/tfRecords
+  - /oak/stanford/groups/shenoy/fwillett/speechPaperRelease_final/derived/tfRecords
+  - /oak/stanford/groups/shenoy/fwillett/speechPaperRelease_final/derived/tfRecords
+  - /oak/stanford/groups/shenoy/fwillett/speechPaperRelease_final/derived/tfRecords
+  - /oak/stanford/groups/shenoy/fwillett/speechPaperRelease_final/derived/tfRecords
+  - /oak/stanford/groups/shenoy/fwillett/speechPaperRelease_final/derived/tfRecords
+  - /oak/stanford/groups/shenoy/fwillett/speechPaperRelease_final/derived/tfRecords
+  - /oak/stanford/groups/shenoy/fwillett/speechPaperRelease_final/derived/tfRecords
+  - /oak/stanford/groups/shenoy/fwillett/speechPaperRelease_final/derived/tfRecords
+  - /oak/stanford/groups/shenoy/fwillett/speechPaperRelease_final/derived/tfRecords
+  - /oak/stanford/groups/shenoy/fwillett/speechPaperRelease_final/derived/tfRecords
+  - /oak/stanford/groups/shenoy/fwillett/speechPaperRelease_final/derived/tfRecords
+syntheticDataDir:
+syntheticMixingRate: 0.0
+whiteNoiseSD: 1.0
+constantOffsetSD: 0.2
+randomWalkSD: 0.0
+nInputFeatures: 256
+timWarpFactor: 0.0
+staticGainSD: 0.0
+nClasses: 40
+maxSeqElements: 500
+
+# Dataset shuffle buffer size
+bufferSize: 1024
+
+copyInputLayer:

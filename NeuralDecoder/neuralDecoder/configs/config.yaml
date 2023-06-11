@@ -1,0 +1,93 @@
+hydra:
+  run:
+    dir: ${outputDir}
+  sweep:
+    dir: ${outputDir}
+    subdir: ${hydra.job.override_dirname}
+  job:
+    config:
+      override_dirname:
+        exclude_keys:
+          - outputDir
+          - loadDir
+          - dataset.dataDir
+          - dataset.syntheticDataDir
+          - dataset.sessions
+          - dataset.datasetToLayerMap
+          - dataset.datasetProbability
+          - dataest.datasetProbabilityVal
+          - dataset.copyInputLayer
+          - wandb.enabled
+          - wandb.setup.project
+          - wandb.setup.entity
+          - wandb.setup.group
+
+defaults:
+  - dataset: handwriting_all_days
+  - model: gru
+  - wandb: defaults
+
+# Specify which GPU to use (on multi-gpu machines, this prevents tensorflow from taking over all GPUs)
+gpuNumber: "0"
+
+# mode can either be 'train' or 'inference'
+mode: train
+
+#where to save the RNN files
+outputDir:
+
+#We can load the variables from a previous run, either to resume training (if loadDir==outputDir)
+#or otherwise to complete an entirely new training run. 'loadCheckpointIdx' specifies which checkpoint to load (-1 = latest)
+loadDir:
+loadCheckpointIdx:
+
+#Applies Gaussian smoothing if equal to 1
+smoothInputs: 1
+smoothKernelSD: 2
+
+learnRateStart: 0.01
+learnRateEnd: 0.0
+learnRateDecaySteps: 100000
+learnRatePower: 1.0
+
+#can optionally specify for only the input layers to train or only the back end
+trainableInput: 1
+trainableBackend: 1
+
+#this seed is set for numpy and tensorflow when the class is initialized
+seed: -1
+
+# how often to save a checkpoint during training [0 = save best]
+batchesPerSave: 0
+
+#how often to run a validation diagnostic batch
+batchesPerVal: 50
+
+#how many minibatches to use total
+nBatchesToTrain: 100000
+
+#number of sentence snippets to include in the minibatch
+batchSize: 64
+
+#can be used to scale up all input features, sometimes useful when transferring to new days without retraining
+inputScale: 1.0
+
+#parameters to specify where to save the outputs and which layer to use during inference
+inferenceOutputFileName:
+inputLayerForInference:
+
+#gradient to keep things reasonable
+gradClipValue: 10
+
+#can do CTC loss or cross-entropy loss
+lossType: ctc #ctc or ce
+
+# Whether to use train data mean and std for normalization
+normLayer: False
+
+# 1: random walk on time dim,
+# -1: random walk on feature dim
+randomWalkAxis: -1
+
+# LR warmup steps. LR will linearly increase from 0 to 1 over this number of steps
+warmUpSteps: 0

@@ -1,0 +1,7 @@
+---
+enabled: false
+setup:
+    project: hydra-example
+    entity:
+    group:
+    mode: online
