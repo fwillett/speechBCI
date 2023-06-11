@@ -1,0 +1,48 @@
+__pycache__/
+.ipynb_checkpoints/
+Simulink/xPC/bin/*
+!Simulink/xPC/bin/*.dlm
+!Simulink/xPC/bin/neuralProcess_Complete_bld.mldatx
+!Simulink/xPC/bin/xNeuralSim_603.mldatx
+!Simulink/xPC/bin/xNeuralSim_603_256ch.mldatx
+
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Visual Studio Code files
+.vscode
+.vs
+
+# PyCharm files
+.idea
+
+# Eclipse Project settings
+*.*project
+.settings
+
+# Sublime Text settings
+*.sublime-workspace
+*.sublime-project
+
+# Editor temporaries
+*.swn
+*.swo
+*.swp
+*.swm
+*.asv
+*~
+
+# IPython notebook checkpoints
+.ipynb_checkpoints
+
+# macOS dir files
+.DS_Store
+
+**/build
+
+Archive/*
+
+# Matlab
+*.asv
