@@ -17,6 +17,7 @@ setup(
 	'wandb',
 	'seaborn',
 	'edit-distance',
+	'scikit-learn',
         'g2p_en==2.1.0'
     ]
 )

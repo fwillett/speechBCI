@@ -4,8 +4,6 @@ from scipy.ndimage import gaussian_filter1d
 from numba import njit
 import matplotlib.pyplot as plt
 import numpy as np
-import tensorflow as tf
-import neuralDecoder.utils.lmDecoderUtils as lmDecoderUtils
 from omegaconf import OmegaConf
 from neuralDecoder.neuralSequenceDecoder import NeuralSequenceDecoder
 import os
@@ -44,10 +42,11 @@ def triggeredAvg(features, eventIdx, eventCodes, window, smoothSD=0, computeCI=T
     allTrials = []
     
     for codeIdx in range(len(codeList)):
-        print(codeIdx)
         trlIdx = np.squeeze(np.argwhere(eventCodes==codeList[codeIdx]))
         trlSnippets = []
         for t in trlIdx:
+            if (eventIdx[t]+window[0])<0 or (eventIdx[t]+window[1])>=features.shape[0]:
+                continue
             trlSnippets.append(features[(eventIdx[t]+window[0]):(eventIdx[t]+window[1]),:])
         
         trlConcat = np.stack(trlSnippets,axis=0)
@@ -75,48 +74,6 @@ def plotSimilarityMatrix(cMat):
     for t in cbar.ax.get_yticklabels():
         t.set_fontsize(6)
         
-def loadTFRecord(files):
-
-    dataset = tf.data.TFRecordDataset(files)
-    maxSeqElements = 500
-    nInputFeatures = 256
-
-    datasetFeatures = {
-        "inputFeatures": tf.io.FixedLenSequenceFeature([nInputFeatures], tf.float32, allow_missing=True),
-        "newClassSignal": tf.io.FixedLenSequenceFeature([], tf.float32, allow_missing=True),
-        "ceMask": tf.io.FixedLenSequenceFeature([], tf.float32, allow_missing=True),
-        "seqClassIDs": tf.io.FixedLenFeature((maxSeqElements), tf.int64),
-        "nTimeSteps": tf.io.FixedLenFeature((), tf.int64),
-        "nSeqElements": tf.io.FixedLenFeature((), tf.int64),
-        "transcription": tf.io.FixedLenFeature((maxSeqElements), tf.int64)
-    }
-
-    def parseDatasetFunction(exampleProto):
-        return tf.io.parse_single_example(exampleProto, datasetFeatures)
-
-    dataset = dataset.map(parseDatasetFunction)
-
-    allDat = []
-    trueSentences = []
-    seqElements = []
-
-    def _convert_to_ascii(text):
-        return [ord(char) for char in text]
-
-    for dat in dataset:
-        allDat.append(dat['inputFeatures'].numpy())
-
-        trans = dat['transcription'].numpy()
-        trans = trans[trans!=0]
-        sent = ''
-        for t in trans:
-            sent += chr(t)
-        trueSentences.append(sent)
-        
-        seqElements.append(dat['seqClassIDs'].numpy())
-        
-    return allDat, trueSentences, seqElements
-
 def plotPreamble():
     import matplotlib.pyplot as plt
 
@@ -152,198 +109,65 @@ def werWithCI(allTrueSeq, allDecSeq):
     
     return meanWER, np.percentile(bootWER, [2.5, 97.5])
 
-def werInference(lmDir, ckptDirs, datasets, layerIdx, useBlankPenalty=True, cartesianProduct=True, channelMask=[]):
-    
-    if useBlankPenalty:
-        acousticScale = 0.8
-    else:
-        acousticScale = 1.2
-        
-    ngramDecoder = lmDecoderUtils.build_lm_decoder(
-        lmDir,
-        acoustic_scale=acousticScale, #1.2
-        nbest=1,
-        beam=17
-    )
-    
-    def infer(ckptDir, layerIdx, dataset):
-        args = OmegaConf.load(os.path.join(ckptDir, 'args.yaml'))
-        args['loadDir'] = ckptDir
-        args['mode'] = 'infer'
-        args['loadCheckpointIdx'] = None
+def makeTuningHeatmap(dat, sets, window):
 
-        for x in range(len(args['dataset']['datasetProbabilityVal'])):
-            args['dataset']['datasetProbabilityVal'][x] = 0.0
-        args['dataset']['datasetProbabilityVal'][layerIdx] = 1.0
-        args['dataset']['sessions'][layerIdx] = dataset
+    features = dat['tx2'].astype(np.float32)
+    nFeat = features.shape[1]
+    nTrials = dat['goTrialEpochs'].shape[0]
+    nClasses = dat['cueList'].shape[1]
+    
+    trialVectors = np.zeros([nTrials, features.shape[1]])
+    predVectors = np.zeros([nTrials, features.shape[1]])
+    
+    tuningR2 = np.zeros([nFeat, len(sets)])
+    tuningPVal = np.zeros([nFeat, len(sets)])
+    
+    for t in range(nTrials):
+        trialVectors[t,:] = np.mean(features[(dat['goTrialEpochs'][t,0]+window[0]):(dat['goTrialEpochs'][t,0]+window[1])], axis=0)
         
-        if channelMask!=[]:
-            args['channelMask'] = channelMask
+    #split observations into folds
+    nFolds = 5
+    heldOutIdx = []
+    minPerFold = np.floor(trialVectors.shape[0]/nFolds).astype(np.int32)
+    remainder = trialVectors.shape[0]-minPerFold*nFolds
+    if remainder>0:
+        currIdx = np.arange(0,(minPerFold+1)).astype(np.int32)
+    else:
+        currIdx = np.arange(0,minPerFold).astype(np.int32)
+
+    for x in range(nFolds):
+        heldOutIdx.append(currIdx.copy())
+        currIdx += len(currIdx)
+        if remainder!=0 and x==remainder:
+            currIdx = currIdx[0:-1]
+
+    for foldIdx in range(nFolds):
+        meanVectors = np.zeros([nClasses, nFeat])
+        for m in range(nClasses):
+            trlIdx = np.squeeze(np.argwhere(np.squeeze(dat['trialCues']-1)==m))
+            trlIdx = np.setdiff1d(trlIdx, heldOutIdx[foldIdx])
+            meanVectors[m,:] = np.mean(trialVectors[trlIdx,:], axis=0)
             
-        # Initialize model
-        tf.compat.v1.reset_default_graph()
-        nsd = NeuralSequenceDecoder(args)
-
-        # Inference
-        out = nsd.inference()
-
-        if useBlankPenalty:
-            bp = np.log(2)
-        else:
-            bp = np.log(1)
-
-        decoder_out = lmDecoderUtils.cer_with_lm_decoder(ngramDecoder, out, outputType='speech_sil', blankPenalty=bp)
+        for t in heldOutIdx[foldIdx]:
+            predVectors[t,:] = meanVectors[dat['trialCues'][t,0]-1,:]
+  
+    for setIdx in range(len(sets)):
+        mSet = sets[setIdx]
+        trlIdx = np.argwhere(np.in1d(np.squeeze(dat['trialCues']-1), mSet))
+        SSTOT = np.sum(np.square(trialVectors[trlIdx,:]-np.mean(trialVectors[trlIdx,:],axis=0,keepdims=True)), axis=0)
+        SSERR = np.sum(np.square(trialVectors[trlIdx,:]-predVectors[trlIdx,:]), axis=0)
         
-        def _ascii_to_text(text):
-            endIdx = np.argwhere(text==0)
-            return ''.join([chr(char) for char in text[0:endIdx[0,0]]])
-
-        trueTranscriptions = []
-        for x in range(out['transcriptions'].shape[0]):
-            trueTranscriptions.append(_ascii_to_text(out['transcriptions'][x,:]))
-
-        return decoder_out['wer'], out['cer'], decoder_out['decoded_transcripts'], trueTranscriptions
-    
-    if cartesianProduct:
-        rnn_wer = []
-        rnn_per = []
-        rnn_decTrans = []
-        rnn_trueTrans = []
-        for rnnIdx in range(len(ckptDirs)):    
-            all_wer = []
-            all_per = []
-            all_decTrans = []
-            all_trueTrans = []
-            for sessIdx in range(len(datasets)):
-                wer, per, decTrans, trueTrans = infer(ckptDirs[rnnIdx], layerIdx[sessIdx], datasets[sessIdx])
-                all_wer.append(wer)
-                all_per.append(per)
-                all_decTrans.append(decTrans)
-                all_trueTrans.append(trueTrans)
-                
-            rnn_wer.append(all_wer)
-            rnn_per.append(all_per)
-            rnn_decTrans.append(all_decTrans)
-            rnn_trueTrans.append(all_trueTrans)
-    else:
-        rnn_wer = []
-        rnn_per = []
-        rnn_decTrans = []
-        rnn_trueTrans = []
-        for sessIdx in range(len(datasets)):
-            wer, per, decTrans, trueTrans = infer(ckptDirs[sessIdx], layerIdx[sessIdx], datasets[sessIdx])
-            rnn_wer.append(wer)
-            rnn_per.append(per)                
-            rnn_decTrans.append(decTrans)
-            rnn_trueTrans.append(trueTrans)
-
-    return rnn_wer, rnn_per, rnn_decTrans, rnn_trueTrans
-
-def plotDotDistributions(dotData, plotLabels):
-    import matplotlib.pyplot as plt
-    from analysis import plotPreamble
-
-    plotPreamble()
-
-    plt.figure(figsize=(1.0,1.5),dpi=300)
-    for x in range(len(plotLabels)):
-        plt.plot(x+(np.random.uniform(size=[10])-0.5)*0.2, dotData[plotIdx]*100, 
-                 'o', markersize=0.2, color='C0')
-        plt.plot([x-0.2, x+0.2], [np.mean(dotData[plotIdx])*100, np.mean(dotData[plotIdx])*100], '-',  color='C0', linewidth=1)
-
-    plt.gca().set_xticks(np.arange(0,len(plotLabels)))
-    plt.gca().set_xticklabels(plotLabels, rotation=45)
-    
-def perInference(lmDir, ckptDirs, datasets, layerIdx, useBlankPenalty=True, cartesianProduct=True, channelMask=[]):
-    
-    def infer(ckptDir, layerIdx, dataset):
-        args = OmegaConf.load(os.path.join(ckptDir, 'args.yaml'))
-        args['loadDir'] = ckptDir
-        args['mode'] = 'infer'
-        args['loadCheckpointIdx'] = None
-
-        for x in range(len(args['dataset']['datasetProbabilityVal'])):
-            args['dataset']['datasetProbabilityVal'][x] = 0.0
-        args['dataset']['datasetProbabilityVal'][layerIdx] = 1.0
-        args['dataset']['sessions'][layerIdx] = dataset
+        tuningR2[:,setIdx] = 1-SSERR/SSTOT
         
-        if channelMask!=[]:
-            args['channelMask'] = list(channelMask)
+        groupVectors = []
+        for m in mSet:
+            trlIdx = np.argwhere(np.squeeze(dat['trialCues']-1)==m)
+            groupVectors.append(trialVectors[trlIdx,:])
             
-        # Initialize model
-        tf.compat.v1.reset_default_graph()
-        nsd = NeuralSequenceDecoder(args)
+        fResults = scipy.stats.f_oneway(*groupVectors,axis=0)
+        tuningPVal[:,setIdx] = fResults[1]
 
-        # Inference
-        out = nsd.inference()
-
-        if useBlankPenalty:
-            bp = np.log(2)
-        else:
-            bp = np.log(1)
-
-        return out['cer']
-    
-    if cartesianProduct:
-        rnn_per = []
-        for rnnIdx in range(len(ckptDirs)):    
-            all_per = []
-            for sessIdx in range(len(datasets)):
-                per = infer(ckptDirs[rnnIdx], layerIdx[sessIdx], datasets[sessIdx])
-                all_per.append(per)
-                
-            rnn_per.append(all_per)
-    else:
-        rnn_per = []
-        for sessIdx in range(len(datasets)):
-            per= infer(ckptDirs[sessIdx], layerIdx[sessIdx], datasets[sessIdx])
-            rnn_per.append(per)                
-
-    return rnn_per
-
-def perInferenceDefault(lmDir, ckptDirs, datasets, layerIdx, useBlankPenalty=True, cartesianProduct=True, channelMask=[]):
-    
-    def infer(ckptDir, layerIdx, dataset):
-        args = OmegaConf.load(os.path.join(ckptDir, 'args.yaml'))
-        args['loadDir'] = ckptDir
-        args['mode'] = 'infer'
-        args['loadCheckpointIdx'] = None
-
-        if channelMask!=[]:
-            args['channelMask'] = list(channelMask)
-            
-        # Initialize model
-        tf.compat.v1.reset_default_graph()
-        nsd = NeuralSequenceDecoder(args)
-
-        # Inference
-        out = nsd.inference()
-
-        if useBlankPenalty:
-            bp = np.log(2)
-        else:
-            bp = np.log(1)
-
-        return out['cer']
-    
-    if cartesianProduct:
-        rnn_per = []
-        for rnnIdx in range(len(ckptDirs)):    
-            all_per = []
-            for sessIdx in range(len(datasets)):
-                per = infer(ckptDirs[rnnIdx], layerIdx[sessIdx], datasets[sessIdx])
-                all_per.append(per)
-                
-            rnn_per.append(all_per)
-    else:
-        rnn_per = []
-        for sessIdx in range(len(datasets)):
-            per= infer(ckptDirs[sessIdx], layerIdx[sessIdx], datasets[sessIdx])
-            rnn_per.append(per)                
-
-    return rnn_per
-
-from matplotlib.pyplot import cm 
+    return tuningR2, tuningPVal
 
 def heatmapPlotCircles(tuning, isSig, clim, titles, layout):
     circle_cmap = cm.Blues(np.linspace(0,1,256))
@@ -408,3 +232,53 @@ def heatmapPlot(tuning, clim, titles, layout):
             plt.gca().set_yticks([])
             if arrIdx==0:
                 plt.title(titles[plotIdx],fontsize=6)
+                
+#gaussian naive bayes classifier with variable time window and channel set
+def gnb_loo(trials_input, timeWindow, chanIdx):
+    unroll_Feat = []
+    for t in range(len(trials_input)):
+        for x in range(trials_input[t].shape[0]):
+            unroll_Feat.append(trials_input[t][x,:,:])
+
+    unroll_Feat = np.concatenate(unroll_Feat, axis=0)
+    mn = np.mean(unroll_Feat, axis=0)
+    sd = np.std(unroll_Feat, axis=0)
+    
+    unroll_X = []
+    unroll_y = []
+
+    for t in range(len(trials_input)):
+        for x in range(trials_input[t].shape[0]):
+            tmp = (trials_input[t][x,:,:] - mn[np.newaxis,:])/sd[np.newaxis,:]
+            b1 = np.mean(tmp[timeWindow[0]:timeWindow[1],chanIdx], axis=0)
+            
+            unroll_X.append(np.concatenate([b1]))
+            unroll_y.append(t)
+
+    unroll_X = np.stack(unroll_X, axis=0)
+    unroll_y = np.array(unroll_y).astype(np.int32)
+    
+    from sklearn.naive_bayes import GaussianNB
+
+    y_pred = np.zeros([unroll_X.shape[0]])
+    for t in range(unroll_X.shape[0]):
+        X_train = np.concatenate([unroll_X[0:t,:], unroll_X[(t+1):,:]], axis=0)
+        y_train = np.concatenate([unroll_y[0:t], unroll_y[(t+1):]])
+
+        gnb = GaussianNB()
+        gnb.fit(X_train, y_train)
+        gnb.var_ = np.ones(gnb.var_.shape)*np.mean(gnb.var_)
+
+        pred_val = gnb.predict(unroll_X[np.newaxis,t,:])
+        y_pred[t] = pred_val
+        
+    return y_pred, unroll_y
+
+def bootCI(x,y):
+    nReps = 10000
+    bootAcc = np.zeros([nReps])
+    for n in range(nReps):
+        shuffIdx = np.random.randint(len(x),size=len(x))
+        bootAcc[n] = np.mean(x[shuffIdx]==y[shuffIdx])
+        
+    return np.percentile(bootAcc,[2.5, 97.5])
