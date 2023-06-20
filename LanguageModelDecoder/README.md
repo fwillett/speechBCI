@@ -1,5 +1,5 @@
 # Brain Speech Decoder
-Based on wenet[https://github.com/wenet-e2e/wenet] and Kaldi[https://github.com/kaldi-asr/kaldi]
+Based on [WeNet](https://github.com/wenet-e2e/wenet) and [Kaldi](https://github.com/kaldi-asr/kaldi)
 
 # Dependencies
 ```
