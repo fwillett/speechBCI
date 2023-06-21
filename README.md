@@ -21,7 +21,7 @@ The transcriptions for the "competitionHoldOut" partition are redacted (we inten
 
 ## Installation
 
-NeuralDecoder should be installed as a python package (python setup.py install). LanguageModelDecoder needs to be compiled first and then installed as a python package (see LanguageModelDecoder/README.md). 
+NeuralDecoder should be installed as a python package (`pip install .`). LanguageModelDecoder needs to be compiled first and then installed as a python package (see LanguageModelDecoder/README.md). 
 
 
 
