@@ -76,21 +76,14 @@ set(HIREDIS_LIB hiredis)
 set(TEST_HIREDIS_LIB hiredis)
 add_subdirectory(${CMAKE_SOURCE_DIR}/third_party/redis-plus-plus)
 
-# third_party: libtorch 1.6.0, use FetchContent_Declare to download, and
+# third_party: libtorch, use FetchContent_Declare to download, and
 # use find_package to find since libtorch is not a standard cmake project
-set(PYTORCH_VERSION "1.6.0")
-if(${CMAKE_SYSTEM_NAME} STREQUAL "Windows")
-    set(LIBTORCH_URL "https://download.pytorch.org/libtorch/cpu/libtorch-win-shared-with-deps-${PYTORCH_VERSION}%2Bcpu.zip")
-    set(URL_HASH "SHA256=dacb2af654f1cffa43b0f3187ce945e1c93305b4c8bb60361c7a8cb543e1da82")
-    set(CMAKE_BUILD_TYPE "Release")
-elseif(${CMAKE_SYSTEM_NAME} STREQUAL "Linux")
+set(PYTORCH_VERSION "1.13.1")
+if(${CMAKE_SYSTEM_NAME} STREQUAL "Linux")
     set(LIBTORCH_URL "https://download.pytorch.org/libtorch/cpu/libtorch-shared-with-deps-${PYTORCH_VERSION}%2Bcpu.zip")
-    set(URL_HASH "SHA256=31d3c5a59b1394f9d958501e392cedc91476358accea76c7094d103e9335b80c")
-elseif(${CMAKE_SYSTEM_NAME} STREQUAL "Darwin")
-    set(LIBTORCH_URL "https://download.pytorch.org/libtorch/cpu/libtorch-macos-${PYTORCH_VERSION}.zip")
-    set(URL_HASH "SHA256=e1140bed7bd56c26638bae28aebbdf68e588a9fae92c6684645bcdd996e4183c")
+    set(URL_HASH "SHA256=d289185802baa1977701b72fc17c8aa6715481703352ce02d6f710cf007dc4f9")
 else()
-    message(FATAL_ERROR "Unsupported CMake System Name '${CMAKE_SYSTEM_NAME}' (expected 'Windows', 'Linux' or 'Darwin')")
+    message(FATAL_ERROR "Unsupported CMake System Name '${CMAKE_SYSTEM_NAME}' (expected 'Linux')")
 endif()
 FetchContent_Declare(libtorch
   URL      ${LIBTORCH_URL}
