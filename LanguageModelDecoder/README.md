@@ -1,55 +1,45 @@
-# Brain Speech Decoder
-Based on [WeNet](https://github.com/wenet-e2e/wenet) and [Kaldi](https://github.com/kaldi-asr/kaldi)
+# Introduction
+This is the repo for langauage model decoder. Codes are based on [WeNet](https://github.com/wenet-e2e/wenet) and [Kaldi](https://github.com/kaldi-asr/kaldi).
 
 # Dependencies
 ```
 CMake >= 3.14
+gcc >= 10.1
+pytorch==1.13.1
 ```
 
-# Build Decoder Runtime
-If you are on Sherlock, set up the build environemnt with the following commands:
-```
-ml cmake
-ml gcc/10.1.0
-export CC=/share/software/user/open/gcc/10.1.0/bin/gcc
-export CXX=/share/software/user/open/gcc/10.1.0/bin/g++
-```
+Please note that this library uses libtorch 1.13.1. If you have other versions of pytorch installed, you may need to uninstall them first and then install the correct version.
 
-Build decoder runtime:
+
+# Instructions for build and run the language model decoder
+
+If you have downloaded the WFST decoding graph, you can skip the first and second steps and go to the [third step](#build-decoder-runtime).
+
+
+### Build binaries for building language model:
+Build SRILM:
+  ```
+  cd srilm-1.7.3
+  export SRILM=$PWD
+  make -j8 MAKE_PIC=yes World && make -j8 cleanest
+  ```
+
+Build openfst, kaldi and other stuff:
+  ```
+  cd runtime/server/x86
+  mkdir build && cd build
+  cmake ..
+  make -j8
+  ```
+
+### Build language model and WFST decoding graph:
+
+Run this [notebook](../AnalysisExamples/buildLanguageModel.ipynb).
+
+
+### Build decoder runtime
+
 ```
 cd runtime/server/x86
 python setup.py install
 ```
-
-# Run Decoder
-## Run python
-See `runtime/server/x86/python/test.py`
-
-
-# Build Language Model
-1. First, build binaries for building language model:
-    1. Build SRILM:
-      ```
-      cd srilm-1.7.3
-      export SRILM=$PWD
-      make MAKE_PIC=yes World
-      make cleanest
-      export PATH=$PATH:$PWD/bin/i686-m64
-      ```
-
-    2. Build openfst and other stuff:
-      ```
-      cd runtime/server/x86
-      mkdir build
-      cd build
-      cmake ..
-      make -j8
-      ```
-
-2. Build speech LM:
-  ```
-  cd examples/speech/s0/
-  sbatch run_sbatch.sh output_dir dict_path train_corpus sil_prob
-  ```
-
-

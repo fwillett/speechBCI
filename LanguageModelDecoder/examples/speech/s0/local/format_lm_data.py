@@ -13,8 +13,10 @@ args = parser.parse_args()
 
 # Read the dictionary
 lexicons = set()
-with open(args.dict, 'r') as f:
+with open(args.dict, 'r', encoding='utf-8', errors='ignore') as f:
     for line in f.readlines():
+        if line.startswith(';;;'):
+            continue
         tokens = line.strip().split(' ')
         lexicons.add(tokens[0].lower())
 

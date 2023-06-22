@@ -10,14 +10,13 @@ setup(
         'hydra-submitit-launcher==1.1.5',
         'transformers==4.23.1',
         'pandas',
-	'numba',
+	    'numba',
         'jupyterlab',
         'ipywidgets',
         'tqdm',
-	'wandb',
-	'seaborn',
-	'edit-distance',
-	'scikit-learn',
+	    'seaborn',
+	    'edit-distance',
+	    'scikit-learn',
         'g2p_en==2.1.0'
     ]
 )

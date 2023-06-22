@@ -11,9 +11,11 @@ phones_with_stress = {'AA', 'AE', 'AH', 'AO', 'AW', \
                      }
 
 out_f = open(lexicon_out, 'w')
-with open(lexicon_in, 'r') as in_f:
+with open(lexicon_in, 'r', encoding='utf-8', errors='ignore') as in_f:
   lines = in_f.readlines()
   for i, line in enumerate(lines):
+    if line.startswith(';;;'):
+      continue
     line = line.strip()
     if '\t' in line:
       lexicon, phones = line.split('\t')
