@@ -22,10 +22,12 @@ def build_gpt2(modelName='gpt2-xl', cacheDir=None):
     return model, tokenizer
 
 
-def build_opt(modelName='facebook/opt-6.7b', cacheDir=None):
-    from transformers import GPT2TokenizerFast, TFOPTForCausalLM
-    tokenizer = GPT2TokenizerFast.from_pretrained(modelName, cache_dir=cacheDir)
-    model = TFOPTForCausalLM.from_pretrained(modelName, cache_dir=cacheDir)
+def build_opt(modelName='facebook/opt-6.7b', cacheDir=None, device='auto', load_in_8bit=False):
+    from transformers import AutoModelForCausalLM, AutoTokenizer
+
+    tokenizer = AutoTokenizer.from_pretrained(modelName, cache_dir=cacheDir)
+    model = AutoModelForCausalLM.from_pretrained(modelName, cache_dir=cacheDir,
+                                                 device_map=device, load_in_8bit=load_in_8bit)
 
     tokenizer.padding_side = "right"
     tokenizer.pad_token = tokenizer.eos_token
@@ -33,15 +35,23 @@ def build_opt(modelName='facebook/opt-6.7b', cacheDir=None):
     return model, tokenizer
 
 def rescore_with_gpt2(model, tokenizer, hypotheses, lengthPenalty):
-    inputs = tokenizer(hypotheses, return_tensors='tf', padding=True)
-    outputs = model(inputs)
-    logProbs = tf.math.log(tf.nn.softmax(outputs['logits'], -1))
-    logProbs = logProbs.numpy()
+    model_class = type(model).__name__
+    if model_class.startswith('TF'):
+        inputs = tokenizer(hypotheses, return_tensors='tf', padding=True)
+        outputs = model(inputs)
+        logProbs = tf.math.log(tf.nn.softmax(outputs['logits'], -1))
+        logProbs = logProbs.numpy()
+    else:
+        import torch
+        inputs = tokenizer(hypotheses, return_tensors='pt', padding=True)
+        with torch.no_grad():
+            outputs = model(**inputs)
+            logProbs = torch.nn.functional.log_softmax(outputs['logits'].float(), -1).numpy()
 
     newLMScores = []
     B, T, _ = logProbs.shape
     for i in range(B):
-        n_tokens = np.sum(inputs['attention_mask'][i])
+        n_tokens = np.sum(inputs['attention_mask'][i].numpy())
 
         newLMScore = 0.
         for j in range(1, n_tokens):
