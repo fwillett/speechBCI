@@ -16,7 +16,7 @@ Please note that this library uses libtorch 1.13.1. If you have other versions o
 If you have downloaded the WFST decoding graph, you can skip the first and second steps and go to the [third step](#build-decoder-runtime).
 
 
-### Build binaries for building language model:
+### Step 1: Build binaries for building language model:
 Build SRILM:
   ```
   cd srilm-1.7.3
@@ -32,12 +32,12 @@ Build openfst, kaldi and other stuff:
   make -j8
   ```
 
-### Build language model and WFST decoding graph:
+### Step 2: Build language model and WFST decoding graph:
 
 Run this [notebook](../AnalysisExamples/buildLanguageModel.ipynb).
 
 
-### Build decoder runtime
+### Step 3: Build decoder runtime
 
 ```
 cd runtime/server/x86
