@@ -31,7 +31,7 @@ echo "lexicon_raw_nosil done"
 #     > $dir/units_nosil.txt || exit 1;
 
 if [ $use_all_phonemes == 1 ]; then
-  cp /oak/stanford/groups/shenoy/stfan/data/cmudict/all_phoneme_units $dir/units_nosil.txt
+  cp local/all_phoneme_units.txt $dir/units_nosil.txt
 else
   cut -d' ' -f2- $dir/lexicon_raw_nosil.txt | tr ' ' '\n' | sort -u > $dir/units_nosil.txt
   echo "units_nosil.txt done"
