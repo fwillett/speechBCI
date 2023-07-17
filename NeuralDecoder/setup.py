@@ -15,7 +15,7 @@ setup(
         'jupyterlab',
         'ipywidgets',
         'tqdm',
-        'g2p_en==2.0.0',
+        'g2p_en==2.1.0',
         'seaborn==0.12.2',
         'scipy==1.25.0',
         'torch==1.13.1',
