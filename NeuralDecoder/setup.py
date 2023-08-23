@@ -25,6 +25,6 @@ setup(
         'bitsandbytes==0.39.1',
         'edit_distance==1.0.6',
         'wandb==0.15.5',
-        'hiplot==1.16.0'
+        'hiplot'
     ]
 )
