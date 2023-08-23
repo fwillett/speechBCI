@@ -1,9 +1,9 @@
 ## A high-performance speech neuroprosthesis
-[![System diagram](SystemDiagram.png)](https://www.biorxiv.org/content/10.1101/2023.01.21.524489v2.abstract)
+[![System diagram](SystemDiagram.png)](https://www.nature.com/articles/s41586-023-06377-x)
 
 ## Overview
 
-This repo is associated with this [preprint](https://www.biorxiv.org/content/10.1101/2023.01.21.524489v2.abstract), [dataset](https://doi.org/10.5061/dryad.x69p8czpq) and machine learning [competition](https://eval.ai/web/challenges/challenge-page/2099/overview). The code contains the RNN decoder (NeuralDecoder) and language model decoder (LanguageModelDecoder) used in the paper, and can be used to reproduce the core offline decoding results. 
+This repo is associated with this [paper](https://www.nature.com/articles/s41586-023-06377-x), [dataset](https://doi.org/10.5061/dryad.x69p8czpq) and machine learning [competition](https://eval.ai/web/challenges/challenge-page/2099/overview). The code contains the RNN decoder (NeuralDecoder) and language model decoder (LanguageModelDecoder) used in the paper, and can be used to reproduce the core offline decoding results. 
 
 The jupyter notebooks in AnalysisExamples show how to [prepare the data for decoder training](AnalysisExamples/rnn_step1_makeTFRecords.ipynb), [train the RNN decoder](AnalysisExamples/rnn_step2_trainBaselineRNN.ipynb), and [evaluate it using the language model](AnalysisExamples/rnn_step3_baselineRNNInference.ipynb). Intermediate results from these steps (.tfrecord files for training, RNN weights from my original run of this code) and the trigram language model we used are available [here](https://doi.org/10.5061/dryad.x69p8czpq) (in the languageModel.tar.gz and derived.tar.gz files). 
 
