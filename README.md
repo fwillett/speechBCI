@@ -17,7 +17,7 @@ The transcriptions for the "competitionHoldOut" partition are redacted. See [bas
 
 ## Results
 
-When trained on the "train" partition and evaluated on the "test" partition, our original run of the code achieved an 18.5% word error rate (RNN + 3-gram baseline) and a 14.5% word error rate (RNN + 5-gram + OPT baseline). For results on the "competitionHoldOut" partition, see the baseline word error rates [here](https://eval.ai/web/challenges/challenge-page/2099/leaderboard/4944). 
+When trained on the "train" partition and evaluated on the "test" partition, our original run of the code achieved an 18.8% word error rate (RNN + 3-gram baseline) and a 13.7% word error rate (RNN + 5-gram + OPT baseline). For results on the "competitionHoldOut" partition, see the baseline word error rates [here](https://eval.ai/web/challenges/challenge-page/2099/leaderboard/4944). 
 
 ## Installation
 
