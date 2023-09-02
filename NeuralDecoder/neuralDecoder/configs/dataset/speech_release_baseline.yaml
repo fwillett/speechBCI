@@ -23,25 +23,25 @@ datasetToLayerMap: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17
 datasetProbability: [0.052, 0.052, 0.052, 0.052, 0.052, 0.052, 0.052, 0.052, 0.052, 0.052, 0.052, 0.052, 0.052, 0.052, 0.052, 0.052, 0.052, 0.052, 0.052]
 datasetProbabilityVal: [0.052, 0.052, 0.052, 0.052, 0.052, 0.052, 0.052, 0.052, 0.052, 0.052, 0.052, 0.052, 0.052, 0.052, 0.052, 0.052, 0.052, 0.052, 0.052]
 dataDir:
-  - /oak/stanford/groups/shenoy/fwillett/speechPaperRelease_final/derived/tfRecords
-  - /oak/stanford/groups/shenoy/fwillett/speechPaperRelease_final/derived/tfRecords
-  - /oak/stanford/groups/shenoy/fwillett/speechPaperRelease_final/derived/tfRecords
-  - /oak/stanford/groups/shenoy/fwillett/speechPaperRelease_final/derived/tfRecords
-  - /oak/stanford/groups/shenoy/fwillett/speechPaperRelease_final/derived/tfRecords
-  - /oak/stanford/groups/shenoy/fwillett/speechPaperRelease_final/derived/tfRecords
-  - /oak/stanford/groups/shenoy/fwillett/speechPaperRelease_final/derived/tfRecords
-  - /oak/stanford/groups/shenoy/fwillett/speechPaperRelease_final/derived/tfRecords
-  - /oak/stanford/groups/shenoy/fwillett/speechPaperRelease_final/derived/tfRecords
-  - /oak/stanford/groups/shenoy/fwillett/speechPaperRelease_final/derived/tfRecords
-  - /oak/stanford/groups/shenoy/fwillett/speechPaperRelease_final/derived/tfRecords
-  - /oak/stanford/groups/shenoy/fwillett/speechPaperRelease_final/derived/tfRecords
-  - /oak/stanford/groups/shenoy/fwillett/speechPaperRelease_final/derived/tfRecords
-  - /oak/stanford/groups/shenoy/fwillett/speechPaperRelease_final/derived/tfRecords
-  - /oak/stanford/groups/shenoy/fwillett/speechPaperRelease_final/derived/tfRecords
-  - /oak/stanford/groups/shenoy/fwillett/speechPaperRelease_final/derived/tfRecords
-  - /oak/stanford/groups/shenoy/fwillett/speechPaperRelease_final/derived/tfRecords
-  - /oak/stanford/groups/shenoy/fwillett/speechPaperRelease_final/derived/tfRecords
-  - /oak/stanford/groups/shenoy/fwillett/speechPaperRelease_final/derived/tfRecords
+  - /oak/stanford/groups/henderj/fwillett/speechPaperRelease_08_20/derived/tfRecords
+  - /oak/stanford/groups/henderj/fwillett/speechPaperRelease_08_20/derived/tfRecords
+  - /oak/stanford/groups/henderj/fwillett/speechPaperRelease_08_20/derived/tfRecords
+  - /oak/stanford/groups/henderj/fwillett/speechPaperRelease_08_20/derived/tfRecords
+  - /oak/stanford/groups/henderj/fwillett/speechPaperRelease_08_20/derived/tfRecords
+  - /oak/stanford/groups/henderj/fwillett/speechPaperRelease_08_20/derived/tfRecords
+  - /oak/stanford/groups/henderj/fwillett/speechPaperRelease_08_20/derived/tfRecords
+  - /oak/stanford/groups/henderj/fwillett/speechPaperRelease_08_20/derived/tfRecords
+  - /oak/stanford/groups/henderj/fwillett/speechPaperRelease_08_20/derived/tfRecords
+  - /oak/stanford/groups/henderj/fwillett/speechPaperRelease_08_20/derived/tfRecords
+  - /oak/stanford/groups/henderj/fwillett/speechPaperRelease_08_20/derived/tfRecords
+  - /oak/stanford/groups/henderj/fwillett/speechPaperRelease_08_20/derived/tfRecords
+  - /oak/stanford/groups/henderj/fwillett/speechPaperRelease_08_20/derived/tfRecords
+  - /oak/stanford/groups/henderj/fwillett/speechPaperRelease_08_20/derived/tfRecords
+  - /oak/stanford/groups/henderj/fwillett/speechPaperRelease_08_20/derived/tfRecords
+  - /oak/stanford/groups/henderj/fwillett/speechPaperRelease_08_20/derived/tfRecords
+  - /oak/stanford/groups/henderj/fwillett/speechPaperRelease_08_20/derived/tfRecords
+  - /oak/stanford/groups/henderj/fwillett/speechPaperRelease_08_20/derived/tfRecords
+  - /oak/stanford/groups/henderj/fwillett/speechPaperRelease_08_20/derived/tfRecords
 syntheticDataDir:
 syntheticMixingRate: 0.0
 whiteNoiseSD: 1.0

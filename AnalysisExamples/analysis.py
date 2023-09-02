@@ -3,6 +3,7 @@ import scipy.stats
 from scipy.ndimage import gaussian_filter1d
 from numba import njit
 import matplotlib.pyplot as plt
+from matplotlib import cm
 import numpy as np
 from omegaconf import OmegaConf
 from neuralDecoder.neuralSequenceDecoder import NeuralSequenceDecoder
