@@ -21,7 +21,7 @@ When trained on the "train" partition and evaluated on the "test" partition, our
 
 ## Installation
 
-NeuralDecoder should be installed as a python package (pip install -e .). LanguageModelDecoder needs to be compiled first and then installed as a python package (see LanguageModelDecoder/README.md). 
+NeuralDecoder should be installed as a python package (pip install -e .) using Python 3.9. LanguageModelDecoder needs to be compiled first and then installed as a python package (see LanguageModelDecoder/README.md). 
 
 
 
