@@ -2,7 +2,7 @@ import os
 import copy
 import random
 from datetime import datetime
-
+from pathlib import Path
 import numpy as np
 import scipy.io
 import scipy.special
@@ -312,12 +312,12 @@ class NeuralSequenceDecoder(object):
 
 
         #clear old checkpoints
-        #ckptFiles = [str(x) for x in pathlib.Path(self.args['outputDir']).glob("ckpt-*")]
-        #for file in ckptFiles:
-        #    os.remove(file)
+        ckptFiles = [str(x) for x in Path(self.args['outputDir']).glob("ckpt-*")]
+        for file in ckptFiles:
+           os.remove(file)
 
-        #if os.path.isfile(self.args['outputDir'] + '/checkpoint'):
-        #    os.remove(self.args['outputDir'] + '/checkpoint')
+        if os.path.isfile(self.args['outputDir'] + '/checkpoint'):
+           os.remove(self.args['outputDir'] + '/checkpoint')
 
         #saving/loading
         ckptVars = {}

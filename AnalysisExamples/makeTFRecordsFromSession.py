@@ -6,8 +6,8 @@ from pathlib import Path
 import matplotlib.pyplot as plt
 from g2p_en import G2p
 import re
-from neuralDecoder.datasets.speechDataset import PHONE_DEF, VOWEL_DEF, CONSONANT_DEF, SIL_DEF, PHONE_DEF_SIL
-        
+from ..NeuralDecoder.neuralDecoder.datasets.speechDataset import PHONE_DEF, VOWEL_DEF, CONSONANT_DEF, SIL_DEF, PHONE_DEF_SIL
+
 def makeTFRecordsFromCompetitionFiles(sessionName, dataPath, tfRecordFolder):
     
     partNames = ['train','test','competitionHoldOut']
