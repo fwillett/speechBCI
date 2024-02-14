@@ -9,6 +9,10 @@ The jupyter notebooks in AnalysisExamples show how to [prepare the data for deco
 
 Example neural tuning analyses (e.g., classification, PSTHs) are also included in the AnalysisExamples folder ([classificationWindowSlide.ipynb](AnalysisExamples/classificationWindowSlide.ipynb), [examplePSTH.ipynb](AnalysisExamples/examplePSTH.ipynb),[naiveBayesClassification.ipynb](AnalysisExamples/naiveBayesClassification.ipynb), [tuningHeatmaps.ipynb](AnalysisExamples/tuningHeatmaps.ipynb), [exampleSaliencyMaps.ipynb](AnalysisExamples/exampleSaliencyMaps.ipynb)).
 
+## PyTorch Implementation
+
+We have posted a new PyTorch implementation of this original TensorFlow RNN decoder [here](https://github.com/cffan/neural_seq_decoder).
+
 ## Train/Test/CompetitionHoldOut Partitions
 
 We have partitioned the data into a "train", "test" and "competitionHoldOut" partition (the partitioned data can be downloaded [here](https://doi.org/10.5061/dryad.x69p8czpq) as competitionData.tar.gz and has been formatted for machine learning). "test" contains the last block of each day (40 sentences), "competitionHoldOut" contains the first two (80 sentences), and "train" contains the rest. 
