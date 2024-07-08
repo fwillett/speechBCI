@@ -5,7 +5,7 @@ setup(
     version='0.0.1',
     packages=find_packages(include=['neuralDecoder']),
     install_requires=[
-        'tensorflow-gpu==2.7.0',
+        'tensorflow-gpu==2.8.0',
         'hydra-core==1.3.2',
         'hydra-submitit-launcher==1.1.5',
         'hydra-optuna-sweeper==1.2.0',
