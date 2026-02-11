@@ -29,7 +29,6 @@ BrainSpeechDecoder::BrainSpeechDecoder(
 }
 
 void BrainSpeechDecoder::SetOpt(const std::shared_ptr<DecodeOptions> opts) {
-  opts_ = opts;
   acoustic_scale_ = opts->ctc_wfst_search_opts.acoustic_scale;
   (static_cast<CtcWfstBeamSearch*>(searcher_.get()))->SetOpt(opts->ctc_wfst_search_opts);
 }
