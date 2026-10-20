@@ -103,6 +103,8 @@ class GRU(Model):
             return x
 
     def getIntermediateLayerOutput(self, x, layerIdx=0):
+        if layerIdx < 0:
+            layerIdx += len(self.rnnLayers)
         batchSize = tf.shape(x)[0]
         if self.stack_kwargs is not None:
             x = tf.image.extract_patches(x[:, None, :, :],
@@ -133,6 +135,6 @@ class GRU(Model):
         timeSteps = tf.cast(timeSteps, dtype=tf.int32)
         if self.stack_kwargs is not None:
             timeSteps = tf.cast((timeSteps - self.stack_kwargs['kernel_size']) // self.stack_kwargs['strides'] + 1, dtype=tf.int32)
-        if self.subsampleFactor > 1:
+        if len(self.rnnLayers) >= 2 and self.subsampleFactor > 1:
             timeSteps = tf.cast((timeSteps + self.subsampleFactor - 1) // self.subsampleFactor, dtype=tf.int32)
         return timeSteps
