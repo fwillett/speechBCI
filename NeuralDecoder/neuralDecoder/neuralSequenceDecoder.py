@@ -14,7 +14,7 @@ from omegaconf.listconfig import ListConfig
 import neuralDecoder.lrSchedule as lrSchedule
 import neuralDecoder.models as models
 from neuralDecoder.datasets import getDataset
-from scipy.ndimage.filters import gaussian_filter1d
+from scipy.ndimage import gaussian_filter1d
 
 @tf.function(experimental_relax_shapes=True)
 def gaussSmooth(inputs, kernelSD=2, padding='SAME'):

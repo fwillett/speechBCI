@@ -102,13 +102,37 @@ class GRU(Model):
         else:
             return x
 
-    # TODO: Fix me
-    def getIntermediateLayerOutput(self, x):
-        x, _ = self.rnn1(x)
+    def getIntermediateLayerOutput(self, x, layerIdx=0):
+        batchSize = tf.shape(x)[0]
+        if self.stack_kwargs is not None:
+            x = tf.image.extract_patches(x[:, None, :, :],
+                                         sizes=[1, 1, self.stack_kwargs['kernel_size'], 1],
+                                         strides=[1, 1, self.stack_kwargs['strides'], 1],
+                                         rates=[1, 1, 1, 1],
+                                         padding='VALID')
+            x = tf.squeeze(x, axis=1)
+        if self.conv1 is not None:
+            x = self.conv1(x)
+        for i, rnn in enumerate(self.rnnLayers):
+            if i == 0:
+                if self.bidirectional:
+                    init_state = [tf.tile(s, [batchSize, 1]) for s in self.initStates]
+                else:
+                    init_state = tf.tile(self.initStates, [batchSize, 1])
+            else:
+                init_state = None
+            out = rnn(x, training=False, initial_state=init_state)
+            x = out[0]
+            if i == len(self.rnnLayers) - 2 and self.subsampleFactor > 1:
+                x = x[:, ::self.subsampleFactor, :]
+            if i == layerIdx:
+                return x
         return x
 
     def getSubsampledTimeSteps(self, timeSteps):
-        timeSteps = tf.cast(timeSteps / self.subsampleFactor, dtype=tf.int32)
+        timeSteps = tf.cast(timeSteps, dtype=tf.int32)
         if self.stack_kwargs is not None:
-            timeSteps = tf.cast((timeSteps - self.stack_kwargs['kernel_size']) / self.stack_kwargs['strides'] + 1, dtype=tf.int32)
+            timeSteps = tf.cast((timeSteps - self.stack_kwargs['kernel_size']) // self.stack_kwargs['strides'] + 1, dtype=tf.int32)
+        if self.subsampleFactor > 1:
+            timeSteps = tf.cast((timeSteps + self.subsampleFactor - 1) // self.subsampleFactor, dtype=tf.int32)
         return timeSteps
